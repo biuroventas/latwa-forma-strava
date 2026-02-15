@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Łączenie z Garmin...</title>
+  <script>
+    (function() {
+      var params = window.location.search || '';
+      window.location.href = 'latwaforma://garmin-callback' + params;
+    })();
+  </script>
+</head>
+<body>
+  <p style="font-family: sans-serif; text-align: center; margin-top: 2em;">
+    Przekierowywanie do Łatwa Forma...<br>
+    <small>Jeśli aplikacja się nie otworzy, wróć do niej ręcznie.</small>
+  </p>
+</body>
+</html>
