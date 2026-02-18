@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Otwieram Łatwa Forma...</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      text-align: center;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 24px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { font-size: 16px; margin: 0; opacity: 0.95; }
+    .fallback { margin-top: 24px; font-size: 14px; opacity: 0.8; }
+    a { color: white; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <p id="mainMsg">Otwieram aplikację Łatwa Forma...</p>
+  <p class="fallback">Jeśli aplikacja się nie otworzy, <a href="#" id="manualLink">kliknij tutaj</a>.</p>
+  <div id="wrongDeviceMsg" style="display:none; margin-top: 32px; max-width: 340px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px;">
+    <p style="font-weight: 600; margin-bottom: 12px;">Otwierasz link na innym urządzeniu?</p>
+    <p style="font-size: 14px; line-height: 1.5; margin: 0;">
+      Ten link działa tylko na telefonie lub tablecie z zainstalowaną aplikacją Łatwa Forma.
+      Otwórz maila na urządzeniu z aplikacją i kliknij link ponownie.
+      Lub w aplikacji wybierz „Mam już konto” i wyślij nowy link.
+    </p>
+  </div>
+
+  <script>
+    (function() {
+      var hash = window.location.hash || '';
+      var search = window.location.search || '';
+      var appUrl = 'latwaforma://auth/callback' + search + hash;
+
+      document.getElementById('manualLink').href = appUrl;
+      document.getElementById('manualLink').onclick = function() {
+        window.location.href = appUrl;
+        return false;
+      };
+      window.location.href = appUrl;
+
+      setTimeout(function() {
+        document.querySelector('.fallback').innerHTML = 'Jeśli aplikacja się nie otworzyła, <a href="' + appUrl + '">kliknij tutaj</a>.';
+      }, 1500);
+
+      setTimeout(function() {
+        document.getElementById('wrongDeviceMsg').style.display = 'block';
+      }, 3500);
+    })();
+  </script>
+</body>
+</html>
