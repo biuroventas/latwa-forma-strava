@@ -12,6 +12,7 @@ import 'shared/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // deploy z Gita – push uruchomi build na Netlify
 
   // Na webie krótki timeout, żeby ekran nie wisiał w szarości – runApp() jak najszybciej.
   final initTimeout = kIsWeb ? const Duration(seconds: 4) : const Duration(seconds: 10);
