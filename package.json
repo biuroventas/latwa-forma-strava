@@ -1,0 +1,8 @@
+{
+  "name": "latwa-forma",
+  "private": true,
+  "description": "Łatwa Forma – deploy web (Netlify)",
+  "devDependencies": {
+    "netlify-plugin-flutter": "^0.3.0"
+  }
+}

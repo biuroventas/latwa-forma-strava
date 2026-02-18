@@ -1,0 +1,10 @@
+# SPA (Flutter web) – nieznane ścieżki przekieruj na index.html
+# Potrzebne na hostingu Apache (np. home.pl, OVH), żeby odświeżanie i linki do /profile, /dashboard itd. działały.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>

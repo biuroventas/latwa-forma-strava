@@ -1,0 +1,71 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '13.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+      # Fix architecture for Apple Silicon simulators
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386 x86_64'
+      # Allow linking arm64 frameworks for simulator (fixes MLKit)
+      config.build_settings['VALID_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      # Fix deployment target to minimum iOS 12.0
+      deployment_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      if deployment_target && deployment_target.to_f < 12.0
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      end
+      # Remove MLKit frameworks from linking on simulator to avoid architecture issues
+      if config.build_settings['SDKROOT'] == 'iphonesimulator' && config.name == 'Debug'
+        if target.name.include?('MLImage') || target.name.include?('MLKit') || target.name.include?('mobile_scanner')
+          # Remove framework from linking
+          other_ldflags = config.build_settings['OTHER_LDFLAGS'] || []
+          other_ldflags = other_ldflags.reject { |flag| flag.to_s.include?('MLImage') || flag.to_s.include?('MLKit') }
+          config.build_settings['OTHER_LDFLAGS'] = other_ldflags
+        end
+      end
+    end
+  end
+  # Fix deployment target for all pods project configurations
+  installer.pods_project.build_configurations.each do |config|
+    deployment_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+    if deployment_target && deployment_target.to_f < 12.0
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+    end
+  end
+end
