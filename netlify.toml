@@ -1,4 +1,8 @@
 # Build Flutter web i publikacja na Netlify (deploy z Gita).
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
+
 [[plugins]]
   package = "netlify-plugin-flutter"
 

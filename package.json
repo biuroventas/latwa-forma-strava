@@ -3,6 +3,6 @@
   "private": true,
   "description": "Łatwa Forma – deploy web (Netlify)",
   "devDependencies": {
-    "netlify-plugin-flutter": "^0.3.0"
+    "netlify-plugin-flutter": "1.2.0"
   }
 }
