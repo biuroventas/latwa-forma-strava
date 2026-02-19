@@ -114,10 +114,14 @@ class WelcomeScreen extends StatelessWidget {
                         ? () async {
                             Navigator.of(ctx).pop();
                             final email = await _showEmailDialog(ctx);
-                            if (email != null && context.mounted) {
-                              await savePendingVerificationEmail(email);
-                              await _runSignInWithEmail(context, email);
+                            if (!context.mounted) return;
+                            if (email == null) return;
+                            if (email.isEmpty) {
+                              await _onEnterCode(context);
+                              return;
                             }
+                            await savePendingVerificationEmail(email);
+                            await _runSignInWithEmail(context, email);
                           }
                         : null,
                     icon: const Icon(Icons.email, size: 20),
@@ -142,6 +146,7 @@ class WelcomeScreen extends StatelessWidget {
     }
   }
 
+  /// Zwraca: email (wyślij link i kod), '' (mam już kod), null (anuluj).
   Future<String?> _showEmailDialog(BuildContext context) async {
     final controller = TextEditingController();
     String? errorText;
@@ -170,6 +175,16 @@ class WelcomeScreen extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
               child: const Text('Anuluj'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(''),
+              child: Text(
+                'Mam już kod',
+                style: TextStyle(
+                  color: Theme.of(ctx).colorScheme.primary,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
             FilledButton(
               onPressed: () {
@@ -737,7 +752,7 @@ class WelcomeScreen extends StatelessWidget {
     return EasyFormaOnboardingScreen(
       onLogin: () => _onLogin(context),
       onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
-      onEnterCode: () => _onEnterCode(context),
+      onEnterCode: null,
     );
   }
 }
