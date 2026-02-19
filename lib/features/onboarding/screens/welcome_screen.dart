@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/supabase_config.dart';
@@ -587,43 +591,145 @@ class WelcomeScreen extends StatelessWidget {
     }
   }
 
+  /// Na webie klient Flutter czasem nie działa – wywołanie REST API Supabase (Auth) bezpośrednio.
+  Future<bool> _signInAnonymouslyViaRest() async {
+    final url = dotenv.env['SUPABASE_URL']?.trim();
+    final key = dotenv.env['SUPABASE_ANON_KEY']?.trim();
+    if (url == null || url.isEmpty || key == null || key.isEmpty) return false;
+    try {
+      final uri = Uri.parse('$url/auth/v1/signup');
+      // Jak w gotrue: POST /signup z data+gotrue_meta_security (bez email/phone/hasła = anonim)
+      final res = await http
+          .post(
+            uri,
+            headers: {'apikey': key, 'Content-Type': 'application/json'},
+            body: '{"data":{},"gotrue_meta_security":{}}',
+          )
+          .timeout(const Duration(seconds: 15));
+      if (res.statusCode != 200) {
+        debugPrint('REST signup anon: ${res.statusCode} ${res.body}');
+        return false;
+      }
+      final json = jsonDecode(res.body) as Map<String, dynamic>;
+      final refreshToken = json['refresh_token'] as String?;
+      if (refreshToken == null) return false;
+      await SupabaseConfig.auth.setSession(refreshToken);
+      return true;
+    } catch (e) {
+      debugPrint('_signInAnonymouslyViaRest: $e');
+      return false;
+    }
+  }
+
   Future<void> _onZaczynamy(BuildContext context) async {
     if (!SupabaseConfig.isInitialized) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Brak połączenia z serwerem. Sprawdź zmienne SUPABASE_URL i SUPABASE_ANON_KEY w Netlify (Environment variables).',
-            ),
-            duration: Duration(seconds: 5),
-          ),
-        );
-      }
+      if (context.mounted) _showAnonymousErrorDialog(context, isInitialized: false);
       return;
     }
-    try {
-      final response = await SupabaseConfig.auth.signInAnonymously();
-      if (response.user == null) {
-        throw Exception('Nie udało się utworzyć konta');
-      }
-      await _markWelcomeAsSeen();
-      if (!context.mounted) return;
-      context.go(AppRoutes.onboarding);
-    } catch (e) {
-      debugPrint('Błąd signInAnonymously: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              e.toString().contains('Anonymous') || e.toString().contains('disabled')
-                  ? 'Logowanie bez konta jest wyłączone. Zaloguj się przez Google lub email.'
-                  : 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.',
-            ),
-            duration: const Duration(seconds: 4),
-          ),
-        );
+    const timeout = Duration(seconds: 18);
+    const pause = Duration(seconds: 2);
+    int attempts = 0;
+    const maxAttempts = 3;
+    while (attempts < maxAttempts) {
+      try {
+        attempts++;
+        final response = await SupabaseConfig.auth.signInAnonymously()
+            .timeout(timeout, onTimeout: () => throw TimeoutException('signInAnonymously'));
+        if (response.user == null) throw Exception('Brak użytkownika');
+        await _markWelcomeAsSeen();
+        if (!context.mounted) return;
+        context.go(AppRoutes.onboarding);
+        return;
+      } on TimeoutException {
+        debugPrint('signInAnonymously timeout (próba $attempts/$maxAttempts)');
+        if (attempts >= maxAttempts && context.mounted) {
+          if (kIsWeb) {
+            final ok = await _signInAnonymouslyViaRest();
+            if (ok && context.mounted) {
+              await _markWelcomeAsSeen();
+              if (context.mounted) context.go(AppRoutes.onboarding);
+              return;
+            }
+          }
+          _showAnonymousErrorDialog(context, timeout: true);
+          return;
+        }
+        await Future<void>.delayed(pause);
+      } catch (e, st) {
+        debugPrint('Błąd signInAnonymously (próba $attempts): $e');
+        debugPrint('$st');
+        if (attempts >= maxAttempts || !context.mounted) {
+          if (context.mounted && kIsWeb) {
+            final ok = await _signInAnonymouslyViaRest();
+            if (ok && context.mounted) {
+              await _markWelcomeAsSeen();
+              if (context.mounted) {
+                context.go(AppRoutes.onboarding);
+                return;
+              }
+            }
+          }
+          if (context.mounted) _showAnonymousErrorDialog(context, error: e);
+          return;
+        }
+        await Future<void>.delayed(pause);
       }
     }
+  }
+
+  void _showAnonymousErrorDialog(BuildContext context, {bool isInitialized = true, bool timeout = false, Object? error}) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Nie udało się rozpocząć bez konta'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (!isInitialized)
+                const Text(
+                  'Aplikacja nie ma połączenia z serwerem (brak konfiguracji w buildzie).',
+                )
+              else if (timeout)
+                const Text(
+                  'Serwer nie odpowiedział w czasie. Sprawdź internet lub spróbuj później.',
+                )
+              else
+                const Text(
+                  'Połączenie z serwerem nie powiodło się. Możesz:',
+                ),
+              const SizedBox(height: 12),
+              const Text('• Upewnij się, że jesteś na adresie app.latwaforma.pl (nie sam latwaforma.pl – tam jest tylko strona informacyjna).'),
+              const SizedBox(height: 8),
+              const Text('• Odśwież stronę (F5) i spróbuj ponownie.'),
+              const SizedBox(height: 8),
+              const Text('• Albo zaloguj się przez Google lub email – przyciski powyżej.'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Zamknij'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              launchUrl(Uri.parse(AppConstants.webAuthRedirectUrl), mode: LaunchMode.externalApplication);
+            },
+            child: const Text('Otwórz app.latwaforma.pl'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _onLogin(context);
+            },
+            child: const Text('Zaloguj przez Google'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
