@@ -468,8 +468,8 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           : _selectedPlan == _PremiumPlan.yearly
               ? 'yearly'
               : 'monthly';
-      final token = session.accessToken;
-      final response = await SupabaseConfig.client.functions.invoke(
+      var token = session.accessToken;
+      var response = await SupabaseConfig.client.functions.invoke(
         'create-checkout-session',
         body: {'plan': plan},
         headers: {'Authorization': 'Bearer $token'},
@@ -477,6 +477,22 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
 
       if (!mounted) return;
 
+      if (response.status == 401) {
+        try {
+          await SupabaseConfig.auth.refreshSession();
+          final retrySession = SupabaseConfig.auth.currentSession;
+          if (retrySession != null) {
+            token = retrySession.accessToken;
+            response = await SupabaseConfig.client.functions.invoke(
+              'create-checkout-session',
+              body: {'plan': plan},
+              headers: {'Authorization': 'Bearer $token'},
+            );
+          }
+        } catch (_) {}
+      }
+
+      if (!mounted) return;
       if (response.status == 401) {
         setState(() => _isLoadingStripe = false);
         final data = response.data as Map<String, dynamic>?;
@@ -523,11 +539,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
   }
 
   /// Otwiera Stripe Customer Portal – zarządzanie subskrypcją, rezygnacja (miesięczna lub roczna).
+  /// Przy 401 próbuje raz odświeżyć sesję i ponowić żądanie, żeby uniknąć komunikatu „wyloguj się”.
   Future<void> _openPortalSession() async {
     setState(() => _isLoadingPortal = true);
     try {
       await SupabaseConfig.auth.refreshSession();
-      final session = SupabaseConfig.auth.currentSession;
+      var session = SupabaseConfig.auth.currentSession;
       if (session == null) {
         if (!mounted) return;
         setState(() => _isLoadingPortal = false);
@@ -535,13 +552,26 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         return;
       }
 
-      final token = session.accessToken;
-      final response = await SupabaseConfig.client.functions.invoke(
+      var token = session.accessToken;
+      var response = await SupabaseConfig.client.functions.invoke(
         'create-portal-session',
         headers: {'Authorization': 'Bearer $token'},
       );
       if (!mounted) return;
 
+      if (response.status == 401) {
+        await SupabaseConfig.auth.refreshSession();
+        session = SupabaseConfig.auth.currentSession;
+        if (session != null) {
+          token = session.accessToken;
+          response = await SupabaseConfig.client.functions.invoke(
+            'create-portal-session',
+            headers: {'Authorization': 'Bearer $token'},
+          );
+        }
+      }
+
+      if (!mounted) return;
       if (response.status == 401) {
         setState(() => _isLoadingPortal = false);
         await _showMessageDialog(
