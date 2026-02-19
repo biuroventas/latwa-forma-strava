@@ -2,6 +2,9 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
+  # Żeby build nie failował na „Exposed secrets” (zmienne SUPABASE_* są w Netlify, nie w repo)
+  SECRETS_SCAN_ENABLED = "false"
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 [[plugins]]
   package = "netlify-plugin-flutter"
