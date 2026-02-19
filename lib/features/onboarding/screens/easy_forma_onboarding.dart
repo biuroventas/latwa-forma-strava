@@ -3,6 +3,20 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
 
+// --- FAQ: pytania i odpowiedzi (stopka) ---
+const List<({String q, String a})> _footerFaqEntries = [
+  (q: 'Czy aplikacja jest darmowa?', a: 'Tak. Łatwa Forma jest darmowa do codziennego użytku: śledzenie kalorii, posiłków, wagi, wody i aktywności. Część funkcji (np. analiza AI ze zdjęcia, rozbudowane statystyki) jest dostępna w planie Premium.'),
+  (q: 'Jak działa licznik kalorii ze zdjęcia?', a: 'W ekranie dodawania posiłku wybierz „Analiza AI”. Zrób zdjęcie dania lub wybierz je z galerii. Aplikacja wysyła zdjęcie do modelu AI (wizja), który rozpoznaje potrawę i szacuje kalorie oraz makroskładniki (białko, tłuszcze, węglowodany). Możesz je potem poprawić i zapisać. Funkcja wymaga Premium.'),
+  (q: 'Jak aplikacja liczy mój dzienny limit kalorii?', a: 'Na podstawie profilu (wiek, płeć, waga, wzrost, poziom aktywności) obliczamy BMR (wzór Harrisa-Benedicta), a potem TDEE. W zależności od celu (schudnięcie, utrzymanie, przytycie) dostosowujemy limit kalorii i makra.'),
+  (q: 'Co to jest „Zacznij bez konta”?', a: 'Możesz korzystać z aplikacji bez logowania. Dane są zapisywane lokalnie. Później możesz połączyć je z kontem (Google lub e-mail), aby mieć backup i synchronizację między urządzeniami.'),
+  (q: 'Czy mogę połączyć Strava lub Garmin?', a: 'Tak. W ustawieniach (Profil) możesz połączyć konto ze Strava lub Garmin Connect. Importowane aktywności są uwzględniane w bilansie kalorii (spalone kcal).'),
+  (q: 'Co daje Premium?', a: 'M.in. analiza posiłku ze zdjęcia (AI), rozbudowane statystyki, eksport danych, wyższy limit porad AI. Subskrypcja jest obsługiwana przez Stripe; płatność i dane karty są po stronie Stripe.'),
+  (q: 'Jak zmienić cel (schudnięcie / utrzymanie / przytycie)?', a: 'W Profilu ustaw wagę docelową. Aplikacja na tej podstawie proponuje cel i dzienny limit; makra można też dostosować ręcznie w ustawieniach profilu.'),
+  (q: 'Jak dodać posiłek?', a: 'Z ekranu głównego lub zakładki „Posiłki” wybierz „Dodaj posiłek”. Możesz wpisać dane ręcznie, zeskanować kod kreskowy (Open Food Facts) lub użyć Analizy AI ze zdjęcia (Premium).'),
+  (q: 'Gdzie są zapisane moje dane?', a: 'Dane są przechowywane na serwerach w Europie (Supabase). Przy „Zacznij bez konta” dane są lokalne do momentu połączenia z kontem.'),
+  (q: 'Jak usunąć konto i dane?', a: 'W aplikacji: Profil → Usuń konto. Po zatwierdzeniu konto i powiązane dane są usuwane. W razie problemów napisz na contact@latwaforma.pl.'),
+];
+
 // --- Theme / design tokens ---
 abstract final class OnboardingTokens {
   // Kolory
@@ -69,48 +83,39 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: Column(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: OnboardingTokens.horizontalPadding,
-                            vertical: OnboardingTokens.topPadding,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildLogo(context),
-                              const SizedBox(height: OnboardingTokens.spaceXl),
-                              _buildTitle(context),
-                              const SizedBox(height: OnboardingTokens.spaceXl),
-                              _buildBenefitsList(context),
-                              const SizedBox(height: 28),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Center(
-                            child: _buildIllustrationPanel(context),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: OnboardingTokens.horizontalPadding,
+                  vertical: OnboardingTokens.topPadding,
                 ),
-                _buildBottomButtons(context),
-                _buildFooter(context),
-              ],
-            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildLogo(context),
+                    const SizedBox(height: OnboardingTokens.spaceXl),
+                    _buildTitle(context),
+                    const SizedBox(height: OnboardingTokens.spaceXl),
+                    _buildBenefitsList(context),
+                    const SizedBox(height: 28),
+                    Center(child: _buildIllustrationPanel(context)),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+              _buildBottomButtons(context),
+              const SizedBox(height: 40),
+              _buildForWhomSection(context),
+              const SizedBox(height: 24),
+              _buildFaqSection(context),
+              _buildFooter(context),
+            ],
+          ),
         ),
+      ),
     );
   }
 
@@ -212,95 +217,102 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
         OnboardingTokens.horizontalPadding,
         OnboardingTokens.bottomPadding,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: OnboardingTokens.buttonHeight,
-            child: ElevatedButton(
-              onPressed: () {
-                // TODO: podpięcie nawigacji / logowania (np. onLogin())
-                onLogin();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: OnboardingTokens.green,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(OnboardingTokens.buttonRadius),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: OnboardingTokens.buttonHeight,
+                child: ElevatedButton(
+                  onPressed: () => onLogin(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: OnboardingTokens.green,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(OnboardingTokens.buttonRadius),
+                    ),
+                  ),
+                  child: const Text('Zaloguj się lub załóż konto'),
                 ),
               ),
-              child: const Text('Zaloguj się lub załóż konto'),
-            ),
+              const SizedBox(height: OnboardingTokens.betweenButtons),
+              SizedBox(
+                height: OnboardingTokens.buttonHeight,
+                child: OutlinedButton(
+                  onPressed: () => onStartWithoutAccount(),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: OnboardingTokens.green,
+                    side: const BorderSide(color: OnboardingTokens.textAlmostBlack, width: 1.2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(OnboardingTokens.buttonRadius),
+                    ),
+                  ),
+                  child: const Text('Zacznij bez konta'),
+                ),
+              ),
+              if (onEnterCode != null) ...[
+                const SizedBox(height: OnboardingTokens.spaceMd),
+                TextButton(
+                  onPressed: onEnterCode,
+                  child: Text(
+                    'Mam już kod z maila – wpisz go',
+                    style: TextStyle(
+                      color: OnboardingTokens.green,
+                      fontSize: 14,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
-          const SizedBox(height: OnboardingTokens.betweenButtons),
-          SizedBox(
-            height: OnboardingTokens.buttonHeight,
-            child: OutlinedButton(
-              onPressed: () {
-                onStartWithoutAccount();
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: OnboardingTokens.green,
-                side: const BorderSide(color: OnboardingTokens.textAlmostBlack, width: 1.2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(OnboardingTokens.buttonRadius),
-                ),
-              ),
-              child: const Text('Zacznij bez konta'),
-            ),
-          ),
-          if (onEnterCode != null) ...[
-            const SizedBox(height: OnboardingTokens.spaceMd),
-            TextButton(
-              onPressed: onEnterCode,
-              child: Text(
-                'Mam już kod z maila – wpisz go',
-                style: TextStyle(
-                  color: OnboardingTokens.green,
-                  fontSize: 14,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildFooter(BuildContext context) {
-    final bool narrow = MediaQuery.sizeOf(context).width < 520;
+    final bool narrow = MediaQuery.sizeOf(context).width < 560;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
         horizontal: OnboardingTokens.horizontalPadding,
-        vertical: OnboardingTokens.spaceLg,
+        vertical: 28,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: OnboardingTokens.greenVeryLight,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (narrow) ...[
-            _footerBrand(context),
-            const SizedBox(height: OnboardingTokens.spaceMd),
-            _footerLinks(context),
-            const SizedBox(height: OnboardingTokens.spaceSm),
-            _footerContact(context),
-          ] else
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+          if (narrow)
+            Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(child: _footerBrand(context)),
-                _footerLinks(context),
-                _footerContact(context),
+                _footerLinkRow(context, wrap: true),
+                const SizedBox(height: 16),
+                _buildFooterSocial(context),
+              ],
+            )
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _footerLinkRow(context, wrap: false),
+                const SizedBox(width: 24),
+                _buildFooterSocial(context),
               ],
             ),
-          const SizedBox(height: OnboardingTokens.spaceMd),
+          const SizedBox(height: 20),
+          Container(
+            height: 1,
+            width: double.infinity,
+            color: OnboardingTokens.greenLight.withOpacity(0.5),
+          ),
+          const SizedBox(height: 16),
           Text(
             '© 2026 Łatwa Forma / VENTAS NORBERT WRÓBLEWSKI. Wszelkie prawa zastrzeżone.',
             style: TextStyle(
@@ -314,42 +326,159 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
     );
   }
 
-  Widget _footerBrand(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  /// Jedna linia linków: Regulamin · Polityka · Kontakt (bez osobnych bloków brand).
+  Widget _footerLinkRow(BuildContext context, {required bool wrap}) {
+    final sep = Text(
+      ' · ',
+      style: TextStyle(fontSize: 13, color: OnboardingTokens.grey),
+    );
+    final links = [
+      _footerLink(context, 'Regulamin', AppConstants.termsUrl),
+      sep,
+      _footerLink(context, 'Polityka prywatności', AppConstants.privacyPolicyUrl),
+      sep,
+      _footerLink(context, 'Kontakt', 'mailto:${AppConstants.contactEmail}'),
+    ];
+    if (wrap) {
+      return Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: links,
+      );
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: links,
+    );
+  }
+
+  /// Sekcja „Dla kogo jest aplikacja” i „Co możesz osiągnąć” – motywacyjna, nad FAQ.
+  Widget _buildForWhomSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: OnboardingTokens.horizontalPadding),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Dla kogo jest Łatwa Forma?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: OnboardingTokens.textAlmostBlack,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Dla każdego, kto chce w końcu ogarnąć odżywianie bez reżimu i głodówek – i zobaczyć realne efekty. '
+                'Nie musisz być na diecie „od poniedziałku”. Wystarczy, że codziennie wiesz, co jesz, ile pijesz i jak się ruszasz. '
+                'Łatwa Forma pomaga trzymać to w jednym miejscu i dopasować plan do Twojego celu.',
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: OnboardingTokens.textAlmostBlack,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Co możesz osiągnąć z jej pomocą?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: OnboardingTokens.textAlmostBlack,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Lepsze nawyki, spokój w głowie i trwała zmiana sylwetki. '
+                'Śledź kalorie i makra bez obsesji, pij wodę regularnie, łącz aktywność ze Stravy i Garmina – i zobacz, jak tygodnie zamieniają się w miesiące postępu. '
+                'Małymi krokami do celu, który naprawdę utrzymasz.',
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: OnboardingTokens.textAlmostBlack,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Sekcja FAQ nad stopką – rozwijane pytania i odpowiedzi.
+  Widget _buildFaqSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: OnboardingTokens.horizontalPadding,
+        vertical: OnboardingTokens.spaceXl,
+      ),
+      decoration: BoxDecoration(
+        color: OnboardingTokens.greenLight.withOpacity(0.25),
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'FAQ – najczęściej zadawane pytania',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: OnboardingTokens.textAlmostBlack,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _FaqExpandableList(entries: _footerFaqEntries, initialCount: 3),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooterSocial(BuildContext context) {
+    return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Łatwa Forma',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: OnboardingTokens.textAlmostBlack,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Plan kalorii, śledzenie wagi i prosty plan do celu.',
+          'Śledź nas: ',
           style: TextStyle(
             fontSize: 13,
             color: OnboardingTokens.grey,
           ),
         ),
+        _socialIcon(context, Icons.facebook_rounded, 'Facebook', null),
+        const SizedBox(width: 4),
+        _socialIcon(context, Icons.camera_alt, 'Instagram', null),
       ],
     );
   }
 
-  Widget _footerLinks(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _footerLink(context, 'Regulamin', AppConstants.termsUrl),
-        const SizedBox(height: 4),
-        _footerLink(context, 'Polityka prywatności', AppConstants.privacyPolicyUrl),
-        const SizedBox(height: 4),
-        _footerLink(context, 'Kontakt', 'mailto:${AppConstants.contactEmail}'),
-      ],
+  Widget _socialIcon(BuildContext context, IconData icon, String tooltip, String? url) {
+    return Tooltip(
+      message: url != null ? tooltip : '$tooltip – wkrótce',
+      child: IconButton(
+        onPressed: url != null
+            ? () => _openUrl(url)
+            : null,
+        icon: Icon(icon, size: 22, color: OnboardingTokens.grey),
+        style: IconButton.styleFrom(
+          padding: const EdgeInsets.all(8),
+          minimumSize: const Size(36, 36),
+        ),
+      ),
     );
   }
 
@@ -370,27 +499,92 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
     );
   }
 
-  Widget _footerContact(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => _openUrl('mailto:${AppConstants.contactEmail}'),
-        child: Text(
-          AppConstants.contactEmail,
-          style: TextStyle(
-            fontSize: 13,
-            color: OnboardingTokens.textAlmostBlack,
-            decoration: TextDecoration.underline,
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _openUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+}
+
+/// Lista FAQ z możliwością rozwijania: najpierw [initialCount] pytań, potem „Zobacz więcej”.
+class _FaqExpandableList extends StatefulWidget {
+  const _FaqExpandableList({
+    required this.entries,
+    this.initialCount = 3,
+  });
+
+  final List<({String q, String a})> entries;
+  final int initialCount;
+
+  @override
+  State<_FaqExpandableList> createState() => _FaqExpandableListState();
+}
+
+class _FaqExpandableListState extends State<_FaqExpandableList> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final count = _expanded ? widget.entries.length : widget.initialCount.clamp(0, widget.entries.length);
+    final visible = widget.entries.take(count).toList();
+    final hasMore = widget.entries.length > widget.initialCount;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final entry in visible)
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              tilePadding: const EdgeInsets.symmetric(vertical: 4),
+              childrenPadding: const EdgeInsets.only(left: 20, bottom: 12, top: 2),
+              controlAffinity: ListTileControlAffinity.leading,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              title: Text(
+                entry.q,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: OnboardingTokens.textAlmostBlack,
+                ),
+              ),
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    entry.a,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: OnboardingTokens.grey,
+                      height: 1.45,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (hasMore)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: TextButton.icon(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              icon: Icon(
+                _expanded ? Icons.expand_less : Icons.expand_more,
+                size: 20,
+                color: OnboardingTokens.green,
+              ),
+              label: Text(
+                _expanded ? 'Pokaż mniej' : 'Zobacz więcej pytań (${widget.entries.length - widget.initialCount})',
+                style: const TextStyle(
+                  color: OnboardingTokens.green,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }

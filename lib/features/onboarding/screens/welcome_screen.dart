@@ -13,6 +13,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/services/auth_link_service.dart';
 import '../../../shared/utils/pending_verification_email.dart';
+import '../widgets/privacy_consent_banner.dart';
 import 'easy_forma_onboarding.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -773,10 +774,20 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EasyFormaOnboardingScreen(
-      onLogin: () => _onLogin(context),
-      onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
-      onEnterCode: null,
+    return Stack(
+      children: [
+        EasyFormaOnboardingScreen(
+          onLogin: () => _onLogin(context),
+          onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
+          onEnterCode: null,
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: const PrivacyConsentBanner(),
+        ),
+      ],
     );
   }
 }

@@ -14,6 +14,15 @@
     .btn:hover { background: #1b5e20; color: white; }
     .links { margin-top: 2em; font-size: 0.95em; }
     .footer { margin-top: 2.5em; color: #666; font-size: 0.9em; }
+    #privacy-consent-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; box-shadow: 0 -2px 12px rgba(0,0,0,0.1); padding: 16px 20px; text-align: center; z-index: 9999; }
+    #privacy-consent-bar.hidden { display: none; }
+    #privacy-consent-bar p { margin: 0 0 12px 0; font-size: 13px; line-height: 1.4; }
+    #privacy-consent-bar .buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    #privacy-consent-bar a, #privacy-consent-bar button { font-size: 14px; }
+    #privacy-consent-bar button { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: inherit; }
+    #privacy-consent-bar .btn-accept { background: #2e7d32; color: white; border: none; }
+    #privacy-consent-bar .btn-reject { background: transparent; color: #333; border: 1px solid #999; }
+    body.has-consent-bar { padding-bottom: 120px; }
   </style>
 </head>
 <body>
@@ -22,12 +31,38 @@
   <a href="https://latwaforma.pl/" class="btn">Otwórz aplikację</a>
   <p style="margin-top: 0.6em; font-size: 0.9em; color: #666;">Aplikacja działa pod adresem <strong>latwaforma.pl</strong> – po kliknięciu otworzy się w tej samej karcie.</p>
   <p class="links">
-    <a href="/polityka-prywatnosci.html">Polityka prywatności</a> &middot;
-    <a href="/regulamin.html">Regulamin</a>
+    <a href="https://latwaforma.pl/polityka-prywatnosci.html">Polityka prywatności</a> &middot;
+    <a href="https://latwaforma.pl/regulamin.html">Regulamin</a>
   </p>
   <p class="footer">
     VENTAS NORBERT WRÓBLEWSKI<br>
     Kontakt: <a href="mailto:contact@latwaforma.pl">contact@latwaforma.pl</a>
   </p>
+
+  <div id="privacy-consent-bar" class="hidden" role="dialog" aria-label="Zgoda na przetwarzanie danych">
+    <p>Ta strona przetwarza dane osobowe zgodnie z naszą <a href="https://latwaforma.pl/polityka-prywatnosci.html" target="_blank" rel="noopener">Polityką prywatności</a>. Korzystając z serwisu, możesz zaakceptować jej warunki lub je odrzucić.</p>
+    <div class="buttons">
+      <a href="https://latwaforma.pl/polityka-prywatnosci.html" target="_blank" rel="noopener">Polityka prywatności</a>
+      <button type="button" class="btn-reject" id="privacy-reject">Odrzuć</button>
+      <button type="button" class="btn-accept" id="privacy-accept">Akceptuję</button>
+    </div>
+  </div>
+  <script>
+    (function() {
+      var KEY = 'latwaforma_landing_privacy_consent';
+      var bar = document.getElementById('privacy-consent-bar');
+      var acceptBtn = document.getElementById('privacy-accept');
+      var rejectBtn = document.getElementById('privacy-reject');
+      function showBar() { bar.classList.remove('hidden'); document.body.classList.add('has-consent-bar'); }
+      function hideBar() { bar.classList.add('hidden'); document.body.classList.remove('has-consent-bar'); }
+      if (localStorage.getItem(KEY) === 'true') {
+        hideBar();
+      } else {
+        showBar();
+      }
+      acceptBtn.addEventListener('click', function() { localStorage.setItem(KEY, 'true'); hideBar(); });
+      rejectBtn.addEventListener('click', function() { hideBar(); });
+    })();
+  </script>
 </body>
 </html>
