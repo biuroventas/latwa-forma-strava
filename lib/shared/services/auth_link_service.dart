@@ -8,7 +8,7 @@ import '../../core/constants/app_constants.dart';
 /// Adres przekierowania po OAuth (Safari / mobile) – schemat latwaforma.
 const String _oauthRedirectUrl = 'latwaforma://auth/callback';
 
-/// Na webie przekierowanie musi być na URL strony (app.latwaforma.pl).
+/// Na webie przekierowanie musi być na URL strony (latwaforma.pl).
 String get _redirectUrl =>
     kIsWeb ? AppConstants.webAuthRedirectUrl : _oauthRedirectUrl;
 

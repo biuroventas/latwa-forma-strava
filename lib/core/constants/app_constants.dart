@@ -88,5 +88,5 @@ class AppConstants {
   static const String termsUrl = 'https://latwaforma.pl/regulamin.html';
 
   /// Adres powrotu po logowaniu Google/email na webie (musi być w Supabase Auth → Redirect URLs).
-  static const String webAuthRedirectUrl = 'https://app.latwaforma.pl';
+  static const String webAuthRedirectUrl = 'https://latwaforma.pl';
 }

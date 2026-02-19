@@ -700,7 +700,7 @@ class WelcomeScreen extends StatelessWidget {
                   'Połączenie z serwerem nie powiodło się. Możesz:',
                 ),
               const SizedBox(height: 12),
-              const Text('• Upewnij się, że jesteś na adresie app.latwaforma.pl (nie sam latwaforma.pl – tam jest tylko strona informacyjna).'),
+              const Text('• Upewnij się, że jesteś na adresie latwaforma.pl.'),
               const SizedBox(height: 8),
               const Text('• Odśwież stronę (F5) i spróbuj ponownie.'),
               const SizedBox(height: 8),
@@ -718,7 +718,7 @@ class WelcomeScreen extends StatelessWidget {
               Navigator.of(ctx).pop();
               launchUrl(Uri.parse(AppConstants.webAuthRedirectUrl), mode: LaunchMode.externalApplication);
             },
-            child: const Text('Otwórz app.latwaforma.pl'),
+            child: const Text('Otwórz latwaforma.pl'),
           ),
           FilledButton(
             onPressed: () {

@@ -29,9 +29,9 @@ Deno.serve(async (req) => {
     const priceYearly = Deno.env.get("STRIPE_PREMIUM_PRICE_YEARLY");
     const priceYearlyOneTime = Deno.env.get("STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME"); // płatność jednorazowa za rok – BLIK
     const priceFallback = Deno.env.get("STRIPE_PREMIUM_PRICE_ID"); // stara konfiguracja – jeden price
-    // Domyślnie app.latwaforma.pl (web). Sekrety STRIPE_SUCCESS_URL / STRIPE_CANCEL_URL nadpisują.
-    const successUrl = Deno.env.get("STRIPE_SUCCESS_URL") ?? "https://app.latwaforma.pl/#/premium-success";
-    const cancelUrl = Deno.env.get("STRIPE_CANCEL_URL") ?? "https://app.latwaforma.pl/#/premium-cancel";
+    // Domyślnie latwaforma.pl (web). Sekrety STRIPE_SUCCESS_URL / STRIPE_CANCEL_URL nadpisują.
+    const successUrl = Deno.env.get("STRIPE_SUCCESS_URL") ?? "https://latwaforma.pl/#/premium-success";
+    const cancelUrl = Deno.env.get("STRIPE_CANCEL_URL") ?? "https://latwaforma.pl/#/premium-cancel";
 
     let plan: "monthly" | "yearly" | "yearly_once" = "monthly";
     try {

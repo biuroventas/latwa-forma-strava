@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const returnUrl =
       Deno.env.get("STRIPE_PORTAL_RETURN_URL") ??
       Deno.env.get("STRIPE_SUCCESS_URL") ??
-      "https://app.latwaforma.pl/#/premium-success";
+      "https://latwaforma.pl/#/premium-success";
 
     if (!stripeSecretKey) {
       return new Response(
