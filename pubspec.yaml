@@ -95,6 +95,8 @@ flutter:
     - assets/images/
     - assets/icons/
     - .env
+    # Na webie .env często 404 – ładowany jest env.production (tworzony na Netlify)
+    - env.production
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

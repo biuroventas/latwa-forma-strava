@@ -17,31 +17,36 @@ class SupabaseConfig {
 
   static Future<void> initialize() async {
     _initialized = false;
-    // Na webie w pubspec jest .env (root) – w buildzie asset to ".env". Najpierw próbuj .env, potem assets/.env.
+    // Na webie pliki z kropką (.env) często 404 – najpierw ładujemy env.production (tworzony na Netlify).
     try {
       if (kIsWeb) {
         try {
-          await dotenv.load(fileName: '.env');
-          debugPrint('✅ .env załadowany (web, .env)');
+          await dotenv.load(fileName: 'env.production');
+          debugPrint('✅ env.production załadowany (web)');
         } catch (_) {
-          await dotenv.load(fileName: 'assets/.env');
-          debugPrint('✅ .env załadowany z assets (web)');
+          try {
+            await dotenv.load(fileName: '.env');
+            debugPrint('✅ .env załadowany (web)');
+          } catch (__) {
+            await dotenv.load(fileName: 'assets/.env');
+            debugPrint('✅ .env z assets (web)');
+          }
         }
       } else {
         await dotenv.load(fileName: '.env');
         debugPrint('✅ .env załadowany z głównego folderu');
       }
     } catch (e) {
-      debugPrint('⚠️ Błąd ładowania .env: $e');
+      debugPrint('⚠️ Błąd ładowania env: $e');
       try {
         if (kIsWeb) {
-          await dotenv.load(fileName: 'assets/.env');
+          await dotenv.load(fileName: 'assets/env.production');
         } else {
           await dotenv.load(fileName: 'assets/.env');
         }
-        debugPrint('✅ .env załadowany z alternatywnej lokalizacji');
+        debugPrint('✅ env załadowany z alternatywnej lokalizacji');
       } catch (e2) {
-        debugPrint('❌ Błąd ładowania .env z alternatywnej lokalizacji: $e2');
+        debugPrint('❌ Błąd ładowania env z alternatywnej lokalizacji: $e2');
         if (kDebugMode) {
           debugPrint('⚠️ Używanie wartości domyślnych (tylko dla testów)');
         }
