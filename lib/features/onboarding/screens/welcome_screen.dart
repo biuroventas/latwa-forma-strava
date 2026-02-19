@@ -113,15 +113,20 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: acceptedTerms
                         ? () async {
                             Navigator.of(ctx).pop();
-                            final email = await _showEmailDialog(ctx);
+                            final result = await _showEmailDialog(ctx);
                             if (!context.mounted) return;
-                            if (email == null) return;
-                            if (email.isEmpty) {
-                              await _onEnterCode(context);
+                            if (result == null) return;
+                            if (result.enterCode) {
+                              if (result.email != null && result.email!.isNotEmpty) {
+                                await savePendingVerificationEmail(result.email!);
+                              }
+                              await _showEnterCodeDialog(context);
                               return;
                             }
-                            await savePendingVerificationEmail(email);
-                            await _runSignInWithEmail(context, email);
+                            if (result.email != null) {
+                              await savePendingVerificationEmail(result.email!);
+                              await _runSignInWithEmail(context, result.email!);
+                            }
                           }
                         : null,
                     icon: const Icon(Icons.email, size: 20),
@@ -146,11 +151,12 @@ class WelcomeScreen extends StatelessWidget {
     }
   }
 
-  /// Zwraca: email (wyślij link i kod), '' (mam już kod), null (anuluj).
-  Future<String?> _showEmailDialog(BuildContext context) async {
+  /// Zwraca: (enterCode: true, email?) = mam już kod (email z pola, jeśli wpisany);
+  /// (enterCode: false, email) = wyślij link i kod; null = anuluj.
+  Future<({bool enterCode, String? email})?> _showEmailDialog(BuildContext context) async {
     final controller = TextEditingController();
     String? errorText;
-    return showDialog<String>(
+    return showDialog<({bool enterCode, String? email})>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setState) => AlertDialog(
@@ -177,7 +183,10 @@ class WelcomeScreen extends StatelessWidget {
               child: const Text('Anuluj'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(ctx).pop(''),
+              onPressed: () {
+                final email = controller.text.trim();
+                Navigator.of(ctx).pop((enterCode: true, email: email.isEmpty ? null : email));
+              },
               child: Text(
                 'Mam już kod',
                 style: TextStyle(
@@ -193,7 +202,7 @@ class WelcomeScreen extends StatelessWidget {
                   setState(() => errorText = 'Podaj adres email');
                   return;
                 }
-                Navigator.of(ctx).pop(email);
+                Navigator.of(ctx).pop((enterCode: false, email: email));
               },
               child: const Text('Wyślij link oraz kod'),
             ),
@@ -273,6 +282,21 @@ class WelcomeScreen extends StatelessWidget {
       if (!context.mounted) return;
       await _showLinkAndCodeDialog(context, email, result.infoMessage);
     }
+  }
+
+  /// Pokazuje tylko okno do wpisania kodu (email już zapisany wcześniej, np. z dialogu logowania).
+  Future<void> _showEnterCodeDialog(BuildContext context) async {
+    final savedEmail = await getPendingVerificationEmail();
+    if (savedEmail != null && savedEmail.isNotEmpty && context.mounted) {
+      await _showLinkAndCodeDialog(
+        context,
+        savedEmail,
+        'Wpisz poniżej kod, który otrzymałeś na adres $savedEmail.',
+        dialogTitle: 'Wpisz kod z maila',
+      );
+      return;
+    }
+    await _onEnterCode(context);
   }
 
   /// Gdy użytkownik zamknął okno lub wyłączył aplikację przed wpisaniem kodu – od razu okno do wpisania kodu.
