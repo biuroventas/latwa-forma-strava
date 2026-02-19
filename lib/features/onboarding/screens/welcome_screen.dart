@@ -588,15 +588,26 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Future<void> _onZaczynamy(BuildContext context) async {
+    if (!SupabaseConfig.isInitialized) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Brak połączenia z serwerem. Sprawdź zmienne SUPABASE_URL i SUPABASE_ANON_KEY w Netlify (Environment variables).',
+            ),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+      return;
+    }
     try {
-      // Tworzymy konto anonimowe od razu przy „Zaczynamy”
       final response = await SupabaseConfig.auth.signInAnonymously();
       if (response.user == null) {
         throw Exception('Nie udało się utworzyć konta');
       }
       await _markWelcomeAsSeen();
       if (!context.mounted) return;
-      // Bezpośrednio do formularza profilu – bez splash, płynne przejście
       context.go(AppRoutes.onboarding);
     } catch (e) {
       debugPrint('Błąd signInAnonymously: $e');
@@ -604,7 +615,9 @@ class WelcomeScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Błąd połączenia. Sprawdź internet i spróbuj ponownie.',
+              e.toString().contains('Anonymous') || e.toString().contains('disabled')
+                  ? 'Logowanie bez konta jest wyłączone. Zaloguj się przez Google lub email.'
+                  : 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.',
             ),
             duration: const Duration(seconds: 4),
           ),

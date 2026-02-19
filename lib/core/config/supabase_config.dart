@@ -69,9 +69,9 @@ class SupabaseConfig {
       await Supabase.initialize(
         url: supabaseUrl,
         anonKey: supabaseAnonKey,
-        authOptions: const FlutterAuthClientOptions(
+        authOptions: FlutterAuthClientOptions(
           authFlowType: AuthFlowType.pkce,
-          detectSessionInUri: false,
+          detectSessionInUri: kIsWeb,
         ),
         realtimeClientOptions: const RealtimeClientOptions(
           logLevel: RealtimeLogLevel.info,

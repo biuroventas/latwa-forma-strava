@@ -3,9 +3,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../core/config/supabase_config.dart';
+import '../../core/constants/app_constants.dart';
 
-/// Adres przekierowania po OAuth (Safari) – schemat latwaforma.
+/// Adres przekierowania po OAuth (Safari / mobile) – schemat latwaforma.
 const String _oauthRedirectUrl = 'latwaforma://auth/callback';
+
+/// Na webie przekierowanie musi być na URL strony (app.latwaforma.pl).
+String get _redirectUrl =>
+    kIsWeb ? AppConstants.webAuthRedirectUrl : _oauthRedirectUrl;
 
 /// Dla magic link (e-mail) używamy HTTPS – klienty e-mail nie obsługują custom scheme.
 /// Strona HTTPS przekierowuje na latwaforma://auth/callback.
@@ -29,11 +34,13 @@ class AuthLinkService {
     try {
       await _auth.signInWithOAuth(
         OAuthProvider.google,
-        redirectTo: _oauthRedirectUrl,
-        authScreenLaunchMode: LaunchMode.externalApplication,
+        redirectTo: _redirectUrl,
+        authScreenLaunchMode: kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
       );
       return AuthLinkResult.success(
-        message: 'Otwieram Safari. Zaloguj się i wróć do aplikacji (może pojawić się pytanie „Otwórz w Latwa Forma?”).',
+        message: kIsWeb
+            ? 'Zostaniesz przekierowany do Google. Po zalogowaniu wrócisz tutaj.'
+            : 'Otwieram Safari. Zaloguj się i wróć do aplikacji (może pojawić się pytanie „Otwórz w Latwa Forma?”).',
       );
     } catch (e, st) {
       debugPrint('signInWithGoogle error: $e\n$st');
@@ -82,7 +89,7 @@ class AuthLinkService {
     try {
       await _auth.signInWithOtp(
         email: trimmed,
-        emailRedirectTo: _emailRedirectUrl,
+        emailRedirectTo: kIsWeb ? _redirectUrl : _emailRedirectUrl,
       );
       return AuthLinkResult.success(
         message: 'Wysłaliśmy link i kod na $trimmed. Sprawdź skrzynkę (także folder Spam) – kliknij link lub wpisz kod w aplikacji.',
@@ -104,8 +111,8 @@ class AuthLinkService {
     try {
       await _auth.linkIdentity(
         OAuthProvider.google,
-        redirectTo: _oauthRedirectUrl,
-        authScreenLaunchMode: LaunchMode.externalApplication,
+        redirectTo: _redirectUrl,
+        authScreenLaunchMode: kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
       );
       return AuthLinkResult.success(
         message: 'Otwieram Safari. Zaloguj się i wróć do aplikacji.',

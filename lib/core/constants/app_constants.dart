@@ -86,4 +86,7 @@ class AppConstants {
   static const String privacyPolicyUrl = 'https://latwaforma.pl/polityka-prywatnosci.html';
   /// URL regulaminu (wymagane w sklepach). Po opublikowaniu regulaminu ustaw tutaj docelowy adres.
   static const String termsUrl = 'https://latwaforma.pl/regulamin.html';
+
+  /// Adres powrotu po logowaniu Google/email na webie (musi być w Supabase Auth → Redirect URLs).
+  static const String webAuthRedirectUrl = 'https://app.latwaforma.pl';
 }
