@@ -86,15 +86,18 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
                               _buildTitle(context),
                               const SizedBox(height: OnboardingTokens.spaceXl),
                               _buildBenefitsList(context),
-                              const SizedBox(height: OnboardingTokens.spaceMd),
+                              const SizedBox(height: 28),
                             ],
                           ),
                         ),
                       ),
                       Flexible(
                         flex: 1,
-                        child: Center(
-                          child: _buildIllustrationPanel(context),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Center(
+                            child: _buildIllustrationPanel(context),
+                          ),
                         ),
                       ),
                     ],
@@ -190,9 +193,9 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
       child: Image.asset(
         'assets/images/grafika2.png',
         fit: BoxFit.contain,
-        height: 300,
+        height: 260,
         excludeFromSemantics: true,
-        errorBuilder: (_, __, ___) => const SizedBox(height: 300),
+        errorBuilder: (_, __, ___) => const SizedBox(height: 260),
       ),
     );
   }
