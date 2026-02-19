@@ -9,7 +9,7 @@ Aplikacja: Flutter (mobilna + web) + landing. Infrastruktura przygotowana pod sk
 | Element | Cel |
 |--------|-----|
 | Domena | **latwaforma.pl** (rejestrator: OVH) |
-| Poczta | **kontakt@latwaforma.pl**, **support@latwaforma.pl**, **norbert@latwaforma.pl** |
+| Poczta | **contact@latwaforma.pl**, **norbert.wroblewski@latwaforma.pl** |
 | Landing | **latwaforma.pl** / **www.latwaforma.pl** |
 | Backend aplikacji | **Supabase** (baza, Auth, Storage, Edge Functions) |
 | API (domena własna) | **api.latwaforma.pl** → Supabase |
@@ -71,7 +71,7 @@ W panelu DNS (OVH) dodajesz rekordy **TXT** podane przez OVH (sekcja Poczta / Ko
 
 - **SPF:** jeden rekord TXT (wartość z panelu OVH).
 - **DKIM:** jeden lub więcej rekordów TXT (nazwa i wartość z panelu poczty OVH).
-- **DMARC:** rekord TXT np. `_dmarc`, wartość np. `v=DMARC1; p=none; rua=mailto:kontakt@latwaforma.pl` (dostosuj politykę i adres raportów).
+- **DMARC:** rekord TXT np. `_dmarc`, wartość np. `v=DMARC1; p=none; rua=mailto:contact@latwaforma.pl` (dostosuj politykę i adres raportów).
 
 Bez poprawnego SPF/DKIM/DMARC maile @latwaforma.pl mogą trafiać do spamu.
 

@@ -45,14 +45,13 @@ Pliki strony muszą trafić do katalogu **www** na serwerze.
 
 ---
 
-## 3. Poczta e-mail (kontakt@, support@, norbert@)
+## 3. Poczta e-mail (contact@, norbert.wroblewski@)
 
 1. W panelu OVH: **Hosting** → Twój hosting (**latwafe**).  
 2. Szukaj sekcji **„Poczta”** / **„E-mail”** / **„Konta e-mail”** (często w tym samym hostingu jest opcja „Utwórz konto e-mail” lub „Zimbra”).  
 3. **Dodaj skrzynki** w domenie **latwaforma.pl**:
-   - **kontakt@latwaforma.pl**
-   - **support@latwaforma.pl**
-   - **norbert@latwaforma.pl** (albo imie.nazwisko@latwaforma.pl)
+   - **contact@latwaforma.pl**
+   - **norbert.wroblewski@latwaforma.pl**
 4. Dla każdej ustaw **hasło** i zapisz je.  
 5. Po utworzeniu skrzynek sprawdź w panelu, czy OVH pokazuje **rekordy MX** i **SPF/DKIM** – będą potrzebne w kroku 4, jeśli domena jest jeszcze u innego rejestrara.
 

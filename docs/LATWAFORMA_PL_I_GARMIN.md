@@ -11,7 +11,7 @@ Architektura zgodna z **PLAN_INFRASTRUKTURY.md**: landing pod **latwaforma.pl**,
 | **latwaforma.pl**, **www.latwaforma.pl** | Landing (strona główna + polityka prywatności + regulamin) |
 | **app.latwaforma.pl** | Aplikacja web (Flutter) – to samo co aplikacja mobilna, w przeglądarce |
 | **api.latwaforma.pl** | Backend (Supabase) – opcjonalna domena własna |
-| **Poczta** | kontakt@latwaforma.pl, support@latwaforma.pl, norbert@latwaforma.pl |
+| **Poczta** | contact@latwaforma.pl, norbert.wroblewski@latwaforma.pl |
 
 Szczegóły DNS, hostingu, maili, ENV i skalowania: **docs/PLAN_INFRASTRUKTURY.md**.
 
@@ -24,7 +24,7 @@ Szczegóły DNS, hostingu, maili, ENV i skalowania: **docs/PLAN_INFRASTRUKTURY.m
 | **Domena latwaforma.pl** | Rejestrator: OVH (zgodnie z planem). Wymagana przez Garmin. |
 | **Hosting landing + poczta** | Np. WebH – landing (latwaforma.pl, www) + skrzynki @latwaforma.pl. |
 | **Hosting aplikacji web** | Vercel, Firebase Hosting lub Netlify – deploy Flutter Web pod **app.latwaforma.pl**. |
-| **E-mail @latwaforma.pl** | kontakt@, support@, norbert@ – wymagane przez Garmin (wniosek z tego samego domeny). |
+| **E-mail @latwaforma.pl** | contact@latwaforma.pl, norbert.wroblewski@latwaforma.pl – wymagane przez Garmin (wniosek z tego samego domeny). |
 
 ---
 
@@ -76,7 +76,7 @@ Ustaw je w **lib/core/constants/app_constants.dart** (`privacyPolicyUrl`, `terms
 
 ## Krok 5. Poczta i SPF/DKIM/DMARC
 
-- Skrzynki **kontakt@**, **support@**, **norbert@latwaforma.pl** w panelu WebH (lub innego hostingu poczty).
+- Skrzynki **contact@latwaforma.pl**, **norbert.wroblewski@latwaforma.pl** w panelu WebH (lub innego hostingu poczty).
 - W DNS (OVH) dodaj rekordy **MX** oraz **TXT** (SPF, DKIM, DMARC) według instrukcji hostingu – szczegóły w **PLAN_INFRASTRUKTURY.md**.
 
 ---
@@ -88,7 +88,7 @@ Ustaw je w **lib/core/constants/app_constants.dart** (`privacyPolicyUrl`, `terms
 | **Valid website representing the company** | **latwaforma.pl** (landing) z nazwą Łatwa Forma / firmą. |
 | **Privacy policy, same domain, link on homepage** | Polityka pod **latwaforma.pl/polityka-prywatnosci.html**; na stronie głównej (landing) link „Polityka prywatności”. |
 | **Externally accessible** | Strona i polityka dostępne bez logowania. |
-| **Contact email, same domain** | W wniosku podaj **norbert@latwaforma.pl** lub **kontakt@latwaforma.pl** (nie gmail). |
+| **Contact email, same domain** | W wniosku podaj **norbert.wroblewski@latwaforma.pl** lub **contact@latwaforma.pl** (nie gmail). |
 | **Legal authority** | W treści: reprezentujesz firmę (np. „I am the owner / sole proprietor and have legal authority to represent the company”). |
 | **No personal use** | Aplikacja dla użytkowników (śledzenie kalorii, integracja Garmin), nie do użytku osobistego. |
 

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../core/constants/app_constants.dart';
 
 // --- Theme / design tokens ---
 abstract final class OnboardingTokens {
@@ -104,6 +107,7 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
                   ),
                 ),
                 _buildBottomButtons(context),
+                _buildFooter(context),
               ],
             ),
         ),
@@ -263,5 +267,130 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    final bool narrow = MediaQuery.sizeOf(context).width < 520;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: OnboardingTokens.horizontalPadding,
+        vertical: OnboardingTokens.spaceLg,
+      ),
+      decoration: BoxDecoration(
+        color: OnboardingTokens.greenVeryLight,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (narrow) ...[
+            _footerBrand(context),
+            const SizedBox(height: OnboardingTokens.spaceMd),
+            _footerLinks(context),
+            const SizedBox(height: OnboardingTokens.spaceSm),
+            _footerContact(context),
+          ] else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _footerBrand(context)),
+                _footerLinks(context),
+                _footerContact(context),
+              ],
+            ),
+          const SizedBox(height: OnboardingTokens.spaceMd),
+          Text(
+            '© 2026 Łatwa Forma / VENTAS NORBERT WRÓBLEWSKI. Wszelkie prawa zastrzeżone.',
+            style: TextStyle(
+              fontSize: 12,
+              color: OnboardingTokens.grey,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _footerBrand(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'Łatwa Forma',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: OnboardingTokens.textAlmostBlack,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Plan kalorii, śledzenie wagi i prosty plan do celu.',
+          style: TextStyle(
+            fontSize: 13,
+            color: OnboardingTokens.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _footerLinks(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _footerLink(context, 'Regulamin', AppConstants.termsUrl),
+        const SizedBox(height: 4),
+        _footerLink(context, 'Polityka prywatności', AppConstants.privacyPolicyUrl),
+        const SizedBox(height: 4),
+        _footerLink(context, 'Kontakt', 'mailto:${AppConstants.contactEmail}'),
+      ],
+    );
+  }
+
+  Widget _footerLink(BuildContext context, String label, String url) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _openUrl(url),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: OnboardingTokens.green,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _footerContact(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _openUrl('mailto:${AppConstants.contactEmail}'),
+        child: Text(
+          AppConstants.contactEmail,
+          style: TextStyle(
+            fontSize: 13,
+            color: OnboardingTokens.textAlmostBlack,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }

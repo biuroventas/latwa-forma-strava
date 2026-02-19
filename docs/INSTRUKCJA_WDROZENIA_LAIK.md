@@ -60,7 +60,7 @@ Instrukcja w **dokładnej kolejności**. Każdy krok mówi: **gdzie wejść**, *
 
 1. W panelu OVH: **Hosting** → **latwaforma.pl** (latwafe).
 2. Szukaj sekcji **„Poczta”** / **„E-mail”** / **„Konta e-mail”**.
-3. **Dodaj skrzynki** w domenie **latwaforma.pl**: **kontakt@**, **support@**, **norbert@latwaforma.pl**. Dla każdej ustaw hasło i zapisz.
+3. **Dodaj skrzynki** w domenie **latwaforma.pl**: **contact@latwaforma.pl** oraz **norbert.wroblewski@latwaforma.pl**. Dla każdej ustaw hasło i zapisz.
 4. OVH może pokazać **rekordy MX i TXT (SPF/DKIM)** – przy DNS w OVH często dodaje je sam; inaczej skopiuj je do Strefy DNS (Część 3).
 
 ---
@@ -108,7 +108,7 @@ Wartości **muszą** pochodzić z panelu WebH („Konfiguracja DNS poczty” / �
 1. **Dodaj wpis** → **Typ: TXT**.
 2. **Subdomena:** puste (lub `@`). **Wartość:** np. `v=spf1 include:webh.pl ~all` (zamień na dokładną wartość z WebH). Zapisz.
 3. **Dodaj wpis** → **TXT** dla **DKIM** – subdomena i wartość z WebH (często subdomena typu `default._domainkey`). Zapisz.
-4. **Dodaj wpis** → **TXT** – subdomena: `_dmarc`, wartość: np. `v=DMARC1; p=none; rua=mailto:kontakt@latwaforma.pl`. Zapisz.
+4. **Dodaj wpis** → **TXT** – subdomena: `_dmarc`, wartość: np. `v=DMARC1; p=none; rua=mailto:contact@latwaforma.pl`. Zapisz.
 
 Propagacja DNS trwa zwykle **kilka minut do 24 godzin**. Rekord **app** (CNAME) dodasz w Części 6, gdy będziesz miał adres z Vercel.
 
@@ -276,7 +276,7 @@ Jeśli używasz **Stripe Dashboard** do tych pól – zmień je tam na powyższe
 
 1. **https://latwaforma.pl** – strona główna, linki Polityka i Regulamin.
 2. **https://app.latwaforma.pl** – aplikacja; logowanie (Google / e-mail); po zalogowaniu Profil – kliknij „Polityka prywatności” i „Regulamin” (powinny otwierać latwaforma.pl).
-3. **Poczta** – wyślij testowego maila na kontakt@latwaforma.pl z innej skrzynki i sprawdź, czy przychodzi (oraz czy nie ląduje w spanie).
+3. **Poczta** – wyślij testowego maila na contact@latwaforma.pl z innej skrzynki i sprawdź, czy przychodzi (oraz czy nie ląduje w spanie).
 4. **Premium (Stripe)** – w aplikacji web wejdź w Premium, „Wykup Premium”, opłać testowo; po powrocie sprawdź, czy wraca na app.latwaforma.pl i czy status się odświeża.
 
 ---
@@ -286,7 +286,7 @@ Jeśli używasz **Stripe Dashboard** do tych pól – zmień je tam na powyższe
 | Nr | Działanie |
 |----|-----------|
 | 1 | Wykup domeny latwaforma.pl w OVH |
-| 2 | Hosting OVH (już masz). Założenie skrzynek kontakt/support/norbert@latwaforma.pl w OVH |
+| 2 | Hosting OVH (już masz). Założenie skrzynek contact@ i norbert.wroblewski@latwaforma.pl w OVH |
 | 3 | W OVH: sprawdzenie/ustawienie DNS – rekordy A (latwaforma.pl, www), MX, TXT (SPF, DKIM, DMARC) |
 | 4 | Wgranie landingu na OVH (FileZilla, 5 plików – patrz INSTRUKCJA_WGRANIA_STRONY_OVH_LAIK.md), włączenie SSL |
 | 5 | Supabase: Site URL i Redirect URLs (app.latwaforma.pl, latwaforma.pl) |

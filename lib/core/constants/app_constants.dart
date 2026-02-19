@@ -89,4 +89,9 @@ class AppConstants {
 
   /// Adres powrotu po logowaniu Google/email na webie (musi być w Supabase Auth → Redirect URLs).
   static const String webAuthRedirectUrl = 'https://latwaforma.pl';
+
+  /// Adres e-mail kontaktowy (dla użytkowników: polityka, regulamin, stopka).
+  static const String contactEmail = 'contact@latwaforma.pl';
+  /// Adres e-mail reprezentanta / właściciela (np. wniosek Garmin, dokumentacja).
+  static const String ownerEmail = 'norbert.wroblewski@latwaforma.pl';
 }

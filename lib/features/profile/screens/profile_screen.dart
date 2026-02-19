@@ -310,7 +310,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _getDeleteAccountErrorMessage(Object? err, int? status) {
     final s = err?.toString() ?? status?.toString() ?? '';
     if (s.contains('404') || s.contains('NOT_FOUND')) {
-      return 'Usługa usuwania konta jest niedostępna. Skontaktuj się z supportem.';
+      return 'Usługa usuwania konta jest niedostępna. Skontaktuj się z nami: ${AppConstants.contactEmail}';
     }
     if (s.contains('401') || s.contains('Nieprawidłowa sesja')) {
       return 'Sesja wygasła. Zaloguj się ponownie i spróbuj jeszcze raz.';
