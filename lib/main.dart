@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'core/auth/auth_callback_handler.dart';
 import 'core/config/supabase_config.dart';
 import 'core/router/app_router.dart';
@@ -58,6 +59,19 @@ class LatwaFormaApp extends StatefulWidget {
   State<LatwaFormaApp> createState() => _LatwaFormaAppState();
 }
 
+bool _onboardingSvgPrecached = false;
+
+void _precacheOnboardingSvg(BuildContext context) {
+  if (_onboardingSvgPrecached) return;
+  _onboardingSvgPrecached = true;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    try {
+      final loader = SvgAssetLoader('assets/images/grafika2.svg');
+      svg.cache.putIfAbsent(loader.cacheKey(null), () => loader.loadBytes(null));
+    } catch (_) {}
+  });
+}
+
 class _LatwaFormaAppState extends State<LatwaFormaApp> {
   StreamSubscription<Uri>? _linkSub;
 
@@ -103,6 +117,10 @@ class _LatwaFormaAppState extends State<LatwaFormaApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: createAppRouter(),
+      builder: (context, child) {
+        _precacheOnboardingSvg(context);
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }

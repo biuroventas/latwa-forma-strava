@@ -2,6 +2,10 @@
   "name": "latwa-forma",
   "private": true,
   "description": "Łatwa Forma – deploy web (Netlify)",
+  "scripts": {
+    "prepare:site": "bash scripts/prepare_latwaforma_pl_site.sh",
+    "deploy:site": "bash scripts/deploy_site_netlify.sh"
+  },
   "devDependencies": {
     "netlify-plugin-flutter": "1.2.0"
   }

@@ -4,6 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../core/config/supabase_config.dart';
+
 class OpenAIService {
   static String? get apiKey => dotenv.env['OPENAI_API_KEY'];
   static const String baseUrl = 'https://api.openai.com/v1';
@@ -97,8 +101,46 @@ Zwróć TYLKO JSON, bez dodatkowych komentarzy. Jeśli nie możesz określić wa
     }
   }
 
-  /// Odpowiada na pytania użytkownika o dietę, odżywianie i aktywność fizyczną
+  /// Odpowiada na pytania użytkownika o dietę, odżywianie i aktywność fizyczną.
+  /// Na webie używa Edge Function (brak CORS, klucz po stronie serwera). Na mobile – Edge Function lub bezpośrednio OpenAI z .env.
   Future<String?> getAdvice(String userQuestion) async {
+    if (SupabaseConfig.isInitialized) {
+      try {
+        final response = await SupabaseConfig.client.functions.invoke(
+          'ai-advice',
+          body: {'question': userQuestion},
+        );
+        if (response.status != 200) {
+          final data = response.data;
+          String msg;
+          if (response.status == 404) {
+            msg = 'Funkcja Porady AI nie jest wdrożona. Uruchom w terminalu: supabase functions deploy ai-advice --no-verify-jwt';
+          } else if (data is Map && data['error'] != null && data['error'] is String) {
+            msg = data['error'] as String;
+          } else {
+            msg = 'Błąd usługi porad (${response.status}). Spróbuj ponownie.';
+          }
+          debugPrint('Błąd ai-advice: ${response.status} $msg');
+          throw Exception(msg);
+        }
+        final data = response.data;
+        if (data is Map && data['content'] != null) {
+          return data['content'] as String?;
+        }
+        return null;
+      } catch (e) {
+        debugPrint('Błąd porady AI (Edge Function): $e');
+        if (e is FunctionException) {
+          final details = e.details;
+          if (details is Map && details['error'] != null && details['error'] is String) {
+            throw Exception(details['error'] as String);
+          }
+        }
+        rethrow;
+      }
+    }
+
+    // Fallback: bezpośrednie wywołanie OpenAI (np. lokalnie z .env, bez Supabase)
     if (apiKey == null || apiKey!.isEmpty) {
       debugPrint('⚠️ OpenAI API key nie jest ustawiony');
       return null;

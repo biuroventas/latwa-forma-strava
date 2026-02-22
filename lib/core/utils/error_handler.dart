@@ -7,6 +7,9 @@ class ErrorHandler {
     if (msg.contains('network') || msg.contains('connection') || msg.contains('socket')) {
       return 'Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.';
     }
+    if (msg.contains('cors') || msg.contains('xmlhttprequest') || msg.contains('failed to fetch')) {
+      return 'Błąd połączenia z usługą. Odśwież stronę i spróbuj ponownie.';
+    }
     if (msg.contains('timeout')) {
       return 'Przekroczono limit czasu. Spróbuj ponownie.';
     }
@@ -16,8 +19,8 @@ class ErrorHandler {
     if (msg.contains('not found') || msg.contains('404')) {
       return 'Nie znaleziono zasobu.';
     }
-    if (msg.contains('server') || msg.contains('500')) {
-      return 'Błąd serwera. Spróbuj później.';
+    if (msg.contains('server') || msg.contains('500') || msg.contains('502')) {
+      return fallback ?? 'Błąd serwera. Spróbuj później.';
     }
     return fallback ?? 'Wystąpił błąd. Spróbuj ponownie.';
   }

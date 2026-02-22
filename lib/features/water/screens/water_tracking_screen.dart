@@ -296,14 +296,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     try {
       final updated = profile.copyWith(waterGoalMl: value);
       await SupabaseService().updateProfile(updated);
-      if (!mounted) return;
+      if (!context.mounted) return;
       ref.invalidate(profileProvider);
       ref.invalidate(dashboardDataProvider(DateTime.now()));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cel wody zaktualizowany')),
       );
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Błąd: $e'),

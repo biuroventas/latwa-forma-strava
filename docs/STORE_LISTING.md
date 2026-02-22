@@ -2,7 +2,9 @@
 
 ## Dane podstawowe
 - **Nazwa aplikacji:** Łatwa Forma
-- **Polityka prywatności:** https://biuroventas.github.io/latwa-forma-strava/privacy.html
+- **Polityka prywatności (PL):** https://latwaforma.pl/polityka-prywatnosci.html
+- **Polityka prywatności (EN):** https://latwaforma.pl/privacy.html
+- **Regulamin (PL):** https://latwaforma.pl/regulamin.html
 - **Kategoria:** Zdrowie i fitness (Health & Fitness)
 - **Wiek:** 4+ (bez treści ograniczonych wiekowo)
 
@@ -170,6 +172,11 @@ Automatic BMR, TDEE and macro calculations. For weight loss, muscle gain or main
 - Uzupełnij przykładowe dane (posiłki, wodę, aktywności)
 - Zrób zrzuty ekranu (iOS: Cmd+S w symulatorze; Android: Ctrl+S lub przycisk w emulatorze)
 - Możesz dodać ramki urządzeń (np. przez Figma, Canva lub narzędzia typu screenshots.pro)
+
+---
+
+## Wersja (pubspec.yaml)
+- Przed wgraniem do sklepów zaktualizuj `version` w `pubspec.yaml` (np. `1.0.0+1`; drugi numer to build number – zwiększaj przy każdym uploadzie).
 
 ---
 

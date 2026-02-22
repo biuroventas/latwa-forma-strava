@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/rendering.dart';
@@ -254,18 +255,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           return;
         }
 
-        final tempDir = await getTemporaryDirectory();
-        final file = File('${tempDir.path}/kalorie_${_selectedDate.day}_${_selectedDate.month}.png');
-        await file.writeAsBytes(byteData.buffer.asUint8List());
-
         final dateStr = '${_selectedDate.day}.${_selectedDate.month}.${_selectedDate.year}';
-        final box = boundary as RenderBox;
-        final shareRect = box.localToGlobal(Offset.zero) & box.size;
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: '📊 Łatwa Forma – Kalorie $dateStr',
-          sharePositionOrigin: shareRect,
-        );
+        final bytes = byteData.buffer.asUint8List();
+        if (kIsWeb) {
+          final xFile = XFile.fromData(bytes, name: 'kalorie_${_selectedDate.day}_${_selectedDate.month}.png');
+          await Share.shareXFiles([xFile], text: '📊 Łatwa Forma – Kalorie $dateStr');
+        } else {
+          final tempDir = await getTemporaryDirectory();
+          final file = File('${tempDir.path}/kalorie_${_selectedDate.day}_${_selectedDate.month}.png');
+          await file.writeAsBytes(bytes);
+          final box = boundary as RenderBox;
+          final shareRect = box.localToGlobal(Offset.zero) & box.size;
+          await Share.shareXFiles(
+            [XFile(file.path)],
+            text: '📊 Łatwa Forma – Kalorie $dateStr',
+            sharePositionOrigin: shareRect,
+          );
+        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

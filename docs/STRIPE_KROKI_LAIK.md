@@ -167,7 +167,62 @@ Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new
 - W **aplikacji** użytkownik wchodzi w **Profil** → **Łatwa Forma Premium** i klika **„Wykup Premium (Stripe)”**.
 - Otworzy się **strona Stripe** z płatnością. Po opłaceniu Stripe wyśle informację do Supabase (webhook), a konto użytkownika dostanie Premium.
 - **Testowanie:** dopóki w Stripe masz włączony **tryb testowy**, użyj karty testowej: **4242 4242 4242 4242**, dowolna data w przyszłości i dowolny CVC. Pieniądze nie będą pobierane.
-- **Produkcja:** gdy będziesz gotowy na prawdziwe płatności, w Stripe wyłącz tryb testowy, ustaw **klucze live** (Secret key z `sk_live_...`) i **live Price ID** w sekretach Supabase oraz upewnij się, że webhook w Stripe wskazuje na ten sam adres (bez zmian).
+- **Produkcja:** poniżej – **CZĘŚĆ 5: Przełączenie na Live**.
+
+---
+
+## CZĘŚĆ 5: Przełączenie na produkcję (Live) – prawdziwe płatności
+
+**Na czym to polega:** Dotąd Stripe działał w „trybie testowym” – nikt nie płaci prawdziwymi pieniędzmi. Żeby klienci mogli faktycznie kupować Premium, musisz w Stripe przełączyć się na **Live** i w Supabase podmienić klucze na „live”.
+
+### Krok L1. Przełącz Stripe na Live
+- Wejdź na **https://dashboard.stripe.com**.
+- **U góry strony** zobaczysz przełącznik **„Test mode” / „Tryb testowy”** (czasem w prawym górnym rogu).
+- Kliknij go, żeby przełączyć na **„Live”** („Tryb produkcyjny”). Stripe pokaże ostrzeżenie – to normalne.
+
+### Krok L2. Produkt i ceny w trybie Live
+W trybie **Live** lista produktów jest **osobna** niż w Test. Jeśli nie masz jeszcze produktu „Łatwa Forma Premium” w Live:
+
+- W lewym menu: **Products** (Produkty) → **+ Add product**.
+- Zrób to samo co w Kroku 3 (nazwa „Łatwa Forma Premium”, trzy cenniki: 69,98 zł / miesiąc, 194,95 zł / rok recurring, 194,95 zł jednorazowo).
+- **Skopiuj trzy Price ID** z tego produktu (tak jak w Kroku 4) – będą to **nowe** ID (price_...), inne niż w trybie testowym. Zapisz je (miesięczny, roczny, roczny jednorazowo).
+
+Jeśli produkt w Live już masz – po prostu skopiuj z niego trzy Price ID.
+
+### Krok L3. Klucz API (Live)
+- W Stripe (upewnij się, że jest **Live**): **Developers** → **API keys**.
+- Zobaczysz teraz **Live** klucze (Secret key zaczyna się od **sk_live_**).
+- Kliknij **Reveal** przy **Secret key** i **skopiuj cały klucz** (sk_live_...). Zapisz – wkleisz go do Supabase.
+
+### Krok L4. Webhook dla Live
+W trybie Live Stripe **nie używa** tego samego webhooka co w Test. Trzeba dodać **drugi** endpoint (ten sam adres, ale w trybie Live).
+
+- W Stripe (nadal **Live**): **Developers** → **Webhooks** → **Add endpoint**.
+- **Endpoint URL:** ten sam co w Kroku 7, np.  
+  `https://TWOJ_PROJECT_REF.supabase.co/functions/v1/stripe-webhook`  
+  (zamień TWOJ_PROJECT_REF na swój identyfikator projektu Supabase).
+- **Events to send:** zaznacz **checkout.session.completed**.
+- Zapisz endpoint. Wejdź w ten nowy webhook → **Signing secret** → **Reveal** → **skopiuj** (whsec_...). To jest **Live** signing secret – zapisz.
+
+### Krok L5. Podmiana sekretów w Supabase
+- Wejdź na **supabase.com** → swój projekt → **Edge Functions** → **Secrets**.
+- **Zamień** (edytuj lub usuń stary i dodaj nowy) te sekrety na wartości **Live**:
+
+| Sekret                         | Nowa wartość (Live) |
+|--------------------------------|----------------------|
+| `STRIPE_SECRET_KEY`            | **sk_live_...** z Kroku L3 |
+| `STRIPE_PREMIUM_PRICE_MONTHLY` | **Price ID** miesięczny z Kroku L2 (Live) |
+| `STRIPE_PREMIUM_PRICE_YEARLY`  | **Price ID** roczny (recurring) z Kroku L2 (Live) |
+| `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | **Price ID** roczny jednorazowo z Kroku L2 (Live) |
+| `STRIPE_WEBHOOK_SECRET`        | **Signing secret** z Kroku L4 (Live, whsec_...) |
+
+- **STRIPE_SUCCESS_URL** i **STRIPE_CANCEL_URL** możesz **zostawić** (np. `https://latwaforma.pl/#/premium-success` i `...#/premium-cancel`), chyba że chcesz inne adresy.
+
+### Krok L6. (Opcjonalnie) Stripe Customer Portal – branding
+- W Stripe: **Settings** (ikonka zębatki) → **Billing** → **Customer portal** (lub **Branding**).
+- Możesz dodać link do polityki prywatności (https://latwaforma.pl/polityka-prywatnosci.html) i regulaminu – wtedy klient przy rezygnacji zobaczy Twoje strony.
+
+**Gotowe.** Od teraz płatności w aplikacji są **prawdziwe** – klienci płacą kartą / BLIKiem itd. Żeby wrócić do testów, w Stripe przełącz z powrotem na „Test mode”, a w Supabase przywróć stare (testowe) wartości sekretów.
 
 ---
 

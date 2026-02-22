@@ -5,6 +5,15 @@ import '../../core/config/supabase_config.dart';
 import '../../core/constants/trial_constants.dart';
 import 'profile_provider.dart';
 
+/// Pozostały czas trialu 24h (null jeśli brak trialu lub Premium opłacone).
+/// Przy każdym odświeżeniu firstUseAtProvider (np. po wejściu na profil) wartość jest przeliczana.
+Duration? _trialRemaining(DateTime? firstUse) {
+  if (firstUse == null) return null;
+  final end = firstUse.add(trialDuration);
+  final remaining = end.difference(DateTime.now());
+  return remaining.isNegative ? null : remaining;
+}
+
 /// Provider zwracający czy użytkownik ma aktywną subskrypcję Premium.
 final isPremiumProvider = Provider<bool>((ref) {
   final profile = ref.watch(profileProvider).valueOrNull;
@@ -19,7 +28,7 @@ final firstUseAtProvider = FutureProvider.autoDispose<DateTime?>((ref) async {
     final userId = SupabaseConfig.auth.currentUser?.id;
     if (userId == null) return null;
     final prefs = await SharedPreferences.getInstance();
-    final key = '${trialStartPrefKeyPrefix}$userId';
+    final key = '$trialStartPrefKeyPrefix$userId';
     final stored = prefs.getInt(key);
     if (stored == null) {
       final now = DateTime.now();
@@ -50,4 +59,11 @@ final isInTrialProvider = Provider<bool>((ref) {
   final firstUse = ref.watch(firstUseAtProvider).valueOrNull;
   if (firstUse == null) return false;
   return DateTime.now().difference(firstUse) < trialDuration;
+});
+
+/// Pozostały czas trialu (do wyświetlenia w profilu). Null jeśli brak trialu lub Premium opłacone.
+final trialRemainingProvider = Provider<Duration?>((ref) {
+  if (ref.watch(isPremiumProvider)) return null;
+  final firstUse = ref.watch(firstUseAtProvider).valueOrNull;
+  return _trialRemaining(firstUse);
 });

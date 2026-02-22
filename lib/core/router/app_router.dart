@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/config/supabase_config.dart';
@@ -75,7 +76,7 @@ CustomTransitionPage _noTransitionPage(GoRouterState state, Widget child) {
     child: child,
     transitionDuration: Duration.zero,
     reverseTransitionDuration: Duration.zero,
-    transitionsBuilder: (_, __, ___, child) => child,
+    transitionsBuilder: (_, _, _, child) => child,
   );
 }
 
@@ -109,14 +110,31 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
     },
     routes: [
       ShellRoute(
-        builder: (_, state, child) => AppBackground(
-          child: OfflineBanner(
-            child: RepaintBoundary(
-              key: ValueKey<String>(state.matchedLocation),
-              child: child,
+        builder: (_, state, child) {
+          final repaintChild = RepaintBoundary(
+            key: ValueKey<String>(state.matchedLocation),
+            child: child,
+          );
+          final content = kIsWeb
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    final w = constraints.maxWidth;
+                    final maxW = w >= 900 ? 960.0 : (w >= 600 ? 800.0 : 560.0);
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: maxW),
+                        child: repaintChild,
+                      ),
+                    );
+                  },
+                )
+              : repaintChild;
+          return AppBackground(
+            child: OfflineBanner(
+              child: content,
             ),
-          ),
-        ),
+          );
+        },
         routes: [
       GoRoute(
         path: AppRoutes.splash,

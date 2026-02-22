@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/config/supabase_config.dart';
 import '../../../core/providers/subscription_provider.dart';
 import '../../../shared/services/openai_service.dart';
 import '../../../core/utils/error_handler.dart';
 
 const _keyAiAdviceDate = 'ai_advice_date';
 const _keyAiAdviceCount = 'ai_advice_count';
+const _keyAiAdvicePremiumDate = 'ai_advice_premium_date';
+const _keyAiAdvicePremiumCount = 'ai_advice_premium_count';
 
 class AiAdviceScreen extends ConsumerStatefulWidget {
   const AiAdviceScreen({super.key});
@@ -24,7 +27,8 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
 
   bool _isLoading = false;
   String? _lastResponse;
-  int _remainingToday = AppConstants.aiAdviceDailyLimit;
+  int _remainingFree = AppConstants.aiAdviceDailyLimit;
+  int _remainingPremium = AppConstants.aiAdvicePremiumDailyLimit;
 
   @override
   void initState() {
@@ -42,16 +46,24 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
   Future<void> _loadRemainingCount() async {
     final prefs = await SharedPreferences.getInstance();
     final today = DateTime.now().toIso8601String().substring(0, 10);
+
     final savedDate = prefs.getString(_keyAiAdviceDate);
     final count = prefs.getInt(_keyAiAdviceCount) ?? 0;
+    final freeRemaining = savedDate != today
+        ? AppConstants.aiAdviceDailyLimit
+        : (AppConstants.aiAdviceDailyLimit - count).clamp(0, AppConstants.aiAdviceDailyLimit);
+
+    final premiumSavedDate = prefs.getString(_keyAiAdvicePremiumDate);
+    final premiumCount = prefs.getInt(_keyAiAdvicePremiumCount) ?? 0;
+    final premiumRemaining = premiumSavedDate != today
+        ? AppConstants.aiAdvicePremiumDailyLimit
+        : (AppConstants.aiAdvicePremiumDailyLimit - premiumCount).clamp(0, AppConstants.aiAdvicePremiumDailyLimit);
 
     if (!mounted) return;
-    if (savedDate != today) {
-      setState(() => _remainingToday = AppConstants.aiAdviceDailyLimit);
-      return;
-    }
-    if (!mounted) return;
-    setState(() => _remainingToday = (AppConstants.aiAdviceDailyLimit - count).clamp(0, AppConstants.aiAdviceDailyLimit));
+    setState(() {
+      _remainingFree = freeRemaining;
+      _remainingPremium = premiumRemaining;
+    });
   }
 
   Future<void> _recordQuery() async {
@@ -69,25 +81,45 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
     await _loadRemainingCount();
   }
 
+  Future<void> _recordPremiumQuery() async {
+    final prefs = await SharedPreferences.getInstance();
+    final today = DateTime.now().toIso8601String().substring(0, 10);
+    final savedDate = prefs.getString(_keyAiAdvicePremiumDate);
+    final count = prefs.getInt(_keyAiAdvicePremiumCount) ?? 0;
+
+    if (savedDate != today) {
+      await prefs.setString(_keyAiAdvicePremiumDate, today);
+      await prefs.setInt(_keyAiAdvicePremiumCount, 1);
+    } else {
+      await prefs.setInt(_keyAiAdvicePremiumCount, count + 1);
+    }
+    await _loadRemainingCount();
+  }
+
   Future<void> _askAi() async {
     final question = _questionController.text.trim();
     if (question.isEmpty) return;
     final hasAccess = ref.read(hasPremiumAccessProvider);
-    if (!hasAccess && _remainingToday <= 0) {
+    final remaining = hasAccess ? _remainingPremium : _remainingFree;
+    final limit = hasAccess ? AppConstants.aiAdvicePremiumDailyLimit : AppConstants.aiAdviceDailyLimit;
+    if (remaining <= 0) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Wykorzystałeś dzisiejszy limit (${AppConstants.aiAdviceDailyLimit} zapytań). Spróbuj jutro lub przejdź na Premium.',
+              hasAccess
+                  ? 'Wykorzystałeś dzisiejszy limit ($limit zapytań). Spróbuj jutro.'
+                  : 'Wykorzystałeś dzisiejszy limit ($limit zapytań). Spróbuj jutro lub przejdź na Premium.',
             ),
           ),
         );
       }
       return;
     }
-    if (OpenAIService.apiKey == null || OpenAIService.apiKey!.isEmpty) {
+    final useEdgeFunction = SupabaseConfig.isInitialized;
+    if (!useEdgeFunction && (OpenAIService.apiKey == null || OpenAIService.apiKey!.isEmpty)) {
       if (mounted) {
-        ErrorHandler.showSnackBar(context, error: 'Klucz OpenAI nie jest skonfigurowany.');
+        ErrorHandler.showSnackBar(context, error: 'Porada AI wymaga połączenia z aplikacją (Supabase) lub klucza OpenAI w konfiguracji.');
       }
       return;
     }
@@ -101,7 +133,11 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
       final response = await _aiService.getAdvice(question);
       if (mounted) {
         if (response != null && response.isNotEmpty) {
-          if (!ref.read(hasPremiumAccessProvider)) await _recordQuery();
+          if (ref.read(hasPremiumAccessProvider)) {
+            await _recordPremiumQuery();
+          } else {
+            await _recordQuery();
+          }
           setState(() {
             _lastResponse = response;
             _isLoading = false;
@@ -122,7 +158,8 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ErrorHandler.showSnackBar(context, error: e);
+        final message = e is Exception ? e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '') : null;
+        ErrorHandler.showSnackBar(context, error: e, fallback: message);
       }
     }
   }
@@ -130,7 +167,9 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
   @override
   Widget build(BuildContext context) {
     final hasAccess = ref.watch(hasPremiumAccessProvider);
-    final canAsk = (hasAccess || _remainingToday > 0) && !_isLoading;
+    final remaining = hasAccess ? _remainingPremium : _remainingFree;
+    final limit = hasAccess ? AppConstants.aiAdvicePremiumDailyLimit : AppConstants.aiAdviceDailyLimit;
+    final canAsk = remaining > 0 && !_isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -152,9 +191,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  hasAccess
-                      ? 'Premium – nieograniczona liczba zapytań'
-                      : 'Pozostało zapytań dziś: $_remainingToday / ${AppConstants.aiAdviceDailyLimit}',
+                  'Pozostało zapytań dziś: $remaining / $limit${hasAccess ? ' (Premium)' : ''}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,

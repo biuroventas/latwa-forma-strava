@@ -11,7 +11,7 @@ Lista tego, co powinna mieć aplikacja, żeby była **legalna** (RODO, prawo kon
 - **Do zrobienia:**
   - Opublikuj politykę pod **stałym adresem** (np. `https://twojadomena.pl/polityka-prywatnosci` lub GitHub Pages) i podaj ten adres w sklepach oraz **w aplikacji** (link w profilu / ustawieniach).
   - Dopisz w polityce: **Stripe** (płatności – przetwarzanie przez Stripe, nie przechowujesz kart), **logowanie Google** (przekazywanie e-maila/identyfikatora do świadczenia usługi), ewentualnie **powiadomienia** (identyfikatory urządzenia do wysyłki powiadomień).
-  - Jeśli hostujesz na GitHub Pages: upewnij się, że URL jest stabilny (np. `https://biuroventas.github.io/latwa-forma-strava/privacy-pl.html`).
+  - W produkcji używaj stałego URL (np. `https://latwaforma.pl/polityka-prywatnosci.html`).
 
 ---
 

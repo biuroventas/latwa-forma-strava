@@ -66,6 +66,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.invalidate(firstUseAtProvider);
+    });
+  }
+
+  @override
   void dispose() {
     _customCaloriesController.dispose();
     _proteinController.dispose();
@@ -690,69 +698,90 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          // Premium / Subskrypcja
-          Card(
-            child: InkWell(
-              onTap: () => context.push(AppRoutes.premium),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(
-                      profile.isPremium ? Icons.workspace_premium : Icons.star_outline,
-                      color: profile.isPremium ? Colors.amber.shade700 : Theme.of(context).colorScheme.primary,
-                      size: 32,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+          // Premium / Subskrypcja (opłacone lub trial 24h)
+          Builder(
+            builder: (context) {
+              final hasPremiumAccess = ref.watch(hasPremiumAccessProvider);
+              final isInTrial = ref.watch(isInTrialProvider);
+              final trialRemaining = ref.watch(trialRemainingProvider);
+              final showActive = profile.isPremium || isInTrial;
+              final remainingText = trialRemaining != null
+                  ? 'Pozostało: ${trialRemaining.inHours}h ${trialRemaining.inMinutes % 60}min'
+                  : null;
+              return Card(
+                child: InkWell(
+                  onTap: () => context.push(AppRoutes.premium),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          hasPremiumAccess ? Icons.workspace_premium : Icons.star_outline,
+                          color: hasPremiumAccess ? Colors.amber.shade700 : Theme.of(context).colorScheme.primary,
+                          size: 32,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                profile.isPremium ? 'Łatwa Forma Premium' : 'Subskrypcja Premium',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              if (profile.isPremium) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.shade100,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    'Aktywna',
-                                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                          color: Colors.amber.shade900,
+                              Row(
+                                children: [
+                                  Text(
+                                    hasPremiumAccess ? 'Łatwa Forma Premium' : 'Subskrypcja Premium',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
                                   ),
+                                  if (showActive) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber.shade100,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        'Aktywna',
+                                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                              color: Colors.amber.shade900,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              if (remainingText != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  remainingText,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                 ),
                               ],
+                              const SizedBox(height: 4),
+                              Text(
+                                hasPremiumAccess
+                                    ? 'Nieograniczona AI, eksport PDF, integracje'
+                                    : 'Odblokuj pełny potencjał – AI, PDF, integracje',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            profile.isPremium
-                                ? 'Nieograniczona AI, eksport PDF, integracje'
-                                : 'Odblokuj pełny potencjał – AI, PDF, integracje',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ],
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
           const SizedBox(height: 16),
           // Integracje

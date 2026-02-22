@@ -1063,7 +1063,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
     final titleColor = isSelected ? colorScheme.onPrimary : colorScheme.onSurface;
     final priceColor = isSelected ? colorScheme.onPrimary : colorScheme.primary;
     final subtitleColor = isSelected ? colorScheme.onPrimary.withValues(alpha: 0.9) : colorScheme.onSurfaceVariant;
-    final radioColor = isSelected ? MaterialStateProperty.all(colorScheme.onPrimary) : null;
+    final radioColor = isSelected ? WidgetStateProperty.all(colorScheme.onPrimary) : null;
 
     return Card(
       elevation: isSelected ? 2 : 0,
@@ -1077,7 +1077,9 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
             children: [
               Radio<_PremiumPlan>(
                 value: plan,
+                // ignore: deprecated_member_use -- RadioGroup refactor deferred
                 groupValue: _selectedPlan,
+                // ignore: deprecated_member_use -- RadioGroup refactor deferred
                 onChanged: (_) => setState(() => _selectedPlan = plan),
                 fillColor: radioColor,
               ),

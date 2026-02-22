@@ -33,6 +33,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+dist_latwaforma_pl/
 
 # Symbolication related
 app.*.symbols
@@ -50,3 +51,6 @@ app.*.map.json
 
 # Supabase
 .supabase/
+
+# Netlify CLI (link do strony)
+.netlify/

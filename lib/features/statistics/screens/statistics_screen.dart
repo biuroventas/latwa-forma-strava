@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -261,17 +262,24 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           completer.complete();
           return;
         }
-        final tempDir = await getTemporaryDirectory();
-        final now = DateTime.now();
-        final file = File('${tempDir.path}/tygodniowe_${now.day}_${now.month}.png');
-        await file.writeAsBytes(byteData.buffer.asUint8List());
-        final box = boundary as RenderBox;
-        final shareRect = box.localToGlobal(Offset.zero) & box.size;
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: '📊 Łatwa Forma – Tygodniowe podsumowanie',
-          sharePositionOrigin: shareRect,
-        );
+        final bytes = byteData.buffer.asUint8List();
+        if (kIsWeb) {
+          final now = DateTime.now();
+          final xFile = XFile.fromData(bytes, name: 'tygodniowe_${now.day}_${now.month}.png');
+          await Share.shareXFiles([xFile], text: '📊 Łatwa Forma – Tygodniowe podsumowanie');
+        } else {
+          final tempDir = await getTemporaryDirectory();
+          final now = DateTime.now();
+          final file = File('${tempDir.path}/tygodniowe_${now.day}_${now.month}.png');
+          await file.writeAsBytes(bytes);
+          final box = boundary as RenderBox;
+          final shareRect = box.localToGlobal(Offset.zero) & box.size;
+          await Share.shareXFiles(
+            [XFile(file.path)],
+            text: '📊 Łatwa Forma – Tygodniowe podsumowanie',
+            sharePositionOrigin: shareRect,
+          );
+        }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

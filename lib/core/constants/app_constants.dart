@@ -30,8 +30,9 @@ class AppConstants {
   static const double maxCarbsG = 600.0;
   static const double maxCaloriesFromMacros = 8000.0;
   
-  // Porada AI - limit zapytań dziennie
-  static const int aiAdviceDailyLimit = 10;
+  // Porada AI – limity zapytań dziennie
+  static const int aiAdviceDailyLimit = 2; // bez Premium
+  static const int aiAdvicePremiumDailyLimit = 100; // Premium (opłacony + trial 24h)
 
   // Logowanie opóźnione – po ilu posiłkach pokazać „Zapisz postępy”
   static const int saveProgressMealsThreshold = 5;
@@ -94,4 +95,9 @@ class AppConstants {
   static const String contactEmail = 'contact@latwaforma.pl';
   /// Adres e-mail reprezentanta / właściciela (np. wniosek Garmin, dokumentacja).
   static const String ownerEmail = 'norbert.wroblewski@latwaforma.pl';
+
+  /// URL do profilu Facebook (stopka „Śledź nas”). Gdy null – przycisk nieaktywny.
+  static const String? socialFacebookUrl = null;
+  /// URL do profilu Instagram (stopka „Śledź nas”). Gdy null – przycisk nieaktywny.
+  static const String? socialInstagramUrl = null;
 }

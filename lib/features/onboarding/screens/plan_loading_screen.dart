@@ -240,12 +240,13 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
 
   Widget _buildMainText() {
     final isBouncePhase = _currentText == 'Dziękujemy!' || _currentText == 'Mamy to!';
+    final color = Theme.of(context).colorScheme;
 
     final textWidget = Text(
       _currentText,
       key: ValueKey(_currentText),
       style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: color.onSurface,
             fontWeight: FontWeight.bold,
           ),
       textAlign: TextAlign.center,
@@ -264,8 +265,8 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
     );
   }
 
-  Widget _buildMilestoneStepper(Color onPrimary) {
-    final primary = Theme.of(context).colorScheme.primary;
+  /// [stepColor] – kolor kółka i linii (np. primary), [iconOnStepColor] – kolor ikony check na kółku (np. onPrimary).
+  Widget _buildMilestoneStepper(Color stepColor, Color iconOnStepColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -275,10 +276,10 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
             _buildStepIcon(
               index: i,
               step: _steps[i],
-              onPrimary: onPrimary,
-              primary: primary,
+              stepColor: stepColor,
+              iconOnStepColor: iconOnStepColor,
             ),
-            if (i < _steps.length - 1) _buildConnectingLine(i, onPrimary),
+            if (i < _steps.length - 1) _buildConnectingLine(i, stepColor),
           ],
         ],
       ),
@@ -288,8 +289,8 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
   Widget _buildStepIcon({
     required int index,
     required _MilestoneStep step,
-    required Color onPrimary,
-    required Color primary,
+    required Color stepColor,
+    required Color iconOnStepColor,
   }) {
     final isCompleted = index <= _completedStepIndex;
     final isActive = index == _activeStepIndex;
@@ -302,14 +303,14 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isCompleted
-            ? onPrimary
+            ? stepColor
             : isActive
-                ? onPrimary.withValues(alpha: 0.5)
-                : onPrimary.withValues(alpha: 0.2),
+                ? stepColor.withValues(alpha: 0.5)
+                : stepColor.withValues(alpha: 0.2),
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: onPrimary.withValues(alpha: 0.5),
+                  color: stepColor.withValues(alpha: 0.5),
                   blurRadius: 14,
                   spreadRadius: 1,
                 ),
@@ -320,15 +321,15 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
         isCompleted ? Icons.check : step.icon,
         size: isCompleted ? 24 : 20,
         color: isCompleted
-            ? primary
+            ? iconOnStepColor
             : isActive
-                ? onPrimary
-                : onPrimary.withValues(alpha: 0.6),
+                ? iconOnStepColor
+                : iconOnStepColor.withValues(alpha: 0.6),
       ),
     );
   }
 
-  Widget _buildConnectingLine(int index, Color onPrimary) {
+  Widget _buildConnectingLine(int index, Color stepColor) {
     final isFilled = index < _completedStepIndex;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 350),
@@ -337,7 +338,7 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
       height: 2,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isFilled ? onPrimary : onPrimary.withValues(alpha: 0.25),
+        color: isFilled ? stepColor : stepColor.withValues(alpha: 0.25),
         borderRadius: BorderRadius.circular(1),
       ),
     );
@@ -349,20 +350,10 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
     final onPrimary = color.onPrimary;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  color.primary,
-                  color.primaryContainer,
-                ],
-              ),
-            ),
-            child: Center(
+          Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -371,7 +362,7 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
                   Icon(
                     Icons.fitness_center,
                     size: 72,
-                    color: onPrimary,
+                    color: color.primary,
                   ),
                   const SizedBox(height: 40),
                   // Główny tekst
@@ -380,13 +371,12 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
                     child: _buildMainText(),
                   ),
                   const SizedBox(height: 48),
-                  // Kroczące kroki (milestone stepper)
+                  // Kroczące kroki (milestone stepper) – kółka w kolorze primary, check w onPrimary
                   if (_currentText != 'Dziękujemy!')
-                    _buildMilestoneStepper(onPrimary),
+                    _buildMilestoneStepper(color.primary, color.onPrimary),
                 ],
               ),
             ),
-          ),
           // Confetti overlay (pełny ekran)
           IgnorePointer(
             child: SizedBox.expand(

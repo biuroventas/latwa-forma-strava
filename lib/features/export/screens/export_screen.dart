@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,19 +83,29 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
 
       final csvContent = csv.toString();
 
-      // Spróbuj zapisać do pliku i udostępnić
+      // Spróbuj zapisać do pliku i udostępnić (na webie bez path_provider)
       try {
-        final dir = await getTemporaryDirectory();
         final dateStr = DateTime.now().toIso8601String().split('T')[0];
-        final file = File('${dir.path}/latwa_forma_export_$dateStr.csv');
-        await file.writeAsString(csvContent, encoding: utf8);
-
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: 'Eksport danych Łatwa Forma',
-          subject: 'Dane Łatwa Forma - $dateStr',
-        );
-
+        if (kIsWeb) {
+          final xFile = XFile.fromData(
+            utf8.encode(csvContent),
+            name: 'latwa_forma_export_$dateStr.csv',
+          );
+          await Share.shareXFiles(
+            [xFile],
+            text: 'Eksport danych Łatwa Forma',
+            subject: 'Dane Łatwa Forma - $dateStr',
+          );
+        } else {
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/latwa_forma_export_$dateStr.csv');
+          await file.writeAsString(csvContent, encoding: utf8);
+          await Share.shareXFiles(
+            [XFile(file.path)],
+            text: 'Eksport danych Łatwa Forma',
+            subject: 'Dane Łatwa Forma - $dateStr',
+          );
+        }
         if (mounted) {
           SuccessMessage.show(
             context,
@@ -360,15 +371,26 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       );
 
       final bytes = await pdf.save();
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/latwa_forma_raport_$fileDateStr.pdf');
-      await file.writeAsBytes(bytes);
-
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Raport Łatwa Forma',
-        subject: 'Raport Łatwa Forma - $dateStr',
-      );
+      if (kIsWeb) {
+        final xFile = XFile.fromData(
+          bytes,
+          name: 'latwa_forma_raport_$fileDateStr.pdf',
+        );
+        await Share.shareXFiles(
+          [xFile],
+          text: 'Raport Łatwa Forma',
+          subject: 'Raport Łatwa Forma - $dateStr',
+        );
+      } else {
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/latwa_forma_raport_$fileDateStr.pdf');
+        await file.writeAsBytes(bytes);
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: 'Raport Łatwa Forma',
+          subject: 'Raport Łatwa Forma - $dateStr',
+        );
+      }
 
       if (mounted) {
         SuccessMessage.show(

@@ -145,7 +145,7 @@ Jeśli nie masz Supabase CLI – zainstaluj go albo użyj Supabase Dashboard: Pr
 
 Ten sam adres co dla magic link musi być w Supabase:
 - Supabase → Authentication → URL Configuration → Redirect URLs
-- Powinna być linia: `https://biuroventas.github.io/latwa-forma-strava/auth_redirect/`
+- Powinna być linia z adresem Twojej strony przekierowania (np. `https://biuroventas.github.io/latwa-forma-strava/auth_redirect/` przy GitHub Pages, lub **w produkcji** `https://latwaforma.pl/auth_redirect/` jeśli hostujesz tam auth_redirect).
 - Jeśli jej nie ma – dodaj ją i zapisz.
 
 **3. Mail z zaproszeniem po polsku**

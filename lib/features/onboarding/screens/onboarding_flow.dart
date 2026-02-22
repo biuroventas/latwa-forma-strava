@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -69,27 +70,42 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => _handleBack(context),
-          tooltip: 'Cofnij',
-        ),
-        title: const Text('Uzupełnij dane'),
-      ),
+      appBar: kIsWeb
+          ? null
+          : AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => _handleBack(context),
+                tooltip: 'Cofnij',
+              ),
+              title: const Text('Uzupełnij dane'),
+            ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 2,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
-            ),
-            child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Płeć
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  trackHeight: 2,
+                  thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (kIsWeb)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Text(
+                          'Uzupełnij dane',
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ),
+                    // Płeć
               Text(
                 'Płeć *',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -283,9 +299,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               const SizedBox(height: 10),
               
               // Przycisk zapisz
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
+              ElevatedButton(
                   onPressed: (_canProceed() && !_isSaving) ? _saveProfile : null,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -304,8 +318,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),
+                  ],
+                ),
               ),
-            ],
             ),
           ),
         ),
@@ -509,7 +524,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           // Rozpocznij 24h trial od razu, żeby dashboard odblokował funkcje premium
           try {
             final prefs = await SharedPreferences.getInstance();
-            final key = '${trialStartPrefKeyPrefix}${response.user!.id}';
+            final key = '$trialStartPrefKeyPrefix${response.user!.id}';
             await prefs.setInt(key, DateTime.now().millisecondsSinceEpoch);
           } catch (_) {}
         } catch (authError, stackTrace) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -19,8 +20,8 @@ const List<({String q, String a})> _footerFaqEntries = [
 
 // --- Theme / design tokens ---
 abstract final class OnboardingTokens {
-  // Kolory
-  static const Color green = Color(0xFF4CAF50);
+  // Kolory (green = tło logo: R66 G148 B69)
+  static const Color green = Color(0xFF429445);
   static const Color greenLight = Color(0xFFE8F5E9);
   static const Color greenVeryLight = Color(0xFFF3FFF4);
   static const Color textAlmostBlack = Color(0xFF212121);
@@ -37,8 +38,8 @@ abstract final class OnboardingTokens {
   static const double blobBlurRadius = 150.0;
 
   // Radius
-  static const double logoRadius = 22.0;
-  static const double logoSize = 88.0;
+  static const double logoRadius = 63.0; // +10%
+  static const double logoSize = 246.0; // 224 * 1.1
   static const double panelRadius = 26.0;
   static const double buttonRadius = 20.0;
   static const double panelHeight = 260.0;
@@ -58,7 +59,7 @@ abstract final class OnboardingTokens {
   static const double logoIconSize = 42.0;
   static const double iconSize = 22.0;
   static const double buttonHeight = 56.0;
-  static const double benefitFontSize = 16.5;
+  static const double benefitFontSize = 18.5;
   static const double titleFontSize = 30.0;
 }
 
@@ -83,40 +84,84 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: OnboardingTokens.horizontalPadding,
-                  vertical: OnboardingTokens.topPadding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildLogo(context),
-                    const SizedBox(height: OnboardingTokens.spaceXl),
-                    _buildTitle(context),
-                    const SizedBox(height: OnboardingTokens.spaceXl),
-                    _buildBenefitsList(context),
-                    const SizedBox(height: 28),
-                    Center(child: _buildIllustrationPanel(context)),
-                    const SizedBox(height: 24),
-                  ],
-                ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth > 720;
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: wide ? 24 : OnboardingTokens.horizontalPadding,
+                      vertical: wide ? 24 : OnboardingTokens.topPadding,
+                    ),
+                    child: wide
+                        ? _buildWideLayout(context)
+                        : _buildNarrowLayout(context),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFaqSection(context),
+                  _buildFooter(context),
+                ],
               ),
-              _buildBottomButtons(context),
-              const SizedBox(height: 40),
-              _buildForWhomSection(context),
-              const SizedBox(height: 24),
-              _buildFaqSection(context),
-              _buildFooter(context),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
+  }
+
+  Widget _buildNarrowLayout(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLogo(context),
+            const SizedBox(height: OnboardingTokens.spaceXl),
+                _buildBenefitsList(context),
+                const SizedBox(height: 0),
+                Transform.translate(
+                  offset: const Offset(0, -14),
+                  child: Center(child: _buildIllustrationPanel(context)),
+                ),
+                const SizedBox(height: 0),
+                Transform.translate(
+                  offset: const Offset(0, -25),
+                  child: _buildBottomButtons(context),
+                ),
+              ],
+            ),
+          ),
+        );
+  }
+
+  Widget _buildWideLayout(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLogo(context),
+            const SizedBox(height: OnboardingTokens.spaceXl),
+            _buildBenefitsList(context),
+            const SizedBox(height: 0),
+            Transform.translate(
+              offset: const Offset(0, -14),
+              child: Center(child: _buildIllustrationPanel(context)),
+            ),
+                const SizedBox(height: 0),
+                Transform.translate(
+                  offset: const Offset(0, -25),
+                  child: _buildBottomButtons(context),
+                ),
+              ],
+            ),
+          ),
+        );
   }
 
   Widget _buildLogo(BuildContext context) {
@@ -128,24 +173,14 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
           color: OnboardingTokens.green,
           borderRadius: BorderRadius.circular(OnboardingTokens.logoRadius),
         ),
-        child: const Icon(
-          Icons.fitness_center,
-          color: Colors.white,
-          size: OnboardingTokens.logoIconSize,
+        clipBehavior: Clip.antiAlias,
+        child: Image.asset(
+          'assets/images/logo400x400.png',
+          width: OnboardingTokens.logoSize,
+          height: OnboardingTokens.logoSize,
+          fit: BoxFit.contain,
         ),
       ),
-    );
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    return Text(
-      'Łatwa Forma',
-      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: OnboardingTokens.textAlmostBlack,
-            fontSize: OnboardingTokens.titleFontSize,
-          ),
-      textAlign: TextAlign.center,
     );
   }
 
@@ -186,7 +221,7 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
             text,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: OnboardingTokens.textAlmostBlack,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.normal,
                   fontSize: OnboardingTokens.benefitFontSize,
                   height: 1.35,
                 ),
@@ -197,15 +232,12 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
   }
 
   Widget _buildIllustrationPanel(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Image.asset(
-        'assets/images/grafika2.png',
-        fit: BoxFit.contain,
-        height: 260,
-        excludeFromSemantics: true,
-        errorBuilder: (_, __, ___) => const SizedBox(height: 260),
-      ),
+    return SvgPicture.asset(
+      'assets/images/grafika2.svg',
+      fit: BoxFit.contain,
+      height: OnboardingTokens.panelHeight,
+      excludeFromSemantics: true,
+      placeholderBuilder: (_) => const SizedBox(height: OnboardingTokens.panelHeight),
     );
   }
 
@@ -213,7 +245,7 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         OnboardingTokens.horizontalPadding,
-        OnboardingTokens.spaceLg,
+        0,
         OnboardingTokens.horizontalPadding,
         OnboardingTokens.bottomPadding,
       ),
@@ -310,11 +342,11 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
           Container(
             height: 1,
             width: double.infinity,
-            color: OnboardingTokens.greenLight.withOpacity(0.5),
+            color: OnboardingTokens.greenLight.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
-            '© 2026 Łatwa Forma / VENTAS NORBERT WRÓBLEWSKI. Wszelkie prawa zastrzeżone.',
+            '© 2026 Łatwa Forma | VENTAS NORBERT WRÓBLEWSKI. Wszelkie prawa zastrzeżone.',
             style: TextStyle(
               fontSize: 12,
               color: OnboardingTokens.grey,
@@ -352,68 +384,28 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
     );
   }
 
-  /// Sekcja „Dla kogo jest aplikacja” i „Co możesz osiągnąć” – motywacyjna, nad FAQ.
-  Widget _buildForWhomSection(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: OnboardingTokens.horizontalPadding),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 640),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Dla kogo jest Łatwa Forma?',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: OnboardingTokens.textAlmostBlack,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Dla każdego, kto chce w końcu ogarnąć odżywianie bez reżimu i głodówek – i zobaczyć realne efekty. '
-                'Nie musisz być na diecie „od poniedziałku”. Wystarczy, że codziennie wiesz, co jesz, ile pijesz i jak się ruszasz. '
-                'Łatwa Forma pomaga trzymać to w jednym miejscu i dopasować plan do Twojego celu.',
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 1.5,
-                  color: OnboardingTokens.textAlmostBlack,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Co możesz osiągnąć z jej pomocą?',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: OnboardingTokens.textAlmostBlack,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Lepsze nawyki, spokój w głowie i trwała zmiana sylwetki. '
-                'Śledź kalorie i makra bez obsesji, pij wodę regularnie, łącz aktywność ze Stravy i Garmina – i zobacz, jak tygodnie zamieniają się w miesiące postępu. '
-                'Małymi krokami do celu, który naprawdę utrzymasz.',
-                style: TextStyle(
-                  fontSize: 15,
-                  height: 1.5,
-                  color: OnboardingTokens.textAlmostBlack,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+  /// Treść sekcji FAQ (wyśrodkowana).
+  Widget _buildFaqSectionContent(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          'FAQ – najczęściej zadawane pytania',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: OnboardingTokens.textAlmostBlack,
           ),
+          textAlign: TextAlign.center,
         ),
-      ),
+        const SizedBox(height: 12),
+        _FaqExpandableList(entries: _footerFaqEntries, initialCount: 5),
+      ],
     );
   }
 
-  /// Sekcja FAQ nad stopką – rozwijane pytania i odpowiedzi.
+  /// Sekcja FAQ nad stopką – wąski layout (pod główną treścią).
   Widget _buildFaqSection(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -421,28 +413,10 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
         horizontal: OnboardingTokens.horizontalPadding,
         vertical: OnboardingTokens.spaceXl,
       ),
-      decoration: BoxDecoration(
-        color: OnboardingTokens.greenLight.withOpacity(0.25),
-      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 640),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'FAQ – najczęściej zadawane pytania',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: OnboardingTokens.textAlmostBlack,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _FaqExpandableList(entries: _footerFaqEntries, initialCount: 3),
-            ],
-          ),
+          child: _buildFaqSectionContent(context),
         ),
       ),
     );
@@ -459,9 +433,9 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
             color: OnboardingTokens.grey,
           ),
         ),
-        _socialIcon(context, Icons.facebook_rounded, 'Facebook', null),
+        _socialIcon(context, Icons.facebook_rounded, 'Facebook', AppConstants.socialFacebookUrl),
         const SizedBox(width: 4),
-        _socialIcon(context, Icons.camera_alt, 'Instagram', null),
+        _socialIcon(context, Icons.camera_alt, 'Instagram', AppConstants.socialInstagramUrl),
       ],
     );
   }

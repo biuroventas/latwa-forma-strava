@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Kolory główne - zielony/niebieski (zdrowie, forma)
-  static const Color primaryColor = Color(0xFF4CAF50); // Zielony
-  static const Color primaryColorDark = Color(0xFF388E3C);
-  static const Color primaryColorLight = Color(0xFF81C784);
+  // Kolory główne = tło logo (R66 G148 B69)
+  static const Color primaryColor = Color(0xFF429445);
+  static const Color primaryColorDark = Color(0xFF368837);
+  static const Color primaryColorLight = Color(0xFF5BB85D);
   
   // Kolory akcentów - pomarańczowy/czerwony (aktywności)
   static const Color accentColor = Color(0xFFFF9800); // Pomarańczowy
@@ -25,7 +25,7 @@ class AppTheme {
   static const Color darkTextSecondary = Color(0xFFB0B0B0);
   
   // Kolory dla wykresów i statystyk
-  static const Color chartColor1 = Color(0xFF4CAF50);
+  static const Color chartColor1 = Color(0xFF429445);
   static const Color chartColor2 = Color(0xFF2196F3);
   static const Color chartColor3 = Color(0xFFFF9800);
   static const Color chartColor4 = Color(0xFFE91E63);
@@ -33,10 +33,10 @@ class AppTheme {
   // Kolory dla makroskładników
   static const Color proteinColor = Color(0xFF2196F3); // Niebieski
   static const Color fatColor = Color(0xFFFF9800); // Pomarańczowy
-  static const Color carbsColor = Color(0xFF4CAF50); // Zielony
+  static const Color carbsColor = Color(0xFF429445); // Zielony (logo)
   
   // Kolory dla statusów
-  static const Color successColor = Color(0xFF4CAF50);
+  static const Color successColor = Color(0xFF429445);
   static const Color warningColor = Color(0xFFFF9800);
   static const Color errorColor = Color(0xFFE53935);
   static const Color infoColor = Color(0xFF2196F3);
@@ -139,6 +139,13 @@ class AppTheme {
           color: textSecondary,
         ),
       ),
+      scrollbarTheme: ScrollbarThemeData(
+        thickness: WidgetStateProperty.all(6),
+        thumbVisibility: WidgetStateProperty.all(false),
+        trackVisibility: WidgetStateProperty.all(false),
+        radius: const Radius.circular(3),
+        interactive: true,
+      ),
     );
   }
   
@@ -239,6 +246,13 @@ class AppTheme {
           fontSize: 14,
           color: darkTextSecondary,
         ),
+      ),
+      scrollbarTheme: ScrollbarThemeData(
+        thickness: WidgetStateProperty.all(6),
+        thumbVisibility: WidgetStateProperty.all(false),
+        trackVisibility: WidgetStateProperty.all(false),
+        radius: const Radius.circular(3),
+        interactive: true,
       ),
     );
   }

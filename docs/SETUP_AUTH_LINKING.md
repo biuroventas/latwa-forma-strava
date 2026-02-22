@@ -61,3 +61,5 @@ Klienty e-mail otwierają link w wbudowanej przeglądarce, która nie obsługuje
 6. **Spam** – link może trafić do folderu spam; zalecaj użytkownikom sprawdzenie
 
 7. **Custom SMTP** – w produkcji skonfiguruj własny SMTP (Authentication → Email Templates → SMTP)
+
+**Produkcja (latwaforma.pl):** Hostuj `auth_redirect` na domenie (np. w deployu Netlify) i w Redirect URLs oraz w .env użyj np. `https://latwaforma.pl/auth_redirect/`.

@@ -47,6 +47,7 @@ class SaveProgressChecker extends StatefulWidget {
     final email = await _showEmailInputDialog(context);
     if (email == null || email.isEmpty || !context.mounted) return;
     await savePendingVerificationEmail(email);
+    if (!context.mounted) return;
     await _runLinkFlow(
       context,
       future: AuthLinkService().linkWithEmail(email),
@@ -200,6 +201,7 @@ class SaveProgressChecker extends StatefulWidget {
   /// Wpisanie kodu bez ponownego wysyłania maila (gdy użytkownik zamknął okno lub wyłączył aplikację).
   static Future<void> _runEnterCodeOnly(BuildContext context, VoidCallback? onInvalidate) async {
     final savedEmail = await getPendingVerificationEmail();
+    if (!context.mounted) return;
     String? email = savedEmail;
     if (email == null || email.isEmpty) {
       final entered = await showDialog<String>(

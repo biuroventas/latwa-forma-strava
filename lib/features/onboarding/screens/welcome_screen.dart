@@ -121,11 +121,13 @@ class WelcomeScreen extends StatelessWidget {
                               if (result.email != null && result.email!.isNotEmpty) {
                                 await savePendingVerificationEmail(result.email!);
                               }
+                              if (!context.mounted) return;
                               await _showEnterCodeDialog(context);
                               return;
                             }
                             if (result.email != null) {
                               await savePendingVerificationEmail(result.email!);
+                              if (!context.mounted) return;
                               await _runSignInWithEmail(context, result.email!);
                             }
                           }
@@ -297,12 +299,14 @@ class WelcomeScreen extends StatelessWidget {
       );
       return;
     }
+    if (!context.mounted) return;
     await _onEnterCode(context);
   }
 
   /// Gdy użytkownik zamknął okno lub wyłączył aplikację przed wpisaniem kodu – od razu okno do wpisania kodu.
   Future<void> _onEnterCode(BuildContext context) async {
     final savedEmail = await getPendingVerificationEmail();
+    if (!context.mounted) return;
     final String email;
     if (savedEmail != null && savedEmail.isNotEmpty) {
       email = savedEmail;
@@ -691,6 +695,7 @@ class WelcomeScreen extends StatelessWidget {
               return;
             }
           }
+          if (!context.mounted) return;
           _showAnonymousErrorDialog(context, timeout: true);
           return;
         }

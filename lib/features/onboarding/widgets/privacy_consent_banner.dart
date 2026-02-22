@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_constants.dart';
+import '../screens/easy_forma_onboarding.dart' show OnboardingTokens;
 
 const String _consentKey = 'privacy_cookie_consent_accepted';
 
@@ -59,43 +60,54 @@ class _PrivacyConsentBannerState extends State<PrivacyConsentBanner> {
     if (!_loaded || _accepted || _dismissedReject) {
       return const SizedBox.shrink();
     }
+    final compactStyle = ButtonStyle(
+      padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+      minimumSize: WidgetStateProperty.all(const Size(0, 36)),
+      visualDensity: VisualDensity.compact,
+    );
     return Material(
       elevation: 8,
       child: SafeArea(
         top: false,
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           color: Theme.of(context).colorScheme.surface,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Ta strona przetwarza dane osobowe zgodnie z naszą Polityką prywatności. '
+                'Przetwarzamy dane osobowe zgodnie z naszą polityką prywatności. '
                 'Korzystając z aplikacji, akceptujesz jej warunki.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   color: Theme.of(context).colorScheme.onSurface,
                   height: 1.4,
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              const SizedBox(height: 10),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 6,
                 children: [
                   TextButton(
+                    style: compactStyle,
                     onPressed: _openPrivacyPolicy,
                     child: const Text('Polityka prywatności'),
                   ),
-                  const SizedBox(width: 12),
                   OutlinedButton(
+                    style: compactStyle,
                     onPressed: _onReject,
                     child: const Text('Odrzuć'),
                   ),
-                  const SizedBox(width: 12),
                   FilledButton(
+                    style: compactStyle.copyWith(
+                      backgroundColor: WidgetStateProperty.all(OnboardingTokens.green),
+                      foregroundColor: WidgetStateProperty.all(Colors.white),
+                    ),
                     onPressed: _onAccept,
                     child: const Text('Akceptuję'),
                   ),
