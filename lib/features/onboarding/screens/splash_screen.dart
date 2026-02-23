@@ -9,11 +9,11 @@ import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/supabase_service.dart';
 
 /// Maksymalny czas oczekiwania na Supabase (getUser / getProfile) – po przekroczeniu przechodzimy na welcome.
-const _splashTimeout = Duration(seconds: 10);
+const _splashTimeout = Duration(seconds: 8);
 /// Maksymalny czas całego splashu – po tym zawsze przechodzimy dalej (na welcome).
 const _splashMaxTime = Duration(seconds: 12);
-/// Po tym czasie pokazujemy przycisk „Przerwij”, żeby użytkownik mógł wyjść z ładowania.
-const _splashShowSkipAfter = Duration(seconds: 5);
+/// Po tym czasie pokazujemy przycisk „Przerwij” (logowanie Google bywa wolne).
+const _splashShowSkipAfter = Duration(seconds: 3);
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -93,8 +93,10 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
       var userId = user?.id;
 
       // Na iOS cold start z „Otwórz w Latwa Forma” link bywa dostępny dopiero tutaj.
+      // Z timeoutem, żeby przy ?code= z Google ekran nie wisiał w nieskończoność.
       if (userId == null) {
-        final sessionSet = await tryProcessInitialAuthLink();
+        final sessionSet = await tryProcessInitialAuthLink()
+            .timeout(const Duration(seconds: 5), onTimeout: () => false);
         if (sessionSet && mounted) {
           user = SupabaseConfig.auth.currentUser;
           userId = user?.id;
@@ -186,6 +188,7 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
       if (!mounted) return;
       _navigateDone = true;
       context.go(AppRoutes.welcome);
+      if (mounted) _showWelcomeSnackBarIfGoogleFailed(context);
     } catch (e) {
       debugPrint('Błąd podczas sprawdzania profilu: $e');
       if (!mounted) return;
@@ -194,58 +197,69 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
       if (elapsed < minDisplayTime) await Future.delayed(minDisplayTime - elapsed);
       if (!mounted) return;
       context.go(AppRoutes.welcome);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Nie udało się zalogować. Uzupełnij profil lub spróbuj zalogować się ponownie.',
-          ),
-          backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 4),
-        ),
-      );
+      if (mounted) {
+        if (!lastGoogleCallbackFailed) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Nie udało się zalogować. Uzupełnij profil lub spróbuj zalogować się ponownie.',
+              ),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        } else {
+          _showWelcomeSnackBarIfGoogleFailed(context);
+        }
+      }
     }
+  }
+
+  void _showWelcomeSnackBarIfGoogleFailed(BuildContext context) {
+    if (!lastGoogleCallbackFailed) return;
+    clearLastGoogleCallbackFailed();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Logowanie Google nie powiodło się. Zaloguj się ponownie w tej samej karcie.',
+        ),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 6),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    // Bez własnego AppBackground – tło daje ShellRoute (jednolite z resztą aplikacji).
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Colors.transparent,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Placeholder dla logo - później zastąpimy prawdziwym logo
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/images/logo400x400.png',
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.fitness_center,
-                size: 60,
-                color: Color(0xFF4CAF50),
+                  child: const Icon(Icons.fitness_center, size: 60, color: Color(0xFF4CAF50)),
+                ),
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'Łatwa Forma',
-              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 16),
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(primary),
             ),
             if (_showSkipButton) ...[
               const SizedBox(height: 24),
@@ -255,10 +269,10 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
                   _navigateDone = true;
                   context.go(AppRoutes.welcome);
                 },
-                icon: const Icon(Icons.close, color: Colors.white, size: 20),
-                label: const Text(
+                icon: Icon(Icons.close, color: primary, size: 20),
+                label: Text(
                   'Przerwij',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: primary, fontWeight: FontWeight.w500),
                 ),
               ),
             ],

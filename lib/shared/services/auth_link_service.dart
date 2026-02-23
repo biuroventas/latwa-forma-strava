@@ -2,15 +2,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../core/auth/sign_out_guard.dart';
 import '../../core/config/supabase_config.dart';
 import '../../core/constants/app_constants.dart';
 
 /// Adres przekierowania po OAuth (Safari / mobile) – schemat latwaforma.
 const String _oauthRedirectUrl = 'latwaforma://auth/callback';
 
-/// Na webie przekierowanie musi być na URL strony (latwaforma.pl).
-String get _redirectUrl =>
-    kIsWeb ? AppConstants.webAuthRedirectUrl : _oauthRedirectUrl;
+/// Na webie przekierowanie musi być na bieżącą origin strony (np. https://latwaforma.pl
+/// lub https://www.latwaforma.pl). PKCE zapisuje code_verifier w localStorage – po powrocie
+/// z Google przeglądarka musi być na tej samej domenie, inaczej „Code verifier could not be found”.
+/// W Supabase Redirect URLs dodaj obie wersje, jeśli używasz www i bez www.
+String get _redirectUrl {
+  if (!kIsWeb) return _oauthRedirectUrl;
+  final origin = Uri.base.origin.trim();
+  // Zawsze używamy bieżącej origin (localhost, latwaforma.pl, www.latwaforma.pl),
+  // żeby po powrocie z Google localStorage był ten sam.
+  return origin.isNotEmpty ? origin : AppConstants.webAuthRedirectUrl.trim();
+}
 
 /// Dla magic link (e-mail) używamy HTTPS – klienty e-mail nie obsługują custom scheme.
 /// Strona HTTPS przekierowuje na latwaforma://auth/callback.
@@ -29,13 +38,17 @@ class AuthLinkService {
   final _auth = SupabaseConfig.auth;
 
   /// Logowanie przez Google (dla użytkowników wracających – bez anonimowego konta).
+  /// prompt=select_account wymusza wybór konta Google (użytkownik może wybrać inny mail niż domyślny w przeglądarce).
   /// externalApplication – Safari. inAppWebView i inAppBrowserView na iOS pokazują pustą stronę.
   Future<AuthLinkResult> signInWithGoogle() async {
     try {
+      // Żeby po powrocie z Google callback był przetworzony (nie blokowany przez guard po wylogowaniu).
+      await clearSignOutMark();
       await _auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: _redirectUrl,
         authScreenLaunchMode: kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
+        queryParams: const {'prompt': 'select_account'},
       );
       return AuthLinkResult.success(
         message: kIsWeb
@@ -106,6 +119,7 @@ class AuthLinkService {
   }
 
   /// Łączy konto przez przeglądarkę (OAuth).
+  /// prompt=select_account – użytkownik może wybrać konto Google (np. inny mail).
   /// externalApplication – Safari; wbudowane widoki pokazują pustą stronę na iOS.
   Future<AuthLinkResult> linkWithGoogleViaBrowser() async {
     try {
@@ -113,6 +127,7 @@ class AuthLinkService {
         OAuthProvider.google,
         redirectTo: _redirectUrl,
         authScreenLaunchMode: kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
+        queryParams: const {'prompt': 'select_account'},
       );
       return AuthLinkResult.success(
         message: 'Otwieram Safari. Zaloguj się i wróć do aplikacji.',

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseConfig {
@@ -15,21 +16,63 @@ class SupabaseConfig {
     return Supabase.instance.client.auth.currentUser;
   }
 
+  /// Parsuje treść pliku .env (KEY=VALUE po linii) do mapy.
+  static Map<String, String> _parseEnv(String content) {
+    final map = <String, String>{};
+    for (final line in content.split('\n')) {
+      final trimmed = line.trim();
+      if (trimmed.isEmpty || trimmed.startsWith('#')) continue;
+      final idx = trimmed.indexOf('=');
+      if (idx <= 0) continue;
+      final key = trimmed.substring(0, idx).trim();
+      final value = trimmed.substring(idx + 1).trim();
+      if (key.isEmpty) continue;
+      // Usuń cudzysłowy z wartości
+      final v = value.startsWith('"') && value.endsWith('"')
+          ? value.substring(1, value.length - 1)
+          : value;
+      map[key] = v;
+    }
+    return map;
+  }
+
   static Future<void> initialize() async {
     _initialized = false;
-    // Na webie pliki z kropką (.env) często 404 – najpierw ładujemy env.production (tworzony na Netlify).
     try {
       if (kIsWeb) {
+        // Na webie najpierw pobierz env.production z serwera (plik w build/web) – niezawodne.
         try {
-          await dotenv.load(fileName: 'env.production');
-          debugPrint('✅ env.production załadowany (web)');
-        } catch (_) {
+          final url = Uri.base.resolve('/env.production');
+          final response = await http.get(url).timeout(
+                const Duration(seconds: 5),
+                onTimeout: () => http.Response('', 408),
+              );
+          if (response.statusCode == 200 && response.body.trim().isNotEmpty) {
+            final map = _parseEnv(response.body);
+            if (map.isNotEmpty) {
+              await dotenv.load(
+                fileName: '.env',
+                mergeWith: map,
+                isOptional: true,
+              );
+              debugPrint('✅ env.production załadowany z serwera (web)');
+            }
+          }
+        } catch (_) {}
+        // Jeśli fetch nie dał danych, fallback na asset
+        if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
           try {
-            await dotenv.load(fileName: '.env');
-            debugPrint('✅ .env załadowany (web)');
+            await dotenv.load(fileName: 'assets/env.production');
+            debugPrint('✅ env.production z assets (web)');
           } catch (__) {
-            await dotenv.load(fileName: 'assets/.env');
-            debugPrint('✅ .env z assets (web)');
+            try {
+              await dotenv.load(fileName: 'env.production');
+              debugPrint('✅ env.production z root (web)');
+            } catch (___) {
+              try {
+                await dotenv.load(fileName: '.env', isOptional: true);
+              } catch (____) {}
+            }
           }
         }
       } else {
@@ -40,13 +83,13 @@ class SupabaseConfig {
       debugPrint('⚠️ Błąd ładowania env: $e');
       try {
         if (kIsWeb) {
-          await dotenv.load(fileName: 'assets/env.production');
+          await dotenv.load(fileName: 'assets/env.production', isOptional: true);
         } else {
-          await dotenv.load(fileName: 'assets/.env');
+          await dotenv.load(fileName: 'assets/.env', isOptional: true);
         }
         debugPrint('✅ env załadowany z alternatywnej lokalizacji');
       } catch (e2) {
-        debugPrint('❌ Błąd ładowania env z alternatywnej lokalizacji: $e2');
+        debugPrint('❌ Błąd ładowania env: $e2');
         if (kDebugMode) {
           debugPrint('⚠️ Używanie wartości domyślnych (tylko dla testów)');
         }
@@ -76,7 +119,9 @@ class SupabaseConfig {
         anonKey: supabaseAnonKey,
         authOptions: FlutterAuthClientOptions(
           authFlowType: AuthFlowType.pkce,
-          detectSessionInUri: kIsWeb,
+          // Na webie false – wymianę ?code= robimy sami w main()/splashu (tryProcessInitialAuthLink),
+          // żeby wyjątki były łapane i nie było „Uncaught Error” w konsoli.
+          detectSessionInUri: false,
         ),
         realtimeClientOptions: const RealtimeClientOptions(
           logLevel: RealtimeLogLevel.info,
@@ -84,6 +129,14 @@ class SupabaseConfig {
       );
       _initialized = true;
       debugPrint('✅ Supabase zainicjalizowane pomyślnie');
+
+      if (kIsWeb) {
+        final origin = (Uri.base.origin).trim();
+        if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+          debugPrint('📍 Lokalne (Chrome): dla logowania Google dodaj w Supabase → Auth → URL Configuration → Redirect URLs:');
+          debugPrint('   $origin');
+        }
+      }
 
       try {
         final currentSession = Supabase.instance.client.auth.currentSession;
@@ -100,4 +153,12 @@ class SupabaseConfig {
   static SupabaseClient get client => Supabase.instance.client;
 
   static GoTrueClient get auth => Supabase.instance.client.auth;
+
+  /// Bazowy URL Edge Functions (np. https://xxx.supabase.co/functions/v1).
+  /// Używane do wywołań HTTP z tokenem, żeby płatność działała bez 401 od bramki.
+  static String get functionsBaseUrl {
+    final u = (dotenv.env['SUPABASE_URL'] ?? '').trim();
+    final base = u.endsWith('/') ? u.substring(0, u.length - 1) : u;
+    return '$base/functions/v1';
+  }
 }
