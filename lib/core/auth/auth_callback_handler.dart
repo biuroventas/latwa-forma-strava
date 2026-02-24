@@ -7,9 +7,23 @@ import '../config/supabase_config.dart';
 import 'package:latwa_forma/core/utils/url_cleaner_stub.dart' if (dart.library.html) 'package:latwa_forma/core/utils/url_cleaner_web.dart' as url_cleaner;
 import 'sign_out_guard.dart';
 
+/// Zwraca kod PKCE z query albo z fragmentu (#path?code=xxx).
+/// Callback Garmin używa garmin_code= – nie traktujemy go jako Supabase code.
+String? _getCodeFromUri(Uri uri) {
+  final q = uri.queryParameters['code'];
+  if (q != null && q.isNotEmpty) return q;
+  final frag = uri.fragment;
+  if (frag.isEmpty || !frag.contains('code=')) return null;
+  final qIndex = frag.indexOf('?');
+  if (qIndex < 0 || qIndex >= frag.length - 1) return null;
+  final params = Uri.splitQueryString(frag.substring(qIndex + 1));
+  final code = params['code'];
+  return (code != null && code.isNotEmpty) ? code : null;
+}
+
 /// Czy URI to callback OAuth/magic link z Supabase (powrót z logowania Google itd.).
 /// Na webie Supabase często przekierowuje na Site URL z tokenami w hash (np. #access_token=...)
-/// albo z parametrem ?code= (PKCE) – rozpoznajemy też te przypadki.
+/// albo z parametrem ?code= (PKCE) – rozpoznajemy też code= w fragmencie (#path?code=).
 bool isAuthCallbackUri(Uri? uri) {
   if (uri == null) return false;
   final s = uri.toString();
@@ -18,6 +32,7 @@ bool isAuthCallbackUri(Uri? uri) {
   if (uri.queryParameters.containsKey('code')) return true;
   final frag = uri.fragment;
   if (frag.isNotEmpty && frag.contains('access_token')) return true;
+  if (frag.isNotEmpty && frag.contains('code=')) return true;
   return false;
 }
 
@@ -41,7 +56,7 @@ Future<void> handleAuthCallbackUri(Uri uri) async {
     debugPrint('⚠️ Auth callback z błędem w URI – pomijam');
     return;
   }
-  final code = uri.queryParameters['code'];
+  final code = _getCodeFromUri(uri);
 
   // PKCE: najpierw wymiana kodu – na webie często pewniejsza niż getSessionFromUrl(uri).
   if (code != null && code.isNotEmpty) {
@@ -62,6 +77,10 @@ Future<void> handleAuthCallbackUri(Uri uri) async {
       debugPrint('⚠️ exchangeCodeForSession: $e');
       if (kDebugMode) debugPrint('$st');
       _lastGoogleCallbackFailed = true;
+      // Brak code_verifier w localStorage – getSessionFromUrl też go nie odzyska; czyścimy URL, żeby odświeżenie nie powtarzało błędu.
+      if (kIsWeb && e.toString().contains('Code verifier could not be found')) {
+        url_cleaner.clearAuthParamsFromUrl();
+      }
     }
   }
 
@@ -92,13 +111,14 @@ Future<void> handleAuthCallbackUri(Uri uri) async {
 Future<bool> tryProcessInitialAuthLink() async {
   try {
     if (!SupabaseConfig.isInitialized) {
-      if (kIsWeb && Uri.base.queryParameters.containsKey('code')) {
+      if (kIsWeb && (Uri.base.queryParameters.containsKey('code') || Uri.base.fragment.contains('code='))) {
         debugPrint('⚠️ Auth: Supabase nie zainicjalizowany – nie można wymienić kodu z URL. Sprawdź env (SUPABASE_URL, SUPABASE_ANON_KEY).');
       }
       return false;
     }
     Uri? uri;
-    if (kIsWeb && Uri.base.queryParameters.containsKey('code')) {
+    final baseHasCode = kIsWeb && (Uri.base.queryParameters.containsKey('code') || Uri.base.fragment.contains('code='));
+    if (kIsWeb && baseHasCode) {
       uri = Uri.base;
       debugPrint('🔐 Auth: wykryto ?code= w URL (origin: ${Uri.base.origin}), rozpoczynam wymianę...');
     } else if (kIsWeb && isAuthCallbackUri(Uri.base)) {
@@ -110,10 +130,10 @@ Future<bool> tryProcessInitialAuthLink() async {
       }
     }
     if (!isAuthCallbackUri(uri)) return false;
-    // Świeży powrót z Google (?code=) – zawsze przetwarzaj. Guard tylko dla starych linków (magic link itd.).
-    final hasFreshCode = uri!.queryParameters.containsKey('code');
+    // Świeży powrót z Google (?code= w query lub we fragmencie) – zawsze przetwarzaj. Guard tylko dla starych linków (magic link itd.).
+    final hasFreshCode = uri != null && _getCodeFromUri(uri) != null;
     if (!hasFreshCode && !await shouldProcessInitialAuthLink()) return false;
-    await handleAuthCallbackUri(uri).timeout(
+    await handleAuthCallbackUri(uri!).timeout(
       _authCallbackTimeout,
       onTimeout: () {
         debugPrint('⚠️ tryProcessInitialAuthLink timeout');

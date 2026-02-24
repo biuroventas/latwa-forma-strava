@@ -1,0 +1,115 @@
+# Integracja Garmin Connect – konfiguracja krok po kroku
+
+Aplikacja Łatwa Forma ma już gotowy kod integracji z Garmin (OAuth 2.0 PKCE, import aktywności). Żeby działała, musisz założyć aplikację w Garmin Developer Portal i dodać klucze do projektu.
+
+---
+
+## 1. Dostęp do portalu (masz już z maila)
+
+- **Portal:** https://developerportal.garmin.com/
+- **Login:** `norbert.wroblewski@latwaforma.pl` (wpisywać ręcznie, case sensitive).
+- Ustaw pierwsze hasło przez link z maila od Garmin („click HERE”).
+
+Na razie masz **Evaluation Environment** (środowisko testowe). Produkcja będzie po osobnej weryfikacji – do rozwoju i testów Evaluation wystarczy.
+
+---
+
+## 2. Utworzenie aplikacji w portalu
+
+1. Zaloguj się na https://developerportal.garmin.com/
+2. W **Overview** kliknij niebieski link **„creating apps”** (albo w menu po lewej: **Apps** → Create / Add app).
+3. Wypełnij formularz – **gotowe wartości do skopiowania** masz w pliku **`docs/GARMIN_WARTOSCI_DO_FORMULARZA.md`** (nazwa, opis, Privacy Policy URL, Redirect URL).
+4. Zapisz aplikację. W portalu dostaniesz:
+   - **Consumer Key** → w projekcie = `GARMIN_CLIENT_ID`
+   - **Consumer Secret** → w projekcie = `GARMIN_CLIENT_SECRET`
+
+W dokumentacji Garmin „Consumer Key” = `client_id`, „Consumer Secret” = `client_secret` w żądaniach OAuth.
+
+---
+
+## 3. Konfiguracja w projekcie Łatwa Forma
+
+### 3.1 Plik `.env` (lokalnie i ewentualnie na CI)
+
+W katalogu głównym projektu w pliku `.env` dodaj (bez commitu – `.env` jest w `.gitignore`):
+
+```env
+# Garmin Connect
+GARMIN_CLIENT_ID=twój_consumer_key_z_portalu
+GARMIN_CLIENT_SECRET=twój_consumer_secret_z_portalu
+```
+
+**Redirect URI:**
+
+- Dla **aplikacji mobilnej** nie musisz nic ustawiać – domyślnie używane jest `latwaforma://garmin-callback`.
+- Dla **aplikacji web** ustaw w `.env`:
+
+```env
+GARMIN_REDIRECT_URI=https://latwaforma.pl/garmin-callback.html
+```
+
+(Aplikacja wdrażana jest tylko na latwaforma.pl – **dokładnie ten sam URL** wpisz w Garmin Developer Portal jako Redirect URL.)
+
+### 3.2 Build web (produkcja)
+
+Przy budowaniu wersji web (`scripts/prepare_latwaforma_pl.sh`) zmienne `GARMIN_CLIENT_ID`, `GARMIN_CLIENT_SECRET` i opcjonalnie `GARMIN_REDIRECT_URI` są kopiowane z `.env` do `env.production` i do `build/web`, tak aby aplikacja web miała do nich dostęp. Upewnij się, że w `.env` (lub w zmiennych na Netlify/CI) są ustawione przed buildem.
+
+### 3.2 Edge Function (wymiana tokenów na stronie)
+
+Na **stronie** (przeglądarka) bezpośredni POST do Garmin jest blokowany przez CORS. Wymiana kodu na tokeny odbywa się więc przez **Supabase Edge Function** `garmin_exchange_code`.
+
+1. **Wdróż funkcję:**  
+   `supabase functions deploy garmin_exchange_code`
+
+2. **Ustaw sekrety** w Supabase (Dashboard → Edge Functions → garmin_exchange_code → Secrets albo przez CLI):  
+   - `GARMIN_CLIENT_ID` = Consumer Key z portalu  
+   - `GARMIN_CLIENT_SECRET` = Consumer Secret  
+   - `GARMIN_REDIRECT_URI` = `https://latwaforma.pl/garmin-callback.html` (opcjonalnie, domyślnie ten URL)
+
+Bez wdrożonej funkcji i sekretów „Połącz z Garmin” na stronie zakończy się błędem typu „Failed to fetch” przy wymianie kodu.
+
+---
+
+## 4. Callback na stronie (web)
+
+Plik `web/garmin-callback.html` jest w repozytorium i przy buildzie trafia do `build/web`. Deploy idzie na latwaforma.pl (Netlify), więc callback jest pod `https://latwaforma.pl/garmin-callback.html`. Skrypt na tej stronie przekazuje `code` do SPA (`/#/integrations?garmin_code=...`) lub do aplikacji mobilnej przez deep link `latwaforma://garmin-callback?...`.
+
+---
+
+## 5. Sprawdzenie działania
+
+1. **Lokalnie (mobile):**  
+   Uruchom aplikację, wejdź w **Profil** → **Integracje** → **Połącz z Garmin Connect**. Powinno otworzyć się Garmin, po autoryzacji przekierowanie z powrotem do aplikacji i zapis tokenów.
+
+2. **Web:**  
+   Otwórz aplikację pod adresem, dla którego ustawiłeś `GARMIN_REDIRECT_URI` i Redirect URL w portalu. Po kliknięciu „Połącz z Garmin Connect” po autoryzacji użytkownik wróci na `garmin-callback.html`, a stamtąd na `/#/integrations?garmin_code=...` – aplikacja wymieni kod na tokeny.
+
+3. **Synchronizacja:**  
+   Po połączeniu użyj przycisku „Synchronizuj aktywności”. **Garmin Health API udostępnia dane tylko z ostatnich 7 dni** (polityka retencji) – synchronizacja pobiera aktywności z tego okresu.
+
+---
+
+## 6. Gdy coś nie działa
+
+- **„Garmin nie jest skonfigurowane”** – brak `GARMIN_CLIENT_ID` lub `GARMIN_CLIENT_SECRET` w załadowanym env (sprawdź `.env` lokalnie, `env.production` / zmienne builda na web).
+- **Błąd redirect_uri / invalid redirect** – w Garmin Developer Portal w ustawieniach aplikacji Redirect URL musi być **identyczny** z tym, którego używa aplikacja (w tym protokół, domena, ścieżka). Dla web – ten sam co `GARMIN_REDIRECT_URI`.
+- **Evaluation vs produkcja** – na razie używaj tylko Evaluation; użycie aplikacji eval w produkcji komercyjnej może skutkować wyłączeniem. Po uzyskaniu dostępu do produkcji załóż osobną aplikację w portalu i wpisz nowe Consumer Key/Secret do konfiguracji produkcyjnej.
+- **InvalidPullTokenException** – potrzebny jest **Consumer Pull Token**. Zaloguj się w **API Tools**: https://healthapi.garmin.com/tools/login → **API Pull Token** → **Create Token**. Skopiuj wygenerowany token (np. `CPT...`) i ustaw go w Supabase jako sekret Edge Function: `supabase secrets set GARMIN_PULL_TOKEN='CPT_twoj_token'`. **Uwaga:** token jest tymczasowy (ma datę wygaśnięcia). Po wygaśnięciu wygeneruj nowy w portalu i zaktualizuj sekret. *(Ostatni token: wygasa 2026-02-25 ok. 22:53 UTC.)*
+- **Data Viewer / sync zwraca puste** – jeśli w Data Viewerze (healthapi.garmin.com/tools/dataViewer) dla Twojego User ID w zakresie 7 dni pojawia się „Could not find data”, to samo API używa Łatwa Forma przy synchronizacji; sync nie będzie miał czego pobrać. W środowisku **Evaluation** dane mogą być udostępniane z opóźnieniem lub tylko przez **Push** (webhook). Warto odczekać 24–48 h po skonfigurowaniu Endpoint Configuration albo skontaktować się z Garmin (Support w portalu).
+
+---
+
+## 7. Endpoint Coverage Test (CONSUMER_PERMISSIONS, USER_DEREG)
+
+W Garmin Developer Portal test **Endpoint Coverage Test** wymaga, żeby w ciągu 24 h na adres **https://latwaforma.pl/api/garmin** trafiły dane dla summary domain **CONSUMER_PERMISSIONS** (push) i **USER_DEREG** (ping). W projekcie jest Netlify Function (`netlify/functions/garmin.js`) – zwraca `200 OK` na GET i POST.
+
+- **Deploy endpointu:** Wdraża się przy **deployu z Gita** (Netlify buduje z `netlify.toml` i wgrywa też funkcję). Lokalny skrypt `deploy_site_netlify.sh` wgrywa tylko folder `build/web` (bez funkcji). Żeby endpoint był na żywo: zrób **push do repozytorium** i poczekaj na build w Netlify, albo w Netlify włącz build z tego repozytorium i zrób deploy.
+- Po wdrożeniu: `curl -I https://latwaforma.pl/api/garmin` → powinno być `200`.
+- W portalu Garmin w **Endpoint Configuration** ustaw **Callback URL** na `https://latwaforma.pl/api/garmin` (jeśli wymagane). Po 24 h od pierwszego push/ping test powinien przejść.
+
+## 8. Przydatne linki
+
+- [Garmin Developer Portal](https://developerportal.garmin.com/)
+- [Connect Developer API – overview](https://developerportal.garmin.com/developer-programs/connect-developer-api)
+- [Programs Docs (OAuth, API)](https://developerportal.garmin.com/developer-programs/programs-docs) – m.in. OAuth 2.0 PKCE
+- W projekcie: `lib/shared/services/garmin_service.dart` – logika OAuth i Wellness API

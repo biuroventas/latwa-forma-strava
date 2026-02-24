@@ -15,3 +15,11 @@
 [build]
   command = "bash scripts/netlify_env.sh && flutter build web --release"
   publish = "build/web"
+  functions = "netlify/functions"
+
+# Endpoint dla Garmin Endpoint Coverage Test (CONSUMER_PERMISSIONS push, USER_DEREG ping)
+[[redirects]]
+  from = "/api/garmin"
+  to = "/.netlify/functions/garmin"
+  status = 200
+  force = true
