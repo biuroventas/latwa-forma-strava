@@ -8,7 +8,10 @@ exports.handler = async function (event) {
   // GET – ping (USER_DEREG), POST – push (CONSUMER_PERMISSIONS)
   return {
     statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, max-age=0',
+    },
     body: JSON.stringify({ ok: true, method }),
   };
 };
