@@ -25,17 +25,27 @@
       var state = new URLSearchParams(window.location.search).get('state');
       var appParams = params;
 
-      // 1) Dla aplikacji mobilnej: deep link (otwiera natywną aplikację, jeśli jest)
-      window.location.href = 'latwaforma://garmin-callback' + appParams;
+      // Na desktopie (np. Safari) nie ma aplikacji – od razu przekieruj na SPA (unikamy błędu „nie można odnaleźć strony”).
+      var isLikelyMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (!isLikelyMobile && code) {
+        var webUrl = window.location.origin + '/#/integrations?garmin_code=' + encodeURIComponent(code) + (state ? '&state=' + encodeURIComponent(state) : '');
+        window.location.replace(webUrl);
+        return;
+      }
 
-      // 2) Dla web: po krótkim opóźnieniu przekieruj na SPA z kodem (gdy nie ma aplikacji)
+      // Na mobile: najpierw próba deep link (otwiera natywną aplikację, jeśli jest)
+      if (isLikelyMobile) {
+        window.location.href = 'latwaforma://garmin-callback' + appParams;
+      }
+
+      // Fallback dla web: po opóźnieniu przekieruj na SPA (gdy nie ma aplikacji lub desktop)
       setTimeout(function() {
         document.getElementById('fallback').style.display = 'block';
         if (code) {
           var webUrl = window.location.origin + '/#/integrations?garmin_code=' + encodeURIComponent(code) + (state ? '&state=' + encodeURIComponent(state) : '');
           window.location.replace(webUrl);
         }
-      }, 1500);
+      }, isLikelyMobile ? 1500 : 400);
     })();
   </script>
 </body>

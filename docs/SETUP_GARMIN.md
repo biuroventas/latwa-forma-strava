@@ -103,7 +103,7 @@ Plik `web/garmin-callback.html` jest w repozytorium i przy buildzie trafia do `b
 
 W Garmin Developer Portal test **Endpoint Coverage Test** wymaga, żeby w ciągu **24 h** na adres **https://latwaforma.pl/api/garmin** trafiły dane dla **każdego** włączonego summary domain (**CONSUMER_PERMISSIONS** – push, **USER_DEREG** – ping). Netlify Function `netlify/functions/garmin.js` zwraca `200 OK` na GET i POST.
 
-- **Deploy endpointu:** Wdraża się przy **deployu z Gita** (Netlify buduje z `netlify.toml` i wgrywa też funkcję). Lokalny skrypt `deploy_site_netlify.sh` wgrywa tylko folder `build/web` (bez funkcji). Żeby endpoint był na żywo: **push do repozytorium** i poczekaj na build w Netlify.
+- **Deploy endpointu:** Wdraża się **wyłącznie przy deployu z Gita** (Netlify buduje z `netlify.toml` i wgrywa też `netlify/functions`). Ręczne wgrywanie tylko folderu `build/web` (np. skrypt `deploy_site_netlify.sh`) **nie** wgrywa funkcji – wtedy POST od Garmin (CONSUMER_PERMISSIONS) dostaje **404**. Żeby endpoint był na żywo: **push do repozytorium** i poczekaj na build w Netlify.
 - Po wdrożeniu: `curl -I https://latwaforma.pl/api/garmin` → powinno być `200`.
 - W portalu Garmin w **API Configuration** / **Endpoint Configuration** ustaw **Callback URL** na `https://latwaforma.pl/api/garmin`.
 
@@ -135,6 +135,11 @@ Strona: **Partner Verification** w Garmin (np. `apis.garmin.com/tools/partnerVer
 
 4. **Apply for Production Key**  
    Gdy **All Tests** są zielone, użyj **Apply for Production Key** i dokończ weryfikację zgodnie z instrukcjami Garmin.
+
+### „Could not find corresponding ping request” (pull notifications)
+
+Ten błąd w logu **Pull notifications** oznacza, że Garmin wysłał **ping** na Twój callback (żeby powiadomić o nowych danych), ale nie dostał poprawnej odpowiedzi **200**. Bez tego Garmin nie łączy pingu z powiadomieniem pull i raportuje brak „corresponding ping request”.  
+**Rozwiązanie:** Upewnij się, że endpoint `https://latwaforma.pl/api/garmin` jest wdrożony (deploy z Gita, nie tylko `build/web`) i zwraca **200** dla GET i POST. Wtedy kolejne pingi będą zaliczane i błąd nie powinien się pojawiać.
 
 ### Jeśli nadal „without data in the last 24 hours”
 

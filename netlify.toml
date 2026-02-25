@@ -18,9 +18,19 @@
   publish = "build/web"
   functions = "netlify/functions"
 
-# Endpoint dla Garmin Endpoint Coverage Test (CONSUMER_PERMISSIONS push, USER_DEREG ping)
+# Endpoint dla Garmin (CONSUMER_PERMISSIONS push, USER_DEREG ping). Wszystkie warianty ścieżki → ta sama funkcja (unikamy 404).
 [[redirects]]
   from = "/api/garmin"
+  to = "/.netlify/functions/garmin"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/api/garmin/"
+  to = "/.netlify/functions/garmin"
+  status = 200
+  force = true
+[[redirects]]
+  from = "/api/garmin/*"
   to = "/.netlify/functions/garmin"
   status = 200
   force = true

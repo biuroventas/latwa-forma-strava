@@ -1,7 +1,9 @@
 /**
- * Endpoint dla Garmin Health API – Endpoint Coverage Test (Partner Verification).
- * CONSUMER_PERMISSIONS (push) i USER_DEREG (ping) wysyłają na ten URL.
- * Zwracamy 200 dla GET/POST/HEAD, żeby Garmin zaliczył „data in the last 24 hours”.
+ * Endpoint dla Garmin Health API.
+ * - Ping (USER_DEREG, CONNECT_ACTIVITY itd.): Garmin wysyła żądanie; musimy zwrócić 200,
+ *   inaczej w logu pojawia się "Could not find corresponding ping request" przy pull.
+ * - Push (CONSUMER_PERMISSIONS): POST z danymi – też 200.
+ * Zwracamy zawsze 200 (oprócz OPTIONS 204), bez parsowania body – żeby każdy ping/push był zaliczony.
  */
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -17,13 +19,14 @@ exports.handler = async function (event) {
     return { statusCode: 204, headers: { ...CORS_HEADERS }, body: '' };
   }
 
-  // GET – ping (USER_DEREG), POST – push (CONSUMER_PERMISSIONS), HEAD – health check
+  // Wszystkie inne metody: 200. Nie parsujemy body – unikamy błędów przy dużym/nieoczekiwanym payloadzie.
+  const body = method === 'HEAD' ? '' : JSON.stringify({ ok: true, method });
   return {
     statusCode: 200,
     headers: {
       'Content-Type': 'application/json',
       ...CORS_HEADERS,
     },
-    body: method === 'HEAD' ? '' : JSON.stringify({ ok: true, method }),
+    body,
   };
 };
