@@ -11,7 +11,8 @@ import '../models/activity.dart';
 class GarminService {
   static const _authUrl = 'https://connect.garmin.com/oauth2Confirm';
   static const _tokenUrl = 'https://diauth.garmin.com/di-oauth2-service/oauth/token';
-  static const _apiBase = 'https://apis.garmin.com';
+  /// Health API (aktywności). Przy InvalidPullTokenException: włącz Pull w healthapi.garmin.com/tools
+  static const _apiBase = 'https://healthapi.garmin.com';
   static const _redirectScheme = 'latwaforma';
   static const _redirectHost = 'garmin-callback';
 
@@ -19,8 +20,8 @@ class GarminService {
   String? get _clientSecret => dotenv.env['GARMIN_CLIENT_SECRET'];
   String? get _redirectUriOverride => dotenv.env['GARMIN_REDIRECT_URI'];
 
-  bool get isConfigured =>
-      (_clientId?.isNotEmpty ?? false) && (_clientSecret?.isNotEmpty ?? false);
+  /// Do rozpoczęcia OAuth (otwarcie strony autoryzacji) wystarczy publiczny client_id.
+  bool get isConfigured => (_clientId?.isNotEmpty ?? false);
 
   String get _redirectUri =>
       (_redirectUriOverride?.isNotEmpty ?? false)
@@ -43,7 +44,7 @@ class GarminService {
   Future<(String verifier, String state)> launchAuth() async {
     if (!isConfigured) {
       throw Exception(
-        'Garmin nie jest skonfigurowane. Dodaj GARMIN_CLIENT_ID i GARMIN_CLIENT_SECRET do .env',
+        'Garmin nie jest skonfigurowane. Dodaj GARMIN_CLIENT_ID do env.',
       );
     }
     final (verifier, challenge) = generatePkce();
@@ -232,7 +233,7 @@ class GarminActivity {
 
   factory GarminActivity.fromJson(Map<String, dynamic> json) {
     int startMs = 0;
-    final startVal = json['startTimeInSeconds'] ?? json['startTimeGmt'] ?? json['start_time'] ?? json['beginTimestamp'];
+    final startVal = json['startTimeInSeconds'] ?? json['StartTimeInSeconds'] ?? json['startTimeGmt'] ?? json['start_time'] ?? json['beginTimestamp'];
     if (startVal is int) {
       startMs = startVal > 10000000000 ? startVal : startVal * 1000;
     } else if (startVal is String) {
@@ -241,11 +242,11 @@ class GarminActivity {
       } catch (_) {}
     }
 
-    final duration = json['durationInSeconds'] ?? json['duration'] ?? json['activeSeconds'] ?? 0;
+    final duration = json['durationInSeconds'] ?? json['DurationInSeconds'] ?? json['duration'] ?? json['activeSeconds'] ?? 0;
     final durationSec = duration is int ? duration : 0;
 
     return GarminActivity(
-      activityId: (json['activityId'] ?? json['activity_id'] ?? json['uuid'] ?? '').toString(),
+      activityId: (json['activityId'] ?? json['activity_id'] ?? json['uuid'] ?? json['id'] ?? json['summaryId'] ?? json['uploadId'] ?? '').toString(),
       activityName: (json['activityName'] ?? json['activity_name'] ?? json['activity_type'] ?? '').toString(),
       activityType: (json['activityType'] ?? json['activity_type'] ?? 'Other').toString(),
       startTimeMs: startMs,

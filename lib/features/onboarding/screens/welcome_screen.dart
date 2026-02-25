@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/auth/auth_callback_handler.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
@@ -15,6 +17,41 @@ import '../../../shared/services/auth_link_service.dart';
 import '../../../shared/utils/pending_verification_email.dart';
 import '../widgets/privacy_consent_banner.dart';
 import 'easy_forma_onboarding.dart';
+
+/// Na webie po powrocie z Google w URL może być hash z tokenami – rozpoznajemy to
+/// w [auth_callback_handler]. Jeśli z jakiegoś powodu main() nie przetworzył callbacku,
+/// ten wrapper przy pierwszym wyświetleniu Welcome próbuje ustawić sesję z URL i przejść do splash.
+class _WelcomeAuthRecovery extends StatefulWidget {
+  const _WelcomeAuthRecovery({required this.child});
+  final Widget child;
+
+  @override
+  State<_WelcomeAuthRecovery> createState() => _WelcomeAuthRecoveryState();
+}
+
+class _WelcomeAuthRecoveryState extends State<_WelcomeAuthRecovery> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _tryRecoverSessionFromUrl());
+  }
+
+  Future<void> _tryRecoverSessionFromUrl() async {
+    if (!mounted || !kIsWeb || !SupabaseConfig.isInitialized) return;
+    if (!isAuthCallbackUri(Uri.base)) return;
+    try {
+      await handleAuthCallbackUri(Uri.base);
+    } catch (_) {}
+    if (!mounted) return;
+    final user = SupabaseConfig.auth.currentUser;
+    if (user != null && !user.isAnonymous) {
+      context.go(AppRoutes.splash);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -103,7 +140,11 @@ class WelcomeScreen extends StatelessWidget {
                             });
                           }
                         : null,
-                    icon: const Icon(Icons.g_mobiledata, size: 24),
+                    icon: SvgPicture.asset(
+                      'assets/icons/google_g.svg',
+                      width: 20,
+                      height: 20,
+                    ),
                     label: const Text('Zaloguj przez Google'),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -528,11 +569,14 @@ class WelcomeScreen extends StatelessWidget {
       );
       return;
     }
-    // Nie pokazuj dialogu „Sukces” dla logowania przez Google – komunikat „Otwieram Safari…”
-    // jest mylący po powrocie do aplikacji (użytkownik już wrócił).
-    final isOAuthSafariMessage = result.infoMessage != null &&
-        (result.infoMessage!.contains('Safari') || result.infoMessage!.contains('Otwieram'));
-    if (result.success && result.infoMessage != null && !isOAuthSafariMessage) {
+    // Nie pokazuj dialogu „Sukces” dla logowania przez Google – komunikat przekierowania
+    // (Safari / web) jest mylący; użytkownik ma się przekierować, a nie widzieć „Sukces” i zostawać na Welcome.
+    final isOAuthRedirectMessage = result.infoMessage != null &&
+        (result.infoMessage!.contains('Safari') ||
+            result.infoMessage!.contains('Otwieram') ||
+            result.infoMessage!.contains('Zostaniesz przekierowany'));
+    if (result.success && result.infoMessage != null && !isOAuthRedirectMessage) {
+      if (!context.mounted) return;
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -547,8 +591,17 @@ class WelcomeScreen extends StatelessWidget {
         ),
       );
     }
-    if (result.success && SupabaseConfig.auth.currentUser != null) {
-      if (context.mounted) context.go(AppRoutes.splash);
+    if (result.success) {
+      // Na webie po powrocie z Google callback może być w URL – odczytaj sesję i przejdź do splash.
+      if (kIsWeb && isAuthCallbackUri(Uri.base)) {
+        try {
+          await handleAuthCallbackUri(Uri.base);
+        } catch (_) {}
+      }
+      if (context.mounted && SupabaseConfig.auth.currentUser != null &&
+          !SupabaseConfig.auth.currentUser!.isAnonymous) {
+        context.go(AppRoutes.splash);
+      }
     }
   }
 
@@ -765,12 +818,17 @@ class WelcomeScreen extends StatelessWidget {
             },
             child: const Text('Otwórz latwaforma.pl'),
           ),
-          FilledButton(
+          FilledButton.icon(
             onPressed: () {
               Navigator.of(ctx).pop();
               _onLogin(context);
             },
-            child: const Text('Zaloguj przez Google'),
+            icon: SvgPicture.asset(
+              'assets/icons/google_g.svg',
+              width: 20,
+              height: 20,
+            ),
+            label: const Text('Zaloguj przez Google'),
           ),
         ],
       ),
@@ -779,20 +837,22 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        EasyFormaOnboardingScreen(
-          onLogin: () => _onLogin(context),
-          onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
-          onEnterCode: null,
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: const PrivacyConsentBanner(),
-        ),
-      ],
+    return _WelcomeAuthRecovery(
+      child: Stack(
+        children: [
+          EasyFormaOnboardingScreen(
+            onLogin: () => _onLogin(context),
+            onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
+            onEnterCode: null,
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: const PrivacyConsentBanner(),
+          ),
+        ],
+      ),
     );
   }
 }
