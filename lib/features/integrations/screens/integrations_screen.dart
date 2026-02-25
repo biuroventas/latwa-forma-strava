@@ -633,9 +633,24 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd synchronizacji Garmin: $e')),
-        );
+        final msg = e.toString().toLowerCase();
+        final isRevoked = msg.contains('revoked') || (msg.contains('jwt') && msg.contains('revocation'));
+        if (isRevoked) {
+          await _supabaseService.deleteGarminIntegration(userId);
+          ref.invalidate(garminIntegrationProvider);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Połączenie z Garmin zostało odłączone (np. w Garmin Connect). Kliknij „Połącz z Garmin Connect”, aby połączyć ponownie.',
+              ),
+              duration: Duration(seconds: 5),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Błąd synchronizacji Garmin: $e')),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isSyncingGarmin = false);
