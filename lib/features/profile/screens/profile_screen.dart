@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _proteinController = TextEditingController();
   final _fatController = TextEditingController();
   final _carbsController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _heightController = TextEditingController();
+  final _currentWeightController = TextEditingController();
+  final _targetWeightController = TextEditingController();
+  final _weeklyRateController = TextEditingController();
 
   // Dane edycji
   String? _gender;
@@ -59,9 +65,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String? _macroWarning;
 
   double get _macroPreviewKcal {
-    final p = double.tryParse(_proteinController.text) ?? 0;
-    final f = double.tryParse(_fatController.text) ?? 0;
-    final c = double.tryParse(_carbsController.text) ?? 0;
+    final p = _parseMacro(_proteinController.text) ?? 0;
+    final f = _parseMacro(_fatController.text) ?? 0;
+    final c = _parseMacro(_carbsController.text) ?? 0;
     return (p * 4) + (f * 9) + (c * 4);
   }
 
@@ -79,6 +85,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _proteinController.dispose();
     _fatController.dispose();
     _carbsController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _currentWeightController.dispose();
+    _targetWeightController.dispose();
+    _weeklyRateController.dispose();
     super.dispose();
   }
 
@@ -88,12 +99,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: context.canPop()
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.pop(),
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.dashboard);
+            }
+          },
+        ),
         title: const Text('Profil'),
         actions: [
           if (!_isEditing) ...[
@@ -181,6 +196,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   : 0.0);
       _customCaloriesController.clear();
       _syncMacroControllers();
+      _ageController.text = profile.age.toString();
+      _heightController.text = profile.heightCm.toStringAsFixed(0);
+      _currentWeightController.text = profile.currentWeightKg.toStringAsFixed(1);
+      _targetWeightController.text = profile.targetWeightKg.toStringAsFixed(1);
+      _weeklyRateController.text = (_manualWeeklyWeightChange ?? 0).toStringAsFixed(1);
       
       // Zapamiętaj oryginalne wartości (przed edycją)
       _originalTargetCalories = profile.targetCalories;
@@ -372,9 +392,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         if (email.isEmpty) return;
                         setState(() => loading = true);
                         try {
-                          final session = SupabaseConfig.auth.currentSession;
+                          // Jak przy „Usuń konto”: odśwież sesję, potem wywołaj Edge Function przez klienta (apikey + token).
+                          final refreshed = await SupabaseConfig.auth.refreshSession();
+                          final session = refreshed.session ?? SupabaseConfig.auth.currentSession;
                           if (session == null) {
+                            if (!ctx.mounted) return;
                             setState(() => loading = false);
+                            Navigator.of(ctx).pop({
+                              'success': false,
+                              'error': kIsWeb
+                                  ? 'Sesja wygasła. Odśwież stronę (F5) i zaloguj się ponownie, potem wyślij zaproszenie.'
+                                  : 'Zaloguj się ponownie i spróbuj jeszcze raz.',
+                            });
                             return;
                           }
                           final response = await SupabaseConfig.client.functions.invoke(
@@ -384,17 +413,56 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           );
                           if (!ctx.mounted) return;
                           setState(() => loading = false);
-                          final data = response.data as Map<String, dynamic>?;
+                          final data = response.data is Map ? response.data as Map<String, dynamic>? : null;
                           final err = data?['error'] ?? response.status;
                           if (response.status == 200 && data?['success'] == true) {
                             Navigator.of(ctx).pop({'success': true, 'message': data?['message'] ?? 'Zaproszenie wysłane'});
+                          } else if (response.status == 401) {
+                            Navigator.of(ctx).pop({
+                              'success': false,
+                              'error': kIsWeb
+                                  ? 'Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.'
+                                  : 'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem wyślij zaproszenie.',
+                            });
                           } else {
                             Navigator.of(ctx).pop({'success': false, 'error': err.toString()});
                           }
                         } catch (e) {
                           if (ctx.mounted) {
                             setState(() => loading = false);
-                            Navigator.of(ctx).pop({'success': false, 'error': e.toString()});
+                            String userMessage;
+                            if (e is FunctionException) {
+                              final details = e.details;
+                              final serverError = details is Map && details['error'] is String
+                                  ? details['error'] as String
+                                  : null;
+                              if (serverError != null) {
+                                if (serverError.toLowerCase().contains('już ma') ||
+                                    serverError.toLowerCase().contains('already') ||
+                                    serverError.toLowerCase().contains('zarejestrowan')) {
+                                  userMessage = 'Ten adres e-mail jest już zarejestrowany w Łatwa Forma. Zaproś kogoś innego.';
+                                } else if (serverError.toLowerCase().contains('prawidłowy') ||
+                                    serverError.toLowerCase().contains('e-mail')) {
+                                  userMessage = 'Podaj prawidłowy adres e-mail.';
+                                } else if (serverError.toLowerCase().contains('zbyt wiele') ||
+                                    serverError.toLowerCase().contains('rate limit')) {
+                                  userMessage = 'Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie.';
+                                } else {
+                                  userMessage = serverError;
+                                }
+                              } else {
+                                userMessage = 'Nie udało się wysłać zaproszenia. Spróbuj ponownie.';
+                              }
+                            } else {
+                              final msg = e.toString();
+                              final is401 = msg.contains('401') || msg.contains('Invalid JWT');
+                              userMessage = is401 && kIsWeb
+                                  ? 'Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie.'
+                                  : is401
+                                      ? 'Sesja wygasła. Wyloguj się i zaloguj ponownie.'
+                                      : 'Nie udało się wysłać zaproszenia. Spróbuj ponownie.';
+                            }
+                            Navigator.of(ctx).pop({'success': false, 'error': userMessage});
                           }
                         }
                       },
@@ -1023,6 +1091,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ),
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (user.email != null && user.email!.trim().isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          user.email!.trim(),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -1166,114 +1244,193 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             // Wiek
+            Text('Wiek *', style: Theme.of(context).textTheme.titleMedium),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Wiek *', style: Theme.of(context).textTheme.titleMedium),
-                Text(
-                  '${_age ?? profile.age} lat',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Slider(
+                    value: (_age ?? profile.age).toDouble().clamp(13.0, 100.0),
+                    min: 13,
+                    max: 100,
+                    divisions: 87,
+                    label: (_age ?? profile.age).toString(),
+                    onChanged: (value) {
+                      setState(() {
+                        _age = value.round();
+                        _ageController.text = value.round().toString();
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 88,
+                  child: TextField(
+                    controller: _ageController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      suffixText: 'lat',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                    ),
+                    onSubmitted: (s) {
+                      final v = int.tryParse(s.trim());
+                      if (v != null && v >= 13 && v <= 100) {
+                        setState(() {
+                          _age = v;
+                          _ageController.text = v.toString();
+                        });
+                      }
+                    },
                   ),
                 ),
               ],
-            ),
-            Slider(
-              value: _age?.toDouble() ?? profile.age.toDouble(),
-              min: 13,
-              max: 100,
-              divisions: 87,
-              label: _age?.toString() ?? profile.age.toString(),
-              onChanged: (value) {
-                setState(() {
-                  _age = value.round();
-                });
-              },
             ),
             const SizedBox(height: 16),
             // Wzrost
+            Text('Wzrost (cm) *', style: Theme.of(context).textTheme.titleMedium),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Wzrost (cm) *', style: Theme.of(context).textTheme.titleMedium),
-                Text(
-                  '${(_heightCm ?? profile.heightCm).toStringAsFixed(0)} cm',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Slider(
+                    value: (_heightCm ?? profile.heightCm).clamp(100.0, 250.0),
+                    min: 100,
+                    max: 250,
+                    divisions: 150,
+                    label: (_heightCm ?? profile.heightCm).round().toString(),
+                    onChanged: (value) {
+                      setState(() {
+                        _heightCm = value.round().toDouble();
+                        _heightController.text = value.round().toString();
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 88,
+                  child: TextField(
+                    controller: _heightController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      suffixText: 'cm',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                    ),
+                    onSubmitted: (s) {
+                      final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                      if (v != null && v >= 100 && v <= 250) {
+                        setState(() {
+                          _heightCm = v.round().toDouble();
+                          _heightController.text = v.round().toString();
+                        });
+                      }
+                    },
                   ),
                 ),
               ],
-            ),
-            Slider(
-              value: _heightCm ?? profile.heightCm,
-              min: 100,
-              max: 250,
-              divisions: 150,
-              label: (_heightCm ?? profile.heightCm).toStringAsFixed(0),
-              onChanged: (value) {
-                setState(() {
-                  _heightCm = value;
-                });
-              },
             ),
             const SizedBox(height: 16),
             // Aktualna waga
+            Text('Aktualna waga (kg) *', style: Theme.of(context).textTheme.titleMedium),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Aktualna waga (kg) *', style: Theme.of(context).textTheme.titleMedium),
-                Text(
-                  '${(_currentWeightKg ?? profile.currentWeightKg).toStringAsFixed(1)} kg',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Slider(
+                    value: (_currentWeightKg ?? profile.currentWeightKg).clamp(30.0, 300.0),
+                    min: 30,
+                    max: 300,
+                    divisions: 270,
+                    label: (_currentWeightKg ?? profile.currentWeightKg).toStringAsFixed(1),
+                    onChanged: (value) {
+                      setState(() {
+                        _currentWeightKg = value;
+                        _targetWeightKg ??= value;
+                        _currentWeightController.text = value.toStringAsFixed(1);
+                        _updateGoalFromWeights();
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 88,
+                  child: TextField(
+                    controller: _currentWeightController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      suffixText: 'kg',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                    ),
+                    onSubmitted: (s) {
+                      final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                      if (v != null && v >= 30 && v <= 300) {
+                        setState(() {
+                          _currentWeightKg = v;
+                          _targetWeightKg ??= v;
+                          _currentWeightController.text = v.toStringAsFixed(1);
+                          _updateGoalFromWeights();
+                        });
+                      }
+                    },
                   ),
                 ),
               ],
-            ),
-            Slider(
-              value: _currentWeightKg ?? profile.currentWeightKg,
-              min: 30,
-              max: 300,
-              divisions: 270,
-              label: (_currentWeightKg ?? profile.currentWeightKg).toStringAsFixed(1),
-              onChanged: (value) {
-                setState(() {
-                  _currentWeightKg = value;
-                  _targetWeightKg ??= value;
-                  _updateGoalFromWeights();
-                });
-              },
             ),
             const SizedBox(height: 16),
             // Waga docelowa
+            Text('Waga docelowa (kg) *', style: Theme.of(context).textTheme.titleMedium),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Waga docelowa (kg) *', style: Theme.of(context).textTheme.titleMedium),
-                Text(
-                  '${(_targetWeightKg ?? profile.targetWeightKg).toStringAsFixed(1)} kg',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Slider(
+                    value: (_targetWeightKg ?? profile.targetWeightKg).clamp(30.0, 300.0),
+                    min: 30,
+                    max: 300,
+                    divisions: 270,
+                    label: (_targetWeightKg ?? profile.targetWeightKg).toStringAsFixed(1),
+                    onChanged: (value) {
+                      setState(() {
+                        _targetWeightKg = value;
+                        _targetWeightController.text = value.toStringAsFixed(1);
+                        _updateGoalFromWeights();
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(
+                  width: 88,
+                  child: TextField(
+                    controller: _targetWeightController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      suffixText: 'kg',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                    ),
+                    onSubmitted: (s) {
+                      final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                      if (v != null && v >= 30 && v <= 300) {
+                        setState(() {
+                          _targetWeightKg = v;
+                          _targetWeightController.text = v.toStringAsFixed(1);
+                          _updateGoalFromWeights();
+                        });
+                      }
+                    },
                   ),
                 ),
               ],
-            ),
-            Slider(
-              value: _targetWeightKg ?? profile.targetWeightKg,
-              min: 30,
-              max: 300,
-              divisions: 270,
-              label: (_targetWeightKg ?? profile.targetWeightKg).toStringAsFixed(1),
-              onChanged: (value) {
-                setState(() {
-                  _targetWeightKg = value;
-                  _updateGoalFromWeights();
-                });
-              },
             ),
             if (_currentWeightKg != null && _targetWeightKg != null)
               Padding(
@@ -1406,6 +1563,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Po zmianie poziomu aktywności przelicz na bieżąco zapotrzebowanie, termin celu, kalorie i makra.
+  void _onActivityLevelChanged() {
+    if (_gender == null || _age == null || _heightCm == null || _activityLevel == null) return;
+    if (_currentWeightKg == null || _targetWeightKg == null || _goal == null) return;
+    if (_goal == AppConstants.goalMaintain) {
+      _recalculateFromWeightsForMaintain();
+    } else {
+      if (_manualWeeklyWeightChange == null || _manualWeeklyWeightChange! <= 0) {
+        _manualWeeklyWeightChange = _goal == AppConstants.goalWeightLoss
+            ? AppConstants.defaultWeightLossRate
+            : AppConstants.defaultWeightGainRate;
+        _weeklyRateController.text = _manualWeeklyWeightChange!.toStringAsFixed(1);
+      }
+      _recalculateFromRate();
+    }
+  }
+
   Widget _buildActivityLevelOption(String title, String description, String value) {
     final isSelected = _activityLevel == value;
     return Card(
@@ -1414,7 +1588,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ? Theme.of(context).colorScheme.primaryContainer
           : Theme.of(context).cardColor,
       child: InkWell(
-        onTap: () => setState(() => _activityLevel = value),
+        onTap: () {
+          setState(() => _activityLevel = value);
+          _onActivityLevelChanged();
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -1513,7 +1690,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           const SizedBox(height: 2),
           Text(
-            '${value.toStringAsFixed(0)} g',
+            '${value.toStringAsFixed(1)} g',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: color,
@@ -1681,22 +1858,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Tempo zmiany wagi',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
-                Text(
-                  '${clampedRate.toStringAsFixed(1)} kg/tydz.',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                ),
+                const Spacer(),
+                if (!isMaintain)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${clampedRate.toStringAsFixed(1)} kg/tydz.',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                    ),
+                  )
+                else
+                  Text(
+                    '0 kg/tydz.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
               ],
             ),
-            if (!isMaintain)
+            if (!isMaintain) ...[
+              const SizedBox(height: 4),
               Slider(
                 value: clampedRate,
                 min: minRate,
@@ -1704,23 +1897,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 divisions: ((maxRate - minRate) / 0.1).round().clamp(1, 100),
                 label: '${clampedRate.toStringAsFixed(1)} kg/tydz.',
                 onChanged: (value) {
-                setState(() {
-                  _manualWeeklyWeightChange = value;
-                  _customCaloriesController.clear();
-                  _recalculateFromRate();
-                });
+                  setState(() {
+                    _manualWeeklyWeightChange = value;
+                    _weeklyRateController.text = value.toStringAsFixed(1);
+                    _customCaloriesController.clear();
+                    _recalculateFromRate();
+                  });
                 },
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Text(
-                  'Dla utrzymania wagi tempo = 0',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
               ),
+            ] else ...[
+              const SizedBox(height: 8),
+              Text(
+                'Dla utrzymania wagi tempo = 0',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
             if (_goal == AppConstants.goalWeightLoss) ...[
               const SizedBox(height: 8),
               Container(
@@ -1777,7 +1970,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Termin: $dateStr',
+                      'Szacunkowy termin osiągnięcia celu: $dateStr',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -2028,15 +2221,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _syncMacroControllers() {
-    _proteinController.text = (_manualProteinG ?? 0).toStringAsFixed(0);
-    _fatController.text = (_manualFatG ?? 0).toStringAsFixed(0);
-    _carbsController.text = (_manualCarbsG ?? 0).toStringAsFixed(0);
+    _proteinController.text = (_manualProteinG ?? 0).toStringAsFixed(1);
+    _fatController.text = (_manualFatG ?? 0).toStringAsFixed(1);
+    _carbsController.text = (_manualCarbsG ?? 0).toStringAsFixed(1);
+  }
+
+  double? _parseMacro(String s) {
+    if (s.trim().isEmpty) return 0.0;
+    return double.tryParse(s.trim().replaceAll(',', '.'));
   }
 
   void _updateCaloriesFromMacros() {
-    final protein = double.tryParse(_proteinController.text) ?? 0;
-    final fat = double.tryParse(_fatController.text) ?? 0;
-    final carbs = double.tryParse(_carbsController.text) ?? 0;
+    final protein = _parseMacro(_proteinController.text) ?? 0;
+    final fat = _parseMacro(_fatController.text) ?? 0;
+    final carbs = _parseMacro(_carbsController.text) ?? 0;
     if (protein < 0 || fat < 0 || carbs < 0) {
       setState(() => _macroWarning = 'Wartości nie mogą być ujemne.');
       return;
@@ -2235,9 +2433,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     const minCarbsKcal = minCarbsG * 4;
     final availableForPf = (calories - minCarbsKcal).clamp(0.0, double.infinity);
 
-    var proteinG = targetWeight * 2.0;
+    var proteinG = targetWeight * AppConstants.proteinPerKg;
     var proteinCalories = proteinG * 4;
-    var fatCalories = calories * 0.275;
+    var fatCalories = calories * AppConstants.fatPercentage;
     var fatG = fatCalories / 9;
 
     // Gdy białko+tłuszcze przekraczają dostępny budżet – skaluj je, zostawiając min. 50g węgli
