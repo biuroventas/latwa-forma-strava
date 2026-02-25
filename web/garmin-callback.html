@@ -10,13 +10,15 @@
     h2 { margin: 0 0 1em; font-size: 1.2em; color: #333; }
     p { margin: 0.5em 0; color: #666; font-size: 0.95em; }
     .ok { color: #2e7d32; font-weight: 500; margin-top: 1.5em; }
+    #fallback { display: none; }
+    #fallback.visible { display: block; }
   </style>
 </head>
 <body>
   <div class="box">
     <h2>Przekierowanie do Łatwa Forma</h2>
     <p>Otwieram aplikację...</p>
-    <p id="fallback" style="display:none;" class="ok">Możesz zamknąć tę kartę i wrócić do aplikacji.</p>
+    <p id="fallback" class="ok">Możesz zamknąć tę kartę i wrócić do aplikacji.</p>
   </div>
   <script>
     (function() {
@@ -40,7 +42,7 @@
 
       // Fallback dla web: po opóźnieniu przekieruj na SPA (gdy nie ma aplikacji lub desktop)
       setTimeout(function() {
-        document.getElementById('fallback').style.display = 'block';
+        document.getElementById('fallback').classList.add('visible');
         if (code) {
           var webUrl = window.location.origin + '/#/integrations?garmin_code=' + encodeURIComponent(code) + (state ? '&state=' + encodeURIComponent(state) : '');
           window.location.replace(webUrl);

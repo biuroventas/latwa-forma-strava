@@ -151,6 +151,25 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
     }
   }
 
+  /// Dozwolone znaki w PDF (ASCII + polskie), reszta → '?' (unikamy FormatException UTF-8).
+  static String _sanitizeForPdf(String s) {
+    if (s.isEmpty) return s;
+    final buf = StringBuffer();
+    for (final rune in s.runes) {
+      if (rune <= 0x7F && rune >= 0x20) {
+        buf.writeCharCode(rune);
+      } else if (rune == 0xA0 || rune == 0x104 || rune == 0x105 || rune == 0x106 || rune == 0x107 ||
+          rune == 0x118 || rune == 0x119 || rune == 0x141 || rune == 0x142 || rune == 0x143 || rune == 0x144 ||
+          rune == 0xD3 || rune == 0xF3 || rune == 0x15A || rune == 0x15B || rune == 0x179 || rune == 0x17A ||
+          rune == 0x17B || rune == 0x17C || rune == 0x2013 || rune == 0x2022) {
+        buf.write(String.fromCharCode(rune));
+      } else {
+        buf.write('?');
+      }
+    }
+    return buf.toString();
+  }
+
   Future<void> _exportToPDF() async {
     final canProceed = await checkPremiumOrNavigate(
       context,
@@ -207,7 +226,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           header: (ctx) => pw.Padding(
             padding: const pw.EdgeInsets.only(bottom: 12),
             child: pw.Text(
-              'Łatwa Forma – Raport',
+              _sanitizeForPdf('Łatwa Forma – Raport'),
               style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                     fontWeight: pw.FontWeight.bold,
                     fontSize: 16,
@@ -217,7 +236,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           footer: (ctx) => pw.Padding(
             padding: const pw.EdgeInsets.only(top: 12),
             child: pw.Text(
-              'Strona ${ctx.pageNumber} z ${ctx.pagesCount} • Wygenerowano $dateStr',
+              _sanitizeForPdf('Strona ${ctx.pageNumber} z ${ctx.pagesCount} • Wygenerowano $dateStr'),
               style: pw.Theme.of(ctx).defaultTextStyle.copyWith(fontSize: 8),
             ),
           ),
@@ -235,34 +254,34 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             if (profile != null) ...[
               pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 8),
-                child: pw.Text(
+                child: pw.Text(_sanitizeForPdf(
                   'Płeć: ${profile.gender == "male" ? "Mężczyzna" : profile.gender == "female" ? "Kobieta" : "Inna"} • '
                   'Wiek: ${profile.age} lat • Wzrost: ${profile.heightCm.toStringAsFixed(0)} cm',
-                ),
+                )),
               ),
               pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 8),
-                child: pw.Text(
+                child: pw.Text(_sanitizeForPdf(
                   'Waga: ${profile.currentWeightKg.toStringAsFixed(1)} kg • '
                   'Cel: ${profile.targetWeightKg.toStringAsFixed(1)} kg • '
                   'Cel kaloryczny: ${profile.targetCalories?.toStringAsFixed(0) ?? "-"} kcal',
-                ),
+                )),
               ),
               pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 16),
-                child: pw.Text(
+                child: pw.Text(_sanitizeForPdf(
                   profile.goal == 'weight_loss'
                       ? 'Cel: Utrata wagi'
                       : profile.goal == 'weight_gain'
                           ? 'Cel: Przybranie wagi'
                           : 'Cel: Utrzymanie wagi',
-                ),
+                )),
               ),
             ] else pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text('Brak profilu')),
             pw.Header(
               level: 0,
               child: pw.Text(
-                'Ostatnie 30 dni – posiłki',
+                _sanitizeForPdf('Ostatnie 30 dni – posiłki'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -292,7 +311,10 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                           padding: const pw.EdgeInsets.all(6),
                         ),
                         pw.Padding(
-                          child: pw.Text(m.name.length > 40 ? '${m.name.substring(0, 40)}...' : m.name),
+                          child: pw.Text(() {
+                            final safe = _sanitizeForPdf(m.name);
+                            return safe.length > 40 ? '${safe.substring(0, 40)}...' : safe;
+                          }()),
                           padding: const pw.EdgeInsets.all(6),
                         ),
                         pw.Padding(
@@ -308,7 +330,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             pw.Header(
               level: 0,
               child: pw.Text(
-                'Ostatnie 30 dni – aktywności',
+                _sanitizeForPdf('Ostatnie 30 dni – aktywności'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -338,7 +360,10 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                           padding: const pw.EdgeInsets.all(6),
                         ),
                         pw.Padding(
-                          child: pw.Text(a.name.length > 40 ? '${a.name.substring(0, 40)}...' : a.name),
+                          child: pw.Text(() {
+                            final safe = _sanitizeForPdf(a.name);
+                            return safe.length > 40 ? '${safe.substring(0, 40)}...' : safe;
+                          }()),
                           padding: const pw.EdgeInsets.all(6),
                         ),
                         pw.Padding(
@@ -354,7 +379,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             pw.Header(
               level: 0,
               child: pw.Text(
-                'Historia wagi',
+                _sanitizeForPdf('Historia wagi'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -411,15 +436,26 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           );
         } catch (_) {
           // Fallback: pobranie pliku (np. gdy przeglądarka nie obsługuje udostępniania PDF)
-          await download_util.downloadBytesAsFile(bytes, pdfFileName, mimeType: 'application/pdf');
-          if (mounted) {
-            SuccessMessage.show(
-              context,
-              'PDF został pobrany. Sprawdź folder Pobrane.',
-              duration: const Duration(seconds: 3),
-            );
+          try {
+            await download_util.downloadBytesAsFile(bytes, pdfFileName, mimeType: 'application/pdf');
+            if (mounted) {
+              SuccessMessage.show(
+                context,
+                'PDF został pobrany. Sprawdź folder Pobrane.',
+                duration: const Duration(seconds: 3),
+              );
+            }
+            return;
+          } catch (_) {
+            if (mounted) {
+              ErrorHandler.showSnackBar(
+                context,
+                error: Exception('download'),
+                fallback: 'Nie udało się udostępnić ani pobrać PDF. Spróbuj w przeglądarce Chrome lub wyeksportuj do CSV.',
+              );
+            }
+            return;
           }
-          return;
         }
       } else {
         // Mobile: najpierw próba przez plik, przy błędzie – przez bytes (XFile.fromData)
@@ -469,10 +505,14 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       debugPrint('Eksport PDF: $e');
       debugPrint('$st');
       if (mounted) {
+        final hint = e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
+        final shortHint = hint.length > 60 ? '${hint.substring(0, 57)}...' : hint;
         ErrorHandler.showSnackBar(
           context,
           error: e,
-          fallback: 'Eksport PDF nie powiódł się. Spróbuj ponownie lub wyeksportuj do CSV.',
+          fallback: shortHint.isNotEmpty
+              ? 'Eksport PDF nie powiódł się ($shortHint). Spróbuj do CSV.'
+              : 'Eksport PDF nie powiódł się. Spróbuj ponownie lub wyeksportuj do CSV.',
         );
       }
     } finally {

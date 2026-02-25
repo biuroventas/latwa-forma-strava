@@ -637,6 +637,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         final isRevoked = msg.contains('revoked') || (msg.contains('jwt') && msg.contains('revocation'));
         if (isRevoked) {
           await _supabaseService.deleteGarminIntegration(userId);
+          if (!mounted) return;
           ref.invalidate(garminIntegrationProvider);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
