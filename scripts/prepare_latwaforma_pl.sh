@@ -33,6 +33,9 @@ if [ ! -s "$ROOT/env.production" ]; then
   echo "Uwaga: brak env.production i .env – aplikacja na webie uruchomi się bez Supabase („Zacznij bez konta” nie zadziała)."
   touch "$ROOT/env.production"
 fi
+# Żeby Flutter w buildzie miał env (asset + fetch z /env.production): skopiuj do assets przed buildem.
+mkdir -p "$ROOT/assets"
+[ -s "$ROOT/env.production" ] && cp "$ROOT/env.production" "$ROOT/assets/env.production" || true
 
 echo "Budowanie Flutter web (optymalizacja: bez source maps)..."
 # --no-source-maps: mniejszy build (mapy źródłowe nie są potrzebne w produkcji).
