@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/constants/trial_constants.dart';
@@ -445,15 +449,52 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
     }
   }
 
+  /// Wywołuje Edge Function create-checkout-session przez HTTP z tokenem (bez bramki JWT – płatność działa od razu).
+  Future<({int status, Map<String, dynamic>? data})> _invokeCreateCheckoutSession(String token, String plan) async {
+    final url = Uri.parse('${SupabaseConfig.functionsBaseUrl}/create-checkout-session');
+    final res = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'plan': plan}),
+    );
+    Map<String, dynamic>? data;
+    if (res.body.isNotEmpty) {
+      try {
+        data = jsonDecode(res.body) as Map<String, dynamic>?;
+      } catch (_) {}
+    }
+    return (status: res.statusCode, data: data);
+  }
+
   /// Otwiera Stripe Checkout (Edge Function tworzy sesję, zwraca URL).
+  /// Wywołanie przez HTTP z tokenem z refreshSession() – bez odświeżania strony.
   Future<void> _openStripeCheckout() async {
     setState(() => _isLoadingStripe = true);
     try {
+      Session? session;
       try {
-        await SupabaseConfig.auth.refreshSession();
-      } catch (_) {}
-      final session = SupabaseConfig.auth.currentSession;
-      if (session == null || session.user.isAnonymous) {
+        final authResponse = await SupabaseConfig.auth.refreshSession();
+        session = authResponse.session;
+        if (session != null && kIsWeb) {
+          await SupabaseConfig.auth.setSession(session.refreshToken ?? session.accessToken);
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
+      } catch (_) {
+        session = null;
+      }
+      if (session == null) {
+        if (!mounted) return;
+        setState(() => _isLoadingStripe = false);
+        await _showMessageDialog(
+          'Błąd połączenia',
+          'Nie udało się połączyć z płatnościami. Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl',
+        );
+        return;
+      }
+      if (session.user.isAnonymous) {
         if (!mounted) return;
         setState(() => _isLoadingStripe = false);
         await _showMessageDialog(
@@ -469,45 +510,45 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
               ? 'yearly'
               : 'monthly';
       var token = session.accessToken;
-      var response = await SupabaseConfig.client.functions.invoke(
-        'create-checkout-session',
-        body: {'plan': plan},
-        headers: {'Authorization': 'Bearer $token'},
-      );
+      var result = await _invokeCreateCheckoutSession(token, plan);
 
       if (!mounted) return;
 
-      if (response.status == 401) {
+      const retryDelays = [500, 900, 1200];
+      for (int retry = 0; retry < 3 && result.status == 401 && mounted; retry++) {
+        await Future.delayed(Duration(milliseconds: retryDelays[retry]));
         try {
-          await SupabaseConfig.auth.refreshSession();
-          final retrySession = SupabaseConfig.auth.currentSession;
+          final authResponse = await SupabaseConfig.auth.refreshSession();
+          final retrySession = authResponse.session;
           if (retrySession != null) {
+            if (kIsWeb) await SupabaseConfig.auth.setSession(retrySession.refreshToken ?? retrySession.accessToken);
             token = retrySession.accessToken;
-            response = await SupabaseConfig.client.functions.invoke(
-              'create-checkout-session',
-              body: {'plan': plan},
-              headers: {'Authorization': 'Bearer $token'},
-            );
+            result = await _invokeCreateCheckoutSession(token, plan);
+          } else {
+            break;
           }
-        } catch (_) {}
+        } catch (_) {
+          break;
+        }
       }
 
       if (!mounted) return;
-      if (response.status == 401) {
+      if (result.status == 401) {
         setState(() => _isLoadingStripe = false);
-        final data = response.data as Map<String, dynamic>?;
+        final data = result.data;
         final errorMsg = data?['error'] as String?;
         final detail = data?['detail'] as String?;
+        final hint = 'Spróbuj za chwilę ponownie lub napisz do nas: contact@latwaforma.pl';
         final fullMsg = [
           errorMsg,
           if (detail != null && detail.isNotEmpty) detail,
-          'Wyloguj się w profilu i zaloguj ponownie, potem spróbuj wykupić Premium.',
+          hint,
         ].where((e) => e != null && e.toString().isNotEmpty).join('\n\n');
-        await _showMessageDialog('Sesja wygasła', fullMsg);
+        await _showMessageDialog('Nie udało się otworzyć płatności', fullMsg);
         return;
       }
 
-      final data = response.data as Map<String, dynamic>?;
+      final data = result.data;
       final urlString = data?['url'] as String?;
       final errorMsg = data?['error'] as String?;
 
@@ -527,24 +568,25 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       if (!mounted) return;
       final msg = e.toString();
       final is401 = msg.contains('401') || msg.contains('Invalid JWT');
-      await _showMessageDialog(
-        is401 ? 'Sesja wygasła' : 'Błąd',
-        is401
-            ? 'Sesja wygasła. Wyloguj się w profilu i zaloguj ponownie, potem spróbuj wykupić Premium jeszcze raz.'
-            : 'Błąd: $e',
-      );
+      final hint = 'Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl';
+      await _showMessageDialog(is401 ? 'Nie udało się otworzyć płatności' : 'Błąd', hint);
     } finally {
       if (mounted) setState(() => _isLoadingStripe = false);
     }
   }
 
   /// Otwiera Stripe Customer Portal – zarządzanie subskrypcją, rezygnacja (miesięczna lub roczna).
-  /// Przy 401 próbuje raz odświeżyć sesję i ponowić żądanie, żeby uniknąć komunikatu „wyloguj się”.
+  /// Przy 401 próbuje raz odświeżyć sesję (używa sesji z refreshSession) i ponowić żądanie.
   Future<void> _openPortalSession() async {
     setState(() => _isLoadingPortal = true);
     try {
-      await SupabaseConfig.auth.refreshSession();
-      var session = SupabaseConfig.auth.currentSession;
+      Session? session;
+      try {
+        final authResponse = await SupabaseConfig.auth.refreshSession();
+        session = authResponse.session ?? SupabaseConfig.auth.currentSession;
+      } catch (_) {
+        session = SupabaseConfig.auth.currentSession;
+      }
       if (session == null) {
         if (!mounted) return;
         setState(() => _isLoadingPortal = false);
@@ -560,10 +602,11 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       if (!mounted) return;
 
       if (response.status == 401) {
-        await SupabaseConfig.auth.refreshSession();
-        session = SupabaseConfig.auth.currentSession;
-        if (session != null) {
-          token = session.accessToken;
+        if (kIsWeb) await Future.delayed(const Duration(milliseconds: 400));
+        final authResponse = await SupabaseConfig.auth.refreshSession();
+        final retrySession = authResponse.session ?? SupabaseConfig.auth.currentSession;
+        if (retrySession != null) {
+          token = retrySession.accessToken;
           response = await SupabaseConfig.client.functions.invoke(
             'create-portal-session',
             headers: {'Authorization': 'Bearer $token'},
@@ -574,10 +617,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       if (!mounted) return;
       if (response.status == 401) {
         setState(() => _isLoadingPortal = false);
-        await _showMessageDialog(
-          'Sesja wygasła',
-          'Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.',
-        );
+        final portalHint = kIsWeb
+            ? 'Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.'
+            : 'Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.';
+        await _showMessageDialog('Sesja wygasła', portalHint);
         return;
       }
 
@@ -767,12 +810,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
             if (!isPremium) ...[
               _buildFeatureRow(context, icon: Icons.calendar_today, label: 'Przeglądanie historii innych dni niż dziś'),
               _buildFeatureRow(context, icon: Icons.pie_chart_outline, label: 'Podgląd makroskładników na dashboardzie'),
-              _buildFeatureRow(context, icon: Icons.psychology, label: 'Nieograniczona porada AI'),
+              _buildFeatureRow(context, icon: Icons.psychology, label: 'Porada AI (limit 100 dziennie)'),
               _buildFeatureRow(context, icon: Icons.camera_alt, label: 'Analiza AI posiłku ze zdjęcia'),
               _buildFeatureRow(context, icon: Icons.restaurant_menu, label: 'Dodawanie posiłku ze składników'),
               _buildFeatureRow(context, icon: Icons.storefront, label: 'Dodawanie posiłku „na mieście”'),
               _buildFeatureRow(context, icon: Icons.directions_run, label: 'Szybkie dodawanie w aktywnościach'),
-              _buildFeatureRow(context, icon: Icons.share, label: 'Udostępnianie tygodniowych statystyk'),
+              _buildFeatureRow(context, icon: Icons.share, label: 'Udostępnianie podsumowania i tygodniowych statystyk'),
               _buildFeatureRow(context, icon: Icons.picture_as_pdf, label: 'Eksport raportów do PDF'),
               _buildFeatureRow(context, icon: Icons.tune, label: 'Własny cel kaloryczny w edycji profilu'),
               _buildFeatureRow(context, icon: Icons.balance, label: 'Własne makroskładniki w edycji profilu'),
@@ -824,7 +867,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.workspace_premium),
-                label: Text(_isLoadingStripe ? 'Otwieram płatność…' : 'Wykup Premium (Stripe)'),
+                label: Text(_isLoadingStripe ? 'Otwieram płatność…' : 'Wykup Premium'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -878,12 +921,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
               const SizedBox(height: 12),
               _buildFeatureRow(context, icon: Icons.calendar_today, label: 'Historia innych dni', isActive: true),
               _buildFeatureRow(context, icon: Icons.pie_chart_outline, label: 'Makroskładniki na dashboardzie', isActive: true),
-              _buildFeatureRow(context, icon: Icons.psychology, label: 'Nieograniczona porada AI', isActive: true),
+              _buildFeatureRow(context, icon: Icons.psychology, label: 'Porada AI (limit 100 dziennie)', isActive: true),
               _buildFeatureRow(context, icon: Icons.camera_alt, label: 'Analiza AI posiłku', isActive: true),
               _buildFeatureRow(context, icon: Icons.restaurant_menu, label: 'Posiłek ze składników', isActive: true),
               _buildFeatureRow(context, icon: Icons.storefront, label: 'Posiłek „na mieście”', isActive: true),
               _buildFeatureRow(context, icon: Icons.directions_run, label: 'Szybkie dodawanie aktywności', isActive: true),
-              _buildFeatureRow(context, icon: Icons.share, label: 'Udostępnianie statystyk', isActive: true),
+              _buildFeatureRow(context, icon: Icons.share, label: 'Udostępnianie podsumowania i statystyk', isActive: true),
               _buildFeatureRow(context, icon: Icons.picture_as_pdf, label: 'Eksport do PDF', isActive: true),
               _buildFeatureRow(context, icon: Icons.tune, label: 'Własny cel kaloryczny', isActive: true),
               _buildFeatureRow(context, icon: Icons.balance, label: 'Własne makroskładniki', isActive: true),

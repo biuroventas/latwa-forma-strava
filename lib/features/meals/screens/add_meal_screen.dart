@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/models/meal.dart';
+import '../../../shared/models/favorite_meal.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/streak_updater.dart';
@@ -32,22 +33,43 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   late final TextEditingController _proteinController;
   late final TextEditingController _fatController;
   late final TextEditingController _carbsController;
+  late final TextEditingController _saturatedFatController;
+  late final TextEditingController _sugarController;
+  late final TextEditingController _fiberController;
+  late final TextEditingController _saltController;
   late final TextEditingController _weightController;
   String? _mealType;
   bool _isLoading = false;
   bool _caloriesManuallyEdited = false;
   bool _isUpdatingCaloriesFromMacros = false;
+  bool _addToFavorites = false;
+
+  /// Inicjalizacja tekstu: puste gdy brak wartości lub 0, żeby użytkownik nie musiał usuwać "0".
+  static String _optionalNum(String? value, bool isDecimal) {
+    if (value == null || value.isEmpty) return '';
+    final n = double.tryParse(value);
+    if (n == null || n <= 0) return '';
+    return isDecimal ? n.toStringAsFixed(1) : n.toStringAsFixed(0);
+  }
 
   @override
   void initState() {
     super.initState();
     final meal = widget.meal;
     _nameController = TextEditingController(text: meal?.name ?? '');
-    _caloriesController = TextEditingController(text: meal?.calories.toStringAsFixed(0) ?? '');
-    _proteinController = TextEditingController(text: meal?.proteinG.toStringAsFixed(0) ?? '0');
-    _fatController = TextEditingController(text: meal?.fatG.toStringAsFixed(0) ?? '0');
-    _carbsController = TextEditingController(text: meal?.carbsG.toStringAsFixed(0) ?? '0');
-    _weightController = TextEditingController(text: meal?.weightG?.toStringAsFixed(0) ?? '');
+    _caloriesController = TextEditingController(
+      text: (meal != null && meal.calories > 0) ? meal.calories.toStringAsFixed(0) : '',
+    );
+    _proteinController = TextEditingController(text: meal != null ? _optionalNum(meal.proteinG.toString(), false) : '');
+    _fatController = TextEditingController(text: meal != null ? _optionalNum(meal.fatG.toString(), false) : '');
+    _carbsController = TextEditingController(text: meal != null ? _optionalNum(meal.carbsG.toString(), false) : '');
+    _saturatedFatController = TextEditingController(text: meal != null ? _optionalNum(meal.saturatedFatG.toString(), true) : '');
+    _sugarController = TextEditingController(text: meal != null ? _optionalNum(meal.sugarG.toString(), true) : '');
+    _fiberController = TextEditingController(text: meal != null ? _optionalNum(meal.fiberG.toString(), true) : '');
+    _saltController = TextEditingController(text: meal != null ? _optionalNum(meal.saltG.toString(), true) : '');
+    _weightController = TextEditingController(
+      text: (meal?.weightG != null && meal!.weightG! > 0) ? meal.weightG!.toStringAsFixed(0) : '',
+    );
     _mealType = meal?.mealType;
   }
 
@@ -58,9 +80,15 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     _proteinController.dispose();
     _fatController.dispose();
     _carbsController.dispose();
+    _saturatedFatController.dispose();
+    _sugarController.dispose();
+    _fiberController.dispose();
+    _saltController.dispose();
     _weightController.dispose();
     super.dispose();
   }
+
+  double _parseOptionalDouble(TextEditingController c) => double.tryParse(c.text.trim().replaceAll(',', '.')) ?? 0;
 
   Future<void> _saveMeal() async {
     if (!_formKey.currentState!.validate()) return;
@@ -85,16 +113,32 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
           userId: userId,
           name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
           calories: _getCalories(),
-          proteinG: double.parse(_proteinController.text),
-          fatG: double.parse(_fatController.text),
-          carbsG: double.parse(_carbsController.text),
+          proteinG: double.tryParse(_proteinController.text) ?? 0,
+          fatG: double.tryParse(_fatController.text) ?? 0,
+          carbsG: double.tryParse(_carbsController.text) ?? 0,
+          saturatedFatG: _parseOptionalDouble(_saturatedFatController),
+          sugarG: _parseOptionalDouble(_sugarController),
+          fiberG: _parseOptionalDouble(_fiberController),
+          saltG: _parseOptionalDouble(_saltController),
           weightG: _weightController.text.isNotEmpty
-              ? double.parse(_weightController.text)
+              ? double.tryParse(_weightController.text)
               : null,
           mealType: _mealType,
           source: widget.meal!.source,
         );
         await service.updateMeal(updatedMeal);
+        if (mounted && _addToFavorites) {
+          final name = _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim();
+          final favorite = FavoriteMeal(
+            userId: userId,
+            name: name,
+            calories: _getCalories(),
+            proteinG: double.tryParse(_proteinController.text) ?? 0,
+            fatG: double.tryParse(_fatController.text) ?? 0,
+            carbsG: double.tryParse(_carbsController.text) ?? 0,
+          );
+          await service.createFavoriteMeal(favorite);
+        }
       } else {
         // Tworzenie nowego posiłku
         final calories = _getCalories();
@@ -110,11 +154,15 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
           userId: userId,
           name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
           calories: calories,
-          proteinG: double.parse(_proteinController.text),
-          fatG: double.parse(_fatController.text),
-          carbsG: double.parse(_carbsController.text),
+          proteinG: double.tryParse(_proteinController.text) ?? 0,
+          fatG: double.tryParse(_fatController.text) ?? 0,
+          carbsG: double.tryParse(_carbsController.text) ?? 0,
+          saturatedFatG: _parseOptionalDouble(_saturatedFatController),
+          sugarG: _parseOptionalDouble(_sugarController),
+          fiberG: _parseOptionalDouble(_fiberController),
+          saltG: _parseOptionalDouble(_saltController),
           weightG: _weightController.text.isNotEmpty
-              ? double.parse(_weightController.text)
+              ? double.tryParse(_weightController.text)
               : null,
           mealType: _mealType,
           source: source,
@@ -124,9 +172,26 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         AnalyticsService.instance.logMealAdded(source: source);
       }
 
+      if (mounted && _addToFavorites) {
+        final name = _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim();
+        final favorite = FavoriteMeal(
+          userId: userId,
+          name: name,
+          calories: _getCalories(),
+          proteinG: double.tryParse(_proteinController.text) ?? 0,
+          fatG: double.tryParse(_fatController.text) ?? 0,
+          carbsG: double.tryParse(_carbsController.text) ?? 0,
+        );
+        await service.createFavoriteMeal(favorite);
+      }
+
       if (mounted) {
         context.pop(true);
-        SuccessMessage.show(context, 'Posiłek dodany pomyślnie!', duration: const Duration(seconds: 2));
+        SuccessMessage.show(
+          context,
+          _addToFavorites ? 'Posiłek zapisany i dodany do ulubionych!' : 'Posiłek dodany pomyślnie!',
+          duration: const Duration(seconds: 2),
+        );
       }
     } catch (e) {
       if (mounted) ErrorHandler.showSnackBar(context, error: e);
@@ -420,6 +485,14 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               },
             ),
             const SizedBox(height: 16),
+            Text(
+              'Białko',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 4),
             TextFormField(
               controller: _proteinController,
               decoration: const InputDecoration(
@@ -430,6 +503,14 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               onChanged: (_) => setState(() => _updateCaloriesFromMacros()),
             ),
             const SizedBox(height: 16),
+            Text(
+              'Tłuszcze',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 4),
             TextFormField(
               controller: _fatController,
               decoration: const InputDecoration(
@@ -439,7 +520,28 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
               onChanged: (_) => setState(() => _updateCaloriesFromMacros()),
             ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: TextFormField(
+                controller: _saturatedFatController,
+                decoration: const InputDecoration(
+                  labelText: 'w tym nasycone (g)',
+                  isDense: true,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+              ),
+            ),
             const SizedBox(height: 16),
+            Text(
+              'Węglowodany',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 4),
             TextFormField(
               controller: _carbsController,
               decoration: const InputDecoration(
@@ -448,6 +550,49 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
               onChanged: (_) => setState(() => _updateCaloriesFromMacros()),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: TextFormField(
+                controller: _sugarController,
+                decoration: const InputDecoration(
+                  labelText: 'w tym cukry (g)',
+                  isDense: true,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: TextFormField(
+                controller: _fiberController,
+                decoration: const InputDecoration(
+                  labelText: 'Błonnik (g)',
+                  isDense: true,
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Sól',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            TextFormField(
+              controller: _saltController,
+              decoration: const InputDecoration(
+                labelText: 'Sól (g)',
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -474,6 +619,17 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               onChanged: (value) {
                 setState(() => _mealType = value);
               },
+            ),
+            const SizedBox(height: 16),
+            CheckboxListTile(
+              value: _addToFavorites,
+              onChanged: (value) {
+                setState(() => _addToFavorites = value ?? false);
+              },
+              title: const Text('Dodaj do ulubionych'),
+              subtitle: const Text('Będziesz mógł szybko dodać ten posiłek później'),
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
             ),
             const SizedBox(height: 32),
             SizedBox(

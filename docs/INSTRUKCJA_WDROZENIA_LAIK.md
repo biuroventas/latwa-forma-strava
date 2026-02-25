@@ -260,8 +260,9 @@ Po kilku–kilkunastu minutach **https://app.latwaforma.pl** powinno otwierać T
 
 1. W **Supabase** → **Edge Functions** → **Secrets** (lub w Stripe Dashboard, jeśli tam trzymasz URL-e).
 2. Ustaw (lub zaktualizuj):
-   - **STRIPE_SUCCESS_URL** = `https://app.latwaforma.pl/#/premium-success`
-   - **STRIPE_CANCEL_URL** = `https://app.latwaforma.pl/#/premium-cancel`
+   - **STRIPE_SUCCESS_URL** = `https://latwaforma.pl/#/premium-success`
+   - **STRIPE_CANCEL_URL** = `https://latwaforma.pl/#/premium-cancel`
+   (Aplikacja działa na latwaforma.pl; nie używaj app.latwaforma.pl. Możesz ustawić sekrety skryptem: `./scripts/set_stripe_return_urls.sh`.)
 3. Zapisz.  
 Jeśli używasz **Stripe Dashboard** do tych pól – zmień je tam na powyższe adresy.
 

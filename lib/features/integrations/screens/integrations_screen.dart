@@ -521,6 +521,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     }
 
     setState(() => _isSyncingGarmin = true);
+    bool showedEmptyHintDialog = false;
     try {
       List<GarminActivity> activities;
       if (kIsWeb) {
@@ -563,29 +564,39 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         } else {
           activities = [];
         }
-        if (activities.isEmpty && responseBody is Map && responseBody['_debug'] != null) {
+        if (activities.isEmpty && responseBody is Map<String, dynamic>) {
+          final emptyHint = responseBody['empty_hint']?.toString() ?? '';
           final debug = responseBody['_debug'] as Map<String, dynamic>?;
           final snippet = debug?['firstResponseSnippet']?.toString() ?? '';
           if (mounted) {
-            showDialog<void>(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: const Text('Odpowiedź Garmin (fragment)'),
-                content: SingleChildScrollView(
-                  child: SelectableText(
-                    snippet.isEmpty
-                        ? 'Garmin zwrócił pustą odpowiedź (status 200).\n\nEndpoint wellness-api/rest/activities w środowisku Evaluation może nie zwracać danych – mimo że Pull Test pokazuje CONNECT_ACTIVITY. Warto sprawdzić w portalu Garmin (Support) lub po uzyskaniu dostępu produkcyjnego.'
-                        : snippet,
+            if (emptyHint.isNotEmpty) {
+              showedEmptyHintDialog = true;
+              showDialog<void>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Brak aktywności z Garmin'),
+                  content: SingleChildScrollView(
+                    child: SelectableText(emptyHint),
                   ),
+                  actions: [
+                    if (snippet.isNotEmpty)
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _showGarminResponseDialog(context, snippet);
+                        },
+                        child: const Text('Szczegóły odpowiedzi API'),
+                      ),
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: const Text('Zamknij'),
+                    ),
+                  ],
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text('Zamknij'),
-                  ),
-                ],
-              ),
-            );
+              );
+            } else if (debug != null && snippet.isNotEmpty) {
+              _showGarminResponseDialog(context, snippet);
+            }
           }
         }
       } else {
@@ -614,12 +625,11 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       }
 
       if (mounted) {
-        SuccessMessage.show(
-          context,
-          imported > 0
-              ? 'Zaimportowano $imported aktywności z Garmin'
-              : 'Brak nowych aktywności do importu',
-        );
+        if (imported > 0) {
+          SuccessMessage.show(context, 'Zaimportowano $imported aktywności z Garmin');
+        } else if (!showedEmptyHintDialog) {
+          SuccessMessage.show(context, 'Brak nowych aktywności do importu');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -630,6 +640,28 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     } finally {
       if (mounted) setState(() => _isSyncingGarmin = false);
     }
+  }
+
+  void _showGarminResponseDialog(BuildContext context, String snippet) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Odpowiedź Garmin (fragment)'),
+        content: SingleChildScrollView(
+          child: SelectableText(
+            snippet.isEmpty
+                ? 'Garmin zwrócił pustą odpowiedź. W środowisku Evaluation API może nie udostępniać danych Pull.'
+                : snippet,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Zamknij'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _disconnectStrava() async {

@@ -118,7 +118,7 @@ Bez poprawnego SPF/DKIM/DMARC maile @latwaforma.pl mogą trafiać do spamu.
 5. **Supabase:** Projekt produkcyjny; ewentualnie custom domain api.latwaforma.pl (Dashboard / dokumentacja); w Auth dodaj redirect URLs dla app.latwaforma.pl i latwaforma.pl.
 6. **Flutter Web:** Build (`flutter build web`), deploy na Vercel/Firebase/Netlify, podpięcie domeny app.latwaforma.pl i CNAME w OVH.
 7. **Aplikacja (Flutter):** W buildzie prod ustaw `SUPABASE_URL` (i ewentualnie anon key), `privacyPolicyUrl` = `https://latwaforma.pl/polityka-prywatnosci.html`, `termsUrl` = `https://latwaforma.pl/regulamin.html`.
-8. **Stripe:** Success/Cancel URL np. `https://app.latwaforma.pl/#/premium-success` i `.../premium-cancel`.
+8. **Stripe:** Success/Cancel URL na **latwaforma.pl**: `https://latwaforma.pl/#/premium-success` i `https://latwaforma.pl/#/premium-cancel` (sekrety Supabase: STRIPE_SUCCESS_URL, STRIPE_CANCEL_URL). Uruchom `./scripts/set_stripe_return_urls.sh`, jeśli przekierowania idą na app.latwaforma.pl.
 
 ---
 

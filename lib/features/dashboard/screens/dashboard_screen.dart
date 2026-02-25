@@ -22,6 +22,13 @@ import '../../../shared/widgets/save_progress_checker.dart';
 import '../../../shared/widgets/premium_gate.dart';
 
 final dashboardDataProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, DateTime>((ref, selectedDate) async {
+  // Na webie po odświeżeniu strony sesja bywa nieaktualna – odśwież przed pierwszym requestem (unikamy Failed to fetch).
+  if (kIsWeb) {
+    try {
+      await SupabaseConfig.auth.refreshSession();
+    } catch (_) {}
+  }
+
   final userId = SupabaseConfig.auth.currentUser?.id;
   if (userId == null) throw Exception('User not logged in');
 
@@ -38,6 +45,10 @@ final dashboardDataProvider = FutureProvider.autoDispose.family<Map<String, dyna
   double totalProtein = 0;
   double totalFat = 0;
   double totalCarbs = 0;
+  double totalSaturatedFat = 0;
+  double totalSugar = 0;
+  double totalFiber = 0;
+  double totalSalt = 0;
   double totalBurned = 0;
 
   for (var meal in meals) {
@@ -45,6 +56,10 @@ final dashboardDataProvider = FutureProvider.autoDispose.family<Map<String, dyna
     totalProtein += meal.proteinG;
     totalFat += meal.fatG;
     totalCarbs += meal.carbsG;
+    totalSaturatedFat += meal.saturatedFatG;
+    totalSugar += meal.sugarG;
+    totalFiber += meal.fiberG;
+    totalSalt += meal.saltG;
   }
 
   for (var activity in activities) {
@@ -60,6 +75,10 @@ final dashboardDataProvider = FutureProvider.autoDispose.family<Map<String, dyna
     'totalProtein': totalProtein,
     'totalFat': totalFat,
     'totalCarbs': totalCarbs,
+    'totalSaturatedFat': totalSaturatedFat,
+    'totalSugar': totalSugar,
+    'totalFiber': totalFiber,
+    'totalSalt': totalSalt,
     'totalBurned': totalBurned,
     'totalMealsCount': totalMealsCount,
     'selectedDate': date,
@@ -76,6 +95,8 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _showMacros = false;
   DateTime _selectedDate = DateTime.now();
+  /// 0 = ostatni tydzień (do dziś), -1 = wstecz o tydzień, -2 = jeszcze wstecz itd.
+  int _weekOffset = 0;
   final _caloriesCardKey = GlobalKey();
   static const _prefShowMacros = 'show_macros';
 
@@ -196,19 +217,42 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Błąd: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.invalidate(dashboardDataProvider(_selectedDate)),
-                child: const Text('Spróbuj ponownie'),
+        error: (error, stack) {
+          final errStr = error.toString();
+          final isLoggedOut = errStr.contains('User not logged in');
+          final isFailedFetch = errStr.contains('Failed to fetch') || errStr.contains('ClientException');
+          final message = isLoggedOut
+              ? 'Sesja wygasła. Zaloguj się ponownie.'
+              : isFailedFetch
+                  ? 'Nie udało się załadować danych. Sprawdź połączenie internetowe i naciśnij „Spróbuj ponownie”.'
+                  : 'Błąd: $error';
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (isLoggedOut) {
+                        context.go(AppRoutes.welcome);
+                      } else {
+                        ref.invalidate(dashboardDataProvider(_selectedDate));
+                      }
+                    },
+                    child: Text(isLoggedOut ? 'Zaloguj się' : 'Spróbuj ponownie'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
       floatingActionButton: _AddFab(
         onAddMeal: () async {
@@ -227,6 +271,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         },
         onWeight: () => context.push(AppRoutes.weight),
         onMeasurements: () => context.push(AppRoutes.bodyMeasurements),
+        onFavorites: () async {
+          final result = await context.push<bool>(AppRoutes.favorites, extra: _selectedDate);
+          if (result == true && context.mounted) ref.invalidate(dashboardDataProvider(_selectedDate));
+        },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -294,6 +342,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final totalProtein = data['totalProtein'] as double;
     final totalFat = data['totalFat'] as double;
     final totalCarbs = data['totalCarbs'] as double;
+    final totalSaturatedFat = data['totalSaturatedFat'] as double;
+    final totalSugar = data['totalSugar'] as double;
+    final totalFiber = data['totalFiber'] as double;
+    final totalSalt = data['totalSalt'] as double;
     final totalBurned = data['totalBurned'] as double;
 
     final targetCalories = profile?.targetCalories ?? 2000.0;
@@ -325,6 +377,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             targetFat,
             totalCarbs,
             targetCarbs,
+            totalSaturatedFat,
+            totalSugar,
+            totalFiber,
+            totalSalt,
           ),
           const SizedBox(height: 16),
           // Woda
@@ -358,6 +414,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     double targetFat,
     double carbs,
     double targetCarbs,
+    double saturatedFat,
+    double sugar,
+    double fiber,
+    double salt,
   ) {
     final net = consumed - burned;
     final percentage = target > 0 ? (consumed / target * 100).clamp(0, 100) : 0;
@@ -467,9 +527,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               const SizedBox(height: 16),
               _buildMacroRow(context, 'Białko', protein, targetProtein, Colors.blue),
               const SizedBox(height: 12),
-              _buildMacroRow(context, 'Tłuszcze', fat, targetFat, Colors.orange),
+              _buildMacroRowWithSub(context, 'Tłuszcze', fat, targetFat, Colors.orange, 'w tym nasycone', saturatedFat),
               const SizedBox(height: 12),
-              _buildMacroRow(context, 'Węglowodany', carbs, targetCarbs, Colors.green),
+              _buildMacroRowWithSub(context, 'Węglowodany', carbs, targetCarbs, Colors.green, 'w tym cukry', sugar, subLabel2: 'błonnik', subValue2: fiber),
+              const SizedBox(height: 12),
+              _buildMacroRow(context, 'Sól', salt, 0, Colors.grey, showTarget: false),
             ],
             if (!isPremium) ...[
               const SizedBox(height: 16),
@@ -508,8 +570,54 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildMacroRow(BuildContext context, String label, double current, double target, Color color) {
-    final percentage = target > 0 ? (current / target * 100).clamp(0, 100) : 0;
+  Widget _buildMacroRow(BuildContext context, String label, double current, double target, Color color, {bool showTarget = true}) {
+    final percentage = target > 0 ? (current / target * 100).clamp(0.0, 100.0) : 0.0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            Text(
+              showTarget && target > 0
+                  ? '${current.toStringAsFixed(0)} / ${target.toStringAsFixed(0)} g'
+                  : '${current.toStringAsFixed(1)} g',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ],
+        ),
+        if (showTarget && target > 0) ...[
+          const SizedBox(height: 4),
+          LinearProgressIndicator(
+            value: percentage / 100,
+            backgroundColor: Colors.grey.shade200,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 6,
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// Makro z podziałem: główny wiersz (np. Tłuszcze X/Y g) + pod wiersz (w tym nasycone: Z g)
+  Widget _buildMacroRowWithSub(
+    BuildContext context,
+    String label,
+    double current,
+    double target,
+    Color color,
+    String subLabel,
+    double subValue, {
+    String? subLabel2,
+    double? subValue2,
+  }) {
+    final percentage = target > 0 ? (current / target * 100).clamp(0.0, 100.0) : 0.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -528,6 +636,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ],
         ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Text(
+            '$subLabel: ${subValue.toStringAsFixed(1)} g',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ),
+        if (subLabel2 != null && subValue2 != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 12, top: 2),
+            child: Text(
+              '$subLabel2: ${subValue2.toStringAsFixed(1)} g',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ),
         const SizedBox(height: 4),
         LinearProgressIndicator(
           value: percentage / 100,
@@ -743,10 +871,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildWeekCard(BuildContext context, WidgetRef ref, bool isPremium) {
     final today = DateTime.now();
-    final weekDays = List.generate(7, (index) {
-      final date = today.subtract(Duration(days: 6 - index));
-      return date;
-    });
+    final isNarrow = MediaQuery.sizeOf(context).width < 600;
+    final dayCount = isNarrow ? 5 : 10; // telefon: 5 dni, tablet/desktop: 10 dni
+    final baseDate = today.subtract(Duration(days: (dayCount - 1) - _weekOffset * dayCount));
+    final weekDays = List.generate(dayCount, (index) => baseDate.add(Duration(days: index)));
+    final canGoRight = _weekOffset < 0;
 
     return Card(
       child: Padding(
@@ -754,16 +883,58 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Ostatni tydzień',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            Row(
+              children: [
+                Text(
+                  'Przegląd',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  iconSize: 22,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  tooltip: 'Wybierz datę',
+                  onPressed: () async {
+                    final dayCountForPicker = MediaQuery.sizeOf(context).width < 600 ? 5 : 10;
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate,
+                      firstDate: DateTime(2020),
+                      lastDate: today.add(const Duration(days: 365)),
+                    );
+                    if (picked == null || !mounted) return;
+                    setState(() {
+                      _selectedDate = picked;
+                      final daysDiff = picked.difference(today).inDays;
+                      _weekOffset = daysDiff >= 0
+                          ? (daysDiff + dayCountForPicker - 1) ~/ dayCountForPicker
+                          : daysDiff ~/ dayCountForPicker;
+                    });
+                    ref.invalidate(dashboardDataProvider(_selectedDate));
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: weekDays.map((date) {
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left),
+                  onPressed: () {
+                    setState(() {
+                      _weekOffset -= 1;
+                    });
+                  },
+                  tooltip: 'Wcześniejszy tydzień',
+                ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: weekDays.map((date) {
                 final isSelected = date.year == _selectedDate.year &&
                     date.month == _selectedDate.month &&
                     date.day == _selectedDate.day;
@@ -833,6 +1004,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 );
               }).toList(),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right),
+                  onPressed: canGoRight
+                      ? () {
+                          setState(() {
+                            _weekOffset += 1;
+                          });
+                        }
+                      : null,
+                  tooltip: 'Późniejszy tydzień',
+                ),
+              ],
             ),
             if (_selectedDate.year != today.year ||
                 _selectedDate.month != today.month ||
@@ -859,6 +1044,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       onPressed: () {
                         setState(() {
                           _selectedDate = DateTime.now();
+                          _weekOffset = 0;
                         });
                         ref.invalidate(dashboardDataProvider(_selectedDate));
                       },
@@ -886,6 +1072,7 @@ class _AddFab extends StatefulWidget {
   final VoidCallback onAddActivity;
   final VoidCallback onWeight;
   final VoidCallback onMeasurements;
+  final VoidCallback onFavorites;
 
   const _AddFab({
     required this.onAddMeal,
@@ -893,6 +1080,7 @@ class _AddFab extends StatefulWidget {
     required this.onAddActivity,
     required this.onWeight,
     required this.onMeasurements,
+    required this.onFavorites,
   });
 
   @override
@@ -921,6 +1109,7 @@ class _AddFabState extends State<_AddFab> {
               _menuItem(Icons.fitness_center, 'Aktywność', Colors.orange, widget.onAddActivity),
               _menuItem(Icons.monitor_weight, 'Waga', Colors.blue, widget.onWeight),
               _menuItem(Icons.straighten, 'Pomiary', Colors.purple, widget.onMeasurements),
+              _menuItem(Icons.favorite, 'Ulubione', Colors.pink, widget.onFavorites),
             ],
           ),
         ),

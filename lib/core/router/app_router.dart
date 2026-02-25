@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/auth/auth_callback_handler.dart';
 import '../../core/config/supabase_config.dart';
 import '../../core/providers/auth_state_provider.dart';
 import '../../shared/widgets/app_background.dart';
@@ -37,6 +38,7 @@ import '../../features/notifications/screens/notifications_settings_screen.dart'
 import '../../features/integrations/screens/integrations_screen.dart';
 import '../../features/ai_advice/screens/ai_advice_screen.dart';
 import '../../features/subscription/screens/premium_screen.dart';
+import '../../features/subscription/screens/premium_success_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -67,6 +69,7 @@ class AppRoutes {
   static const editFavorite = '/favorites/edit';
   static const aiAdvice = '/ai-advice';
   static const premium = '/premium';
+  static const premiumSuccess = '/premium-success';
 }
 
 /// Strona bez animacji – natychmiastowa zamiana (eliminuje „scinanie” przy wszystkich przejściach).
@@ -89,6 +92,10 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
     refreshListenable: notifier,
     redirect: (context, state) {
       try {
+        // Po powrocie z Google OAuth callback jest w URL (ścieżka lub hash z tokenami) – idź na splash.
+        if (kIsWeb && isAuthCallbackUri(Uri.base)) {
+          return AppRoutes.splash;
+        }
         final loc = state.uri.toString();
         if (loc.contains('auth/callback') || loc.contains('auth%2Fcallback')) {
           return AppRoutes.splash;
@@ -219,6 +226,10 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
       GoRoute(
         path: AppRoutes.premium,
         pageBuilder: (_, state) => _noTransitionPage(state, const PremiumScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.premiumSuccess,
+        pageBuilder: (_, state) => _noTransitionPage(state, const PremiumSuccessScreen()),
       ),
       GoRoute(
         path: AppRoutes.export,

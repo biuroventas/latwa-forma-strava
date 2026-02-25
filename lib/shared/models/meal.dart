@@ -6,6 +6,14 @@ class Meal {
   final double proteinG;
   final double fatG;
   final double carbsG;
+  /// Tłuszcze nasycone (g) – część ogólnych tłuszczów
+  final double saturatedFatG;
+  /// Cukry (g) – część węglowodanów
+  final double sugarG;
+  /// Błonnik (g)
+  final double fiberG;
+  /// Sól (g)
+  final double saltG;
   final double? weightG;
   final String? mealType;
   final String source;
@@ -19,6 +27,10 @@ class Meal {
     this.proteinG = 0,
     this.fatG = 0,
     this.carbsG = 0,
+    this.saturatedFatG = 0,
+    this.sugarG = 0,
+    this.fiberG = 0,
+    this.saltG = 0,
     this.weightG,
     this.mealType,
     this.source = 'manual',
@@ -34,6 +46,10 @@ class Meal {
       proteinG: (json['protein_g'] as num?)?.toDouble() ?? 0,
       fatG: (json['fat_g'] as num?)?.toDouble() ?? 0,
       carbsG: (json['carbs_g'] as num?)?.toDouble() ?? 0,
+      saturatedFatG: (json['saturated_fat_g'] as num?)?.toDouble() ?? 0,
+      sugarG: (json['sugar_g'] as num?)?.toDouble() ?? 0,
+      fiberG: (json['fiber_g'] as num?)?.toDouble() ?? 0,
+      saltG: (json['salt_g'] as num?)?.toDouble() ?? 0,
       weightG: json['weight_g'] != null ? (json['weight_g'] as num).toDouble() : null,
       mealType: json['meal_type'] as String?,
       source: json['source'] as String? ?? 'manual',
@@ -50,6 +66,10 @@ class Meal {
       'protein_g': proteinG,
       'fat_g': fatG,
       'carbs_g': carbsG,
+      'saturated_fat_g': saturatedFatG,
+      'sugar_g': sugarG,
+      'fiber_g': fiberG,
+      'salt_g': saltG,
       if (weightG != null) 'weight_g': weightG,
       if (mealType != null) 'meal_type': mealType,
       'source': source,

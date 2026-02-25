@@ -11,8 +11,10 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/config/supabase_config.dart';
-import '../../../core/utils/success_message.dart';
+import '../../../core/utils/download_bytes_stub.dart'
+    if (dart.library.html) '../../../core/utils/download_bytes_web.dart' as download_util;
 import '../../../core/utils/error_handler.dart';
+import '../../../core/utils/success_message.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../shared/widgets/loading_overlay.dart';
 import '../../../shared/widgets/premium_gate.dart';
@@ -82,30 +84,30 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       }
 
       final csvContent = csv.toString();
+      final dateStr = DateTime.now().toIso8601String().split('T')[0];
 
-      // Spróbuj zapisać do pliku i udostępnić (na webie bez path_provider)
-      try {
-        final dateStr = DateTime.now().toIso8601String().split('T')[0];
-        if (kIsWeb) {
-          final xFile = XFile.fromData(
-            utf8.encode(csvContent),
-            name: 'latwa_forma_export_$dateStr.csv',
-          );
-          await Share.shareXFiles(
-            [xFile],
-            text: 'Eksport danych Łatwa Forma',
-            subject: 'Dane Łatwa Forma - $dateStr',
-          );
-        } else {
-          final dir = await getTemporaryDirectory();
-          final file = File('${dir.path}/latwa_forma_export_$dateStr.csv');
-          await file.writeAsString(csvContent, encoding: utf8);
-          await Share.shareXFiles(
-            [XFile(file.path)],
-            text: 'Eksport danych Łatwa Forma',
-            subject: 'Dane Łatwa Forma - $dateStr',
+      // Na webie Share często nie działa – od razu kopiuj do schowka i pokaż sukces.
+      if (kIsWeb) {
+        await Clipboard.setData(ClipboardData(text: csvContent));
+        if (mounted) {
+          SuccessMessage.show(
+            context,
+            'Dane skopiowane do schowka. Wklej do Notatnika lub Excela i zapisz jako .csv',
+            duration: const Duration(seconds: 3),
           );
         }
+        return;
+      }
+
+      try {
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/latwa_forma_export_$dateStr.csv');
+        await file.writeAsString(csvContent, encoding: utf8);
+        await Share.shareXFiles(
+          [XFile(file.path)],
+          text: 'Eksport danych Łatwa Forma',
+          subject: 'Dane Łatwa Forma - $dateStr',
+        );
         if (mounted) {
           SuccessMessage.show(
             context,
@@ -135,7 +137,13 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         }
       }
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (mounted) {
+        ErrorHandler.showSnackBar(
+          context,
+          error: e,
+          fallback: 'Nie udało się wyeksportować. Sprawdź połączenie i spróbuj ponownie.',
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isExporting = false);
@@ -170,7 +178,24 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         ..sort((a, b) => (a.createdAt ?? DateTime(0)).compareTo(b.createdAt ?? DateTime(0)));
       final weightLogs = await service.getWeightLogs(userId, limit: 100);
 
-      final pdf = pw.Document();
+      // Czcionka z obsługą polskich znaków (ą, ć, ę, ł, ń, ó, ś, ź, ż)
+      ByteData fontData;
+      try {
+        fontData = await rootBundle.load('assets/fonts/OpenSans-Regular.ttf');
+      } catch (_) {
+        if (mounted) {
+          ErrorHandler.showSnackBar(
+            context,
+            error: Exception('font'),
+            fallback: 'Błąd ładowania czcionki. Odśwież stronę (F5) i spróbuj ponownie.',
+          );
+        }
+        return;
+      }
+      final ttfFont = pw.Font.ttf(fontData);
+      final pdfTheme = pw.ThemeData.withFont(base: ttfFont);
+
+      final pdf = pw.Document(theme: pdfTheme);
       final now = DateTime.now();
       final dateStr = '${now.day}.${now.month}.${now.year}';
       final fileDateStr = now.toIso8601String().split('T')[0];
@@ -372,15 +397,30 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
 
       final bytes = await pdf.save();
       if (kIsWeb) {
-        final xFile = XFile.fromData(
-          bytes,
-          name: 'latwa_forma_raport_$fileDateStr.pdf',
-        );
-        await Share.shareXFiles(
-          [xFile],
-          text: 'Raport Łatwa Forma',
-          subject: 'Raport Łatwa Forma - $dateStr',
-        );
+        final pdfFileName = 'latwa_forma_raport_$fileDateStr.pdf';
+        try {
+          final xFile = XFile.fromData(
+            bytes,
+            name: pdfFileName,
+            mimeType: 'application/pdf',
+          );
+          await Share.shareXFiles(
+            [xFile],
+            text: 'Raport Łatwa Forma',
+            subject: 'Raport Łatwa Forma - $dateStr',
+          );
+        } catch (_) {
+          // Fallback: pobranie pliku (np. gdy przeglądarka nie obsługuje udostępniania PDF)
+          await download_util.downloadBytesAsFile(bytes, pdfFileName, mimeType: 'application/pdf');
+          if (mounted) {
+            SuccessMessage.show(
+              context,
+              'PDF został pobrany. Sprawdź folder Pobrane.',
+              duration: const Duration(seconds: 3),
+            );
+          }
+          return;
+        }
       } else {
         final dir = await getTemporaryDirectory();
         final file = File('${dir.path}/latwa_forma_raport_$fileDateStr.pdf');
@@ -400,7 +440,13 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         );
       }
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (mounted) {
+        ErrorHandler.showSnackBar(
+          context,
+          error: e,
+          fallback: 'Eksport PDF nie powiódł się. Spróbuj ponownie lub wyeksportuj do CSV.',
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isExporting = false);

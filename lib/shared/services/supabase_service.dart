@@ -6,6 +6,7 @@ import '../models/water_log.dart';
 import '../models/weight_log.dart';
 import '../models/body_measurement.dart';
 import '../models/favorite_meal.dart';
+import '../models/favorite_activity.dart';
 import '../models/streak.dart';
 import '../models/goal_challenge.dart';
 
@@ -355,6 +356,29 @@ class SupabaseService {
 
   Future<void> deleteFavoriteMeal(String favoriteMealId) async {
     await _client.from('favorite_meals').delete().eq('id', favoriteMealId);
+  }
+
+  // Favorite activities
+  Future<List<FavoriteActivity>> getFavoriteActivities(String userId) async {
+    final response = await _client
+        .from('favorite_activities')
+        .select()
+        .eq('user_id', userId)
+        .order('created_at', ascending: false);
+    return (response as List).map((json) => FavoriteActivity.fromJson(json)).toList();
+  }
+
+  Future<FavoriteActivity> createFavoriteActivity(FavoriteActivity fa) async {
+    final response = await _client
+        .from('favorite_activities')
+        .insert(fa.toJson())
+        .select()
+        .single();
+    return FavoriteActivity.fromJson(response);
+  }
+
+  Future<void> deleteFavoriteActivity(String favoriteActivityId) async {
+    await _client.from('favorite_activities').delete().eq('id', favoriteActivityId);
   }
 
   // Streaks operations

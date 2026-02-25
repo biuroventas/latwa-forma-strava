@@ -101,13 +101,50 @@ Plik `web/garmin-callback.html` jest w repozytorium i przy buildzie trafia do `b
 
 ## 7. Endpoint Coverage Test (CONSUMER_PERMISSIONS, USER_DEREG)
 
-W Garmin Developer Portal test **Endpoint Coverage Test** wymaga, żeby w ciągu 24 h na adres **https://latwaforma.pl/api/garmin** trafiły dane dla summary domain **CONSUMER_PERMISSIONS** (push) i **USER_DEREG** (ping). W projekcie jest Netlify Function (`netlify/functions/garmin.js`) – zwraca `200 OK` na GET i POST.
+W Garmin Developer Portal test **Endpoint Coverage Test** wymaga, żeby w ciągu **24 h** na adres **https://latwaforma.pl/api/garmin** trafiły dane dla **każdego** włączonego summary domain (**CONSUMER_PERMISSIONS** – push, **USER_DEREG** – ping). Netlify Function `netlify/functions/garmin.js` zwraca `200 OK` na GET i POST.
 
-- **Deploy endpointu:** Wdraża się przy **deployu z Gita** (Netlify buduje z `netlify.toml` i wgrywa też funkcję). Lokalny skrypt `deploy_site_netlify.sh` wgrywa tylko folder `build/web` (bez funkcji). Żeby endpoint był na żywo: zrób **push do repozytorium** i poczekaj na build w Netlify, albo w Netlify włącz build z tego repozytorium i zrób deploy.
+- **Deploy endpointu:** Wdraża się przy **deployu z Gita** (Netlify buduje z `netlify.toml` i wgrywa też funkcję). Lokalny skrypt `deploy_site_netlify.sh` wgrywa tylko folder `build/web` (bez funkcji). Żeby endpoint był na żywo: **push do repozytorium** i poczekaj na build w Netlify.
 - Po wdrożeniu: `curl -I https://latwaforma.pl/api/garmin` → powinno być `200`.
-- W portalu Garmin w **Endpoint Configuration** ustaw **Callback URL** na `https://latwaforma.pl/api/garmin` (jeśli wymagane). Po 24 h od pierwszego push/ping test powinien przejść.
+- W portalu Garmin w **API Configuration** / **Endpoint Configuration** ustaw **Callback URL** na `https://latwaforma.pl/api/garmin`.
 
-## 8. Przydatne linki
+---
+
+## 8. Test produkcyjny (Partner Verification) – jak przejść
+
+Strona: **Partner Verification** w Garmin (np. `apis.garmin.com/tools/partnerVerification` lub z menu w Developer Portal).
+
+### Co musi być zielone
+
+- **Endpoint Setup Test** – zwykle zielony, jeśli Callback URL jest ustawiony i endpoint zwraca 200.
+- **Endpoint Coverage Test** – wymaga, żeby **w ostatnich 24 godzinach** Garmin **wysłał** do Twojego URL przynajmniej jedno żądanie dla **każdego** włączonego summary domain. Komunikat *„1 enabled summary domain(s) without data in the last 24 hours”* oznacza, że dla jednej z domen (np. USER_DEREG lub CONSUMER_PERMISSIONS) w tym oknie nie było żadnego ruchu.
+
+### Kroki, żeby Endpoint Coverage Test przeszedł
+
+1. **Upewnij się, że endpoint żyje**  
+   - Deploy Netlify **z Gita** (nie tylko `deploy_site_netlify.sh`), żeby wgrać `netlify/functions/garmin.js`.  
+   - Sprawdź: `curl -I https://latwaforma.pl/api/garmin` → `200 OK`.  
+   - W portalu Garmin: **API Configuration** → Callback URL = `https://latwaforma.pl/api/garmin`.
+
+2. **Wyślij ruch z Garmina na swój URL (trigger webhooków)**  
+   Garmin liczy „data” tylko wtedy, gdy **on** wyśle request do Twojego URLa.  
+   - **USER_DEREG (ping):** Wejdź w **Garmin Connect** (connect.garmin.com lub aplikacja) → Ustawienia konta / Connected Apps. Znajdź **Łatwa Forma** i **odłącz** / usuń dostęp. Garmin powinien wysłać ping na `https://latwaforma.pl/api/garmin`. Potem możesz z powrotem połączyć Łatwa Forma.  
+   - **CONSUMER_PERMISSIONS (push):** Zazwyczaj wysyłany przy **pierwszej autoryzacji**. Wykonaj **„Połącz z Garmin Connect”** w aplikacji (latwaforma.pl) i dokończ OAuth – to może wygenerować push na Twój callback.
+
+3. **Poczekaj i odśwież test**  
+   Test sprawdza ruch w ostatnich 24 h. Po wykonaniu kroków odczekaj (nawet kilka godzin) i w **Partner Verification** kliknij **Refresh Tests**. Gdy obie domeny miały ruch, **Endpoint Coverage Test** powinien być zielony.
+
+4. **Apply for Production Key**  
+   Gdy **All Tests** są zielone, użyj **Apply for Production Key** i dokończ weryfikację zgodnie z instrukcjami Garmin.
+
+### Jeśli nadal „without data in the last 24 hours”
+
+- W Netlify (Functions → garmin) sprawdź logi – czy są wywołania z ostatnich 24 h.
+- W portalu Garmin upewnij się, że wymagane summary domains mają ten sam Callback URL.
+- W razie wątpliwości: **Garmin Developer Support** (Support w portalu lub connect-support@developer.garmin.com).
+
+---
+
+## 9. Przydatne linki
 
 - [Garmin Developer Portal](https://developerportal.garmin.com/)
 - [Connect Developer API – overview](https://developerportal.garmin.com/developer-programs/connect-developer-api)

@@ -1,10 +1,24 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:latwa_forma/core/utils/pkce_storage_stub.dart'
+    if (dart.library.html) 'package:latwa_forma/core/utils/pkce_storage_web.dart' as pkce_storage;
+
 class SupabaseConfig {
   static bool _initialized = false;
+
+  /// Env załadowany z assetu/serwera (na webie dotenv bywa puste – tu mamy pewność).
+  static final Map<String, String> _loadedEnv = {};
+
+  /// Wartość zmiennej env (np. GARMIN_CLIENT_ID). Najpierw z _loadedEnv, potem z dotenv.
+  static String? getEnv(String key) {
+    final v = _loadedEnv[key]?.trim();
+    if (v != null && v.isNotEmpty) return v;
+    return dotenv.env[key]?.trim();
+  }
 
   /// Czy Supabase został poprawnie zainicjalizowany (URL + klucz z .env).
   /// Gdy false, [auth] i [client] nie są dostępne – aplikacja pokazuje Welcome bez logowania.
@@ -40,9 +54,9 @@ class SupabaseConfig {
     _initialized = false;
     try {
       if (kIsWeb) {
-        // Na webie najpierw pobierz env.production z serwera (plik w build/web) – niezawodne.
+        // 1) Fetch z serwera (po deployu: build/web/env.production na latwaforma.pl)
         try {
-          final url = Uri.base.resolve('/env.production');
+          final url = Uri.base.resolve('env.production?v=${DateTime.now().millisecondsSinceEpoch}');
           final response = await http.get(url).timeout(
                 const Duration(seconds: 5),
                 onTimeout: () => http.Response('', 408),
@@ -50,34 +64,69 @@ class SupabaseConfig {
           if (response.statusCode == 200 && response.body.trim().isNotEmpty) {
             final map = _parseEnv(response.body);
             if (map.isNotEmpty) {
+              _loadedEnv.addAll(map);
               await dotenv.load(
                 fileName: '.env',
                 mergeWith: map,
                 isOptional: true,
               );
-              debugPrint('✅ env.production załadowany z serwera (web)');
+              debugPrint('✅ env.production z serwera (web)');
             }
           }
         } catch (_) {}
-        // Jeśli fetch nie dał danych, fallback na asset
-        if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
+        // 2) Asset przez rootBundle – niezawodne przy „flutter run -d chrome”
+        for (final path in ['assets/env.production', 'env.production']) {
           try {
-            await dotenv.load(fileName: 'assets/env.production');
-            debugPrint('✅ env.production z assets (web)');
-          } catch (__) {
-            try {
-              await dotenv.load(fileName: 'env.production');
-              debugPrint('✅ env.production z root (web)');
-            } catch (___) {
-              try {
-                await dotenv.load(fileName: '.env', isOptional: true);
-              } catch (____) {}
+            final String raw = await rootBundle.loadString(path);
+            final map = _parseEnv(raw);
+            if (map.isNotEmpty) {
+              _loadedEnv.addAll(map);
+              await dotenv.load(
+                fileName: '.env',
+                mergeWith: map,
+                isOptional: true,
+              );
+              debugPrint('✅ env z $path (web)');
+              break;
             }
+          } catch (e) {
+            if (path == 'env.production') debugPrint('⚠️ rootBundle env: $e');
           }
         }
+        // 3) Klasyczny dotenv.load na asset (fallback)
+        if ((dotenv.env['GARMIN_CLIENT_ID']?.trim().isEmpty ?? true) &&
+            (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true)) {
+          try {
+            await dotenv.load(fileName: 'assets/env.production', isOptional: true);
+          } catch (__) {}
+        }
+        if (_loadedEnv.isEmpty && dotenv.env.isNotEmpty) {
+          _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
+        }
       } else {
-        await dotenv.load(fileName: '.env');
-        debugPrint('✅ .env załadowany z głównego folderu');
+        // Najpierw opcjonalnie .env (może nie istnieć po sklonowaniu z gita)
+        await dotenv.load(fileName: '.env', isOptional: true);
+        // Fallback: env.production (root lub assets) – żeby działało bez .env po clone
+        if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
+          try {
+            await dotenv.load(fileName: 'env.production', isOptional: true);
+            if (dotenv.env['SUPABASE_URL']?.trim().isNotEmpty ?? false) {
+              _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
+              debugPrint('✅ env.production załadowany z głównego folderu');
+            }
+          } catch (_) {}
+        }
+        if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
+          await dotenv.load(fileName: 'assets/env.production', isOptional: true);
+          if (dotenv.env['SUPABASE_URL']?.trim().isNotEmpty ?? false) {
+            _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
+            debugPrint('✅ env.production z assets');
+          }
+        }
+        if (_loadedEnv.isEmpty && dotenv.env.isNotEmpty) {
+          _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
+        }
+        debugPrint('✅ env załadowany (desktop/mobile)');
       }
     } catch (e) {
       debugPrint('⚠️ Błąd ładowania env: $e');
@@ -85,7 +134,10 @@ class SupabaseConfig {
         if (kIsWeb) {
           await dotenv.load(fileName: 'assets/env.production', isOptional: true);
         } else {
-          await dotenv.load(fileName: 'assets/.env', isOptional: true);
+          await dotenv.load(fileName: 'env.production', isOptional: true);
+          if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
+            await dotenv.load(fileName: 'assets/env.production', isOptional: true);
+          }
         }
         debugPrint('✅ env załadowany z alternatywnej lokalizacji');
       } catch (e2) {
@@ -96,8 +148,8 @@ class SupabaseConfig {
       }
     }
 
-    final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
-    final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
+    final supabaseUrl = getEnv('SUPABASE_URL') ?? '';
+    final supabaseAnonKey = getEnv('SUPABASE_ANON_KEY') ?? '';
 
     debugPrint('🔍 Sprawdzanie konfiguracji:');
     debugPrint('   URL: ${supabaseUrl.isEmpty ? "❌ BRAK" : "✅ $supabaseUrl"}');
@@ -119,8 +171,9 @@ class SupabaseConfig {
         anonKey: supabaseAnonKey,
         authOptions: FlutterAuthClientOptions(
           authFlowType: AuthFlowType.pkce,
-          // Na webie false – wymianę ?code= robimy sami w main()/splashu (tryProcessInitialAuthLink),
-          // żeby wyjątki były łapane i nie było „Uncaught Error” w konsoli.
+          // Na webie natywny localStorage przeglądarki – code_verifier przetrwa przeładowanie po powrocie z Google.
+          pkceAsyncStorage: pkce_storage.getPkceStorageForWeb(),
+          // Na webie false – wymianę ?code= robi tylko tryProcessInitialAuthLink (jak na localhost, gdzie działa).
           detectSessionInUri: false,
         ),
         realtimeClientOptions: const RealtimeClientOptions(
@@ -133,8 +186,11 @@ class SupabaseConfig {
       if (kIsWeb) {
         final origin = (Uri.base.origin).trim();
         if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
-          debugPrint('📍 Lokalne (Chrome): dla logowania Google dodaj w Supabase → Auth → URL Configuration → Redirect URLs:');
-          debugPrint('   $origin');
+          final redirectUrl = origin.endsWith('/') ? origin : '$origin/';
+          debugPrint('📍 LOCALHOST – logowanie Google:');
+          debugPrint('   1) Uruchom z ustalonym portem: flutter run -d chrome --web-port=8080');
+          debugPrint('   2) W Supabase → Auth → URL Configuration → Redirect URLs dodaj: $redirectUrl');
+          debugPrint('   3) Otwórz w przeglądarce dokładnie ten adres (ze slashem) i loguj w TEJ SAMEJ karcie.');
         }
       }
 
@@ -157,7 +213,7 @@ class SupabaseConfig {
   /// Bazowy URL Edge Functions (np. https://xxx.supabase.co/functions/v1).
   /// Używane do wywołań HTTP z tokenem, żeby płatność działała bez 401 od bramki.
   static String get functionsBaseUrl {
-    final u = (dotenv.env['SUPABASE_URL'] ?? '').trim();
+    final u = (getEnv('SUPABASE_URL') ?? '').trim();
     final base = u.endsWith('/') ? u.substring(0, u.length - 1) : u;
     return '$base/functions/v1';
   }

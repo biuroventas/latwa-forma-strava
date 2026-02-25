@@ -50,6 +50,7 @@ app.*.map.json
 .env
 env.production
 assets/env.production
+web/env.production
 
 # Supabase
 .supabase/

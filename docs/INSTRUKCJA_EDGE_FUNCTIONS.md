@@ -2,6 +2,18 @@
 
 Funkcje `delete_user` (usuwanie konta) i `invite_user` (zapraszanie znajomych) działają jako Supabase Edge Functions. Aby działały w aplikacji, muszą być **wdrożone** do Twojego projektu Supabase.
 
+## Zaproś znajomego (invite_user) – co trzeba zrobić
+
+1. **Wdróż funkcję** (bez `--no-verify-jwt` – wymagana jest zalogowana sesja):
+   ```bash
+   supabase functions deploy invite_user
+   ```
+2. **Opcjonalnie** – w Supabase → Edge Functions → Secrets ustaw:
+   - `INVITE_REDIRECT_URL` = adres, na który ma trafić zaproszony po kliknięciu w link (domyślnie: `https://latwaforma.pl/`).
+3. W aplikacji: Profil → **Zaproś znajomego** → wpisz e-mail → Wyślij. Zaproszenie leci z Supabase Auth (mail z linkiem do rejestracji).
+
+Jeśli widzisz **„Sesja wygasła”**: odśwież stronę (F5), zaloguj się ponownie i spróbuj jeszcze raz. Aplikacja przed wysłaniem odświeża sesję i wywołuje funkcję przez HTTP z aktualnym tokenem.
+
 ## Czy trzeba coś konfigurować w panelu Supabase?
 
 **Nie.** W panelu Supabase nie trzeba nic włączać ani ustawiać. Supabase automatycznie wstrzykuje do każdej Edge Function zmienne:

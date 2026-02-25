@@ -10,7 +10,7 @@ abstract final class AppBackgroundTokens {
   static const double blobBlurRadius = 150.0;
 }
 
-/// Tło aplikacji: jasny gradient + 2 rozmyte zielone bloby (jak na onboardingu).
+/// Tło aplikacji: jasny gradient + 2 rozmyte zielone bloby tylko w skrajnych częściach ekranu (rogi).
 /// Używane globalnie w ShellRoute, żeby szata graficzna była spójna w całej aplikacji.
 class AppBackground extends StatelessWidget {
   const AppBackground({super.key, required this.child});
@@ -34,9 +34,10 @@ class AppBackground extends StatelessWidget {
             ),
           ),
         ),
+        // Bąbelek tylko w lewym górnym rogu (skraj ekranu).
         Positioned(
-          top: -80,
-          left: -60,
+          top: -140,
+          left: -120,
           child: Container(
             width: AppBackgroundTokens.blobSize,
             height: AppBackgroundTokens.blobSize,
@@ -55,9 +56,10 @@ class AppBackground extends StatelessWidget {
             ),
           ),
         ),
+        // Bąbelek tylko w prawym dolnym rogu (skraj ekranu).
         Positioned(
-          bottom: -100,
-          right: -80,
+          bottom: -140,
+          right: -120,
           child: Container(
             width: AppBackgroundTokens.blobSize,
             height: AppBackgroundTokens.blobSize,

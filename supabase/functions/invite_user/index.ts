@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const defaultRedirectUrl = "https://biuroventas.github.io/latwa-forma-strava/auth_redirect/";
+const defaultRedirectUrl = "https://latwaforma.pl/";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,9 +15,17 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return new Response(
         JSON.stringify({ error: "Brak autoryzacji" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!jwt) {
+      return new Response(
+        JSON.stringify({ error: "Brak tokenu" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -31,7 +39,7 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+    const { data: { user }, error: userError } = await supabaseUser.auth.getUser(jwt);
 
     if (userError || !user || user.isAnonymous) {
       return new Response(
@@ -53,11 +61,12 @@ Deno.serve(async (req) => {
       auth: { persistSession: false },
     });
 
-    const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
+    let { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(
       email,
       { redirectTo: redirectUrl }
     );
 
+    let wasAlreadyInvited = false;
     if (inviteError) {
       const msg = inviteError.message.toLowerCase();
       if (msg.includes("already been registered") || msg.includes("already exists")) {
@@ -66,22 +75,45 @@ Deno.serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (msg.includes("over email rate limit")) {
+      if (msg.includes("already been invited") || msg.includes("already invited") || msg.includes("invitation has already been sent") || msg.includes("invitation")) {
+        wasAlreadyInvited = true;
+        const retry = await supabaseAdmin.auth.admin.inviteUserByEmail(
+          email,
+          { redirectTo: redirectUrl }
+        );
+        inviteError = retry.error;
+        inviteData = retry.data;
+      }
+      if (inviteError) {
+        if (msg.includes("over email rate limit")) {
+          return new Response(
+            JSON.stringify({ error: "Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (wasAlreadyInvited) {
+          return new Response(
+            JSON.stringify({
+              success: true,
+              message: "Na ten adres e-mail wysłano już wcześniej zaproszenie. Wysłaliśmy je ponownie – sprawdź skrzynkę (w tym spam).",
+            }),
+            { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        // Nie przekazuj surowego błędu (może zawierać "email") – zwróć ogólny komunikat
         return new Response(
-          JSON.stringify({ error: "Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "Nie udało się wysłać zaproszenia. Sprawdź adres e-mail lub spróbuj później." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      return new Response(
-        JSON.stringify({ error: inviteError.message }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Zaproszenie wysłano na ${email}`,
+        message: wasAlreadyInvited
+          ? "Na ten adres e-mail wysłano już wcześniej zaproszenie. Wysłaliśmy je ponownie – sprawdź skrzynkę (w tym spam)."
+          : `Zaproszenie wysłano na ${email}`,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

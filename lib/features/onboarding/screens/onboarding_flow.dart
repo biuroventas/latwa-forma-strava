@@ -37,6 +37,34 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Map<String, double>? _macros;
   DateTime? _targetDate;
 
+  late final TextEditingController _ageController;
+  late final TextEditingController _heightController;
+  late final TextEditingController _currentWeightController;
+  late final TextEditingController _targetWeightController;
+
+  @override
+  void initState() {
+    super.initState();
+    _age = 25;
+    _heightCm = 170;
+    _currentWeightKg = 70;
+    _targetWeightKg = 70;
+    _goal = AppConstants.goalMaintain;
+    _ageController = TextEditingController(text: '25');
+    _heightController = TextEditingController(text: '170');
+    _currentWeightController = TextEditingController(text: '70');
+    _targetWeightController = TextEditingController(text: '70');
+  }
+
+  @override
+  void dispose() {
+    _ageController.dispose();
+    _heightController.dispose();
+    _currentWeightController.dispose();
+    _targetWeightController.dispose();
+    super.dispose();
+  }
+
   Future<void> _handleBack(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -134,25 +162,48 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
               ),
               const SizedBox(height: 2),
-              if (_age != null)
-                Text(
-                  '$_age lat',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Slider(
+                      value: (_age ?? 25).toDouble().clamp(13.0, 100.0),
+                      min: 13,
+                      max: 100,
+                      divisions: 87,
+                      label: (_age ?? 25).toString(),
+                      onChanged: (value) {
+                        setState(() {
+                          _age = value.round();
+                          _ageController.text = value.round().toString();
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 88,
+                    child: TextField(
+                      controller: _ageController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        suffixText: 'lat',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                       ),
-                ),
-              Slider(
-                value: _age?.toDouble() ?? 25,
-                min: 13,
-                max: 100,
-                divisions: 87,
-                label: _age?.toString() ?? '25',
-                onChanged: (value) {
-                  setState(() {
-                    _age = value.round();
-                  });
-                },
+                      onSubmitted: (s) {
+                        final v = int.tryParse(s.trim());
+                        if (v != null && v >= 13 && v <= 100) {
+                          setState(() {
+                            _age = v;
+                            _ageController.text = v.toString();
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               
@@ -164,25 +215,48 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
               ),
               const SizedBox(height: 2),
-              if (_heightCm != null)
-                Text(
-                  '${_heightCm!.toStringAsFixed(0)} cm',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Slider(
+                      value: (_heightCm ?? 170).clamp(100.0, 250.0),
+                      min: 100,
+                      max: 250,
+                      divisions: 150,
+                      label: (_heightCm ?? 170).round().toString(),
+                      onChanged: (value) {
+                        setState(() {
+                          _heightCm = value.round().toDouble();
+                          _heightController.text = value.round().toString();
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 88,
+                    child: TextField(
+                      controller: _heightController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        suffixText: 'cm',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                       ),
-                ),
-              Slider(
-                value: _heightCm ?? 170,
-                min: 100,
-                max: 250,
-                divisions: 150,
-                label: _heightCm?.toStringAsFixed(0) ?? '170',
-                onChanged: (value) {
-                  setState(() {
-                    _heightCm = value;
-                  });
-                },
+                      onSubmitted: (s) {
+                        final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                        if (v != null && v >= 100 && v <= 250) {
+                          setState(() {
+                            _heightCm = v.round().toDouble();
+                            _heightController.text = v.round().toString();
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               
@@ -194,27 +268,52 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
               ),
               const SizedBox(height: 2),
-              if (_currentWeightKg != null)
-                Text(
-                  '${_currentWeightKg!.toStringAsFixed(1)} kg',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Slider(
+                      value: (_currentWeightKg ?? 70).clamp(30.0, 300.0),
+                      min: 30,
+                      max: 300,
+                      divisions: 270,
+                      label: (_currentWeightKg ?? 70).toStringAsFixed(1),
+                      onChanged: (value) {
+                        setState(() {
+                          _currentWeightKg = value;
+                          _targetWeightKg ??= value;
+                          _currentWeightController.text = value.toStringAsFixed(1);
+                          _updateGoalFromWeights();
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 88,
+                    child: TextField(
+                      controller: _currentWeightController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        suffixText: 'kg',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                       ),
-                ),
-              Slider(
-                value: _currentWeightKg ?? 70,
-                min: 30,
-                max: 300,
-                divisions: 270,
-                label: _currentWeightKg?.toStringAsFixed(1) ?? '70.0',
-                onChanged: (value) {
-                  setState(() {
-                    _currentWeightKg = value;
-                    _targetWeightKg ??= value;
-                    _updateGoalFromWeights();
-                  });
-                },
+                      onSubmitted: (s) {
+                        final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                        if (v != null && v >= 30 && v <= 300) {
+                          setState(() {
+                            _currentWeightKg = v;
+                            _targetWeightKg ??= v;
+                            _currentWeightController.text = v.toStringAsFixed(1);
+                            _updateGoalFromWeights();
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               
@@ -226,31 +325,55 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 ),
               ),
               const SizedBox(height: 2),
-              if (_targetWeightKg != null)
-                Text(
-                  '${_targetWeightKg!.toStringAsFixed(1)} kg',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
               if (_currentWeightKg != null && _targetWeightKg != null)
                 Text(
                   'Różnica: ${(_targetWeightKg! - _currentWeightKg!).abs().toStringAsFixed(1)} kg',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-              Slider(
-                value: _targetWeightKg ?? (_currentWeightKg ?? 70),
-                min: 30,
-                max: 300,
-                divisions: 270,
-                label: (_targetWeightKg ?? _currentWeightKg ?? 70).toStringAsFixed(1),
-                onChanged: (value) {
-                  setState(() {
-                    _targetWeightKg = value;
-                    _updateGoalFromWeights();
-                  });
-                },
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Slider(
+                      value: (_targetWeightKg ?? _currentWeightKg ?? 70).clamp(30.0, 300.0),
+                      min: 30,
+                      max: 300,
+                      divisions: 270,
+                      label: (_targetWeightKg ?? _currentWeightKg ?? 70).toStringAsFixed(1),
+                      onChanged: (value) {
+                        setState(() {
+                          _targetWeightKg = value;
+                          _targetWeightController.text = value.toStringAsFixed(1);
+                          _updateGoalFromWeights();
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 88,
+                    child: TextField(
+                      controller: _targetWeightController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        suffixText: 'kg',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                      ),
+                      onSubmitted: (s) {
+                        final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                        if (v != null && v >= 30 && v <= 300) {
+                          setState(() {
+                            _targetWeightKg = v;
+                            _targetWeightController.text = v.toStringAsFixed(1);
+                            _updateGoalFromWeights();
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
               if (_currentWeightKg != null && _targetWeightKg != null)
                 Padding(

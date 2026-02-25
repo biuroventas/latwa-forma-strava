@@ -80,6 +80,10 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
         proteinG: _totalProtein,
         fatG: _totalFat,
         carbsG: _totalCarbs,
+        saturatedFatG: 0,
+        sugarG: 0,
+        fiberG: 0,
+        saltG: 0,
         weightG: _weightG,
         source: AppConstants.mealSourceBarcode,
       );
@@ -114,6 +118,10 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
       proteinG: _totalProtein,
       fatG: _totalFat,
       carbsG: _totalCarbs,
+      saturatedFatG: 0,
+      sugarG: 0,
+      fiberG: 0,
+      saltG: 0,
       weightG: _weightG,
       source: AppConstants.mealSourceBarcode,
     )).then((result) {

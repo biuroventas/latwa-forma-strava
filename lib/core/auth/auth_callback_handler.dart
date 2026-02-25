@@ -28,6 +28,7 @@ bool isAuthCallbackUri(Uri? uri) {
   if (uri == null) return false;
   final s = uri.toString();
   if (s.contains('error=') || s.contains('error_code=')) return false;
+  if (s.contains('garmin_code=') || s.contains('strava_code=')) return false;
   if (s.contains('auth/callback') || s.contains('auth%2Fcallback')) return true;
   if (uri.queryParameters.containsKey('code')) return true;
   final frag = uri.fragment;

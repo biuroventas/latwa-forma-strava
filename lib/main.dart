@@ -38,12 +38,11 @@ void main() async {
     debugPrint('Stack trace: $stackTrace');
   }
 
-  if (!kIsWeb) {
-    try {
-      await tryProcessInitialAuthLink()
-          .timeout(const Duration(seconds: 5), onTimeout: () => false);
-    } catch (_) {}
-  }
+  // Na webie wymiana ?code= z Google przed runApp() (wbudowany handler + nasz tryProcessInitialAuthLink).
+  try {
+    final authTimeout = kIsWeb ? const Duration(seconds: 10) : const Duration(seconds: 6);
+    await tryProcessInitialAuthLink().timeout(authTimeout, onTimeout: () => false);
+  } catch (_) {}
 
   runApp(
     const ProviderScope(
@@ -82,11 +81,7 @@ class _LatwaFormaAppState extends State<LatwaFormaApp> {
       _linkSub = AppLinks().uriLinkStream.listen((Uri uri) {
         if (isAuthCallbackUri(uri)) handleAuthCallbackUri(uri);
       });
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await Future.delayed(const Duration(milliseconds: 250));
-        if (!mounted) return;
-        await tryProcessInitialAuthLink();
-      });
+      // Wymiana ?code= z Google odbywa się na splashu (jedno miejsce), nie tutaj.
     } catch (e) {
       debugPrint('⚠️ AppLinks init: $e');
     }

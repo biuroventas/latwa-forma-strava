@@ -95,8 +95,10 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    # env.production tworzony na Netlify; .env tylko lokalnie (nie w assets, żeby build na Netlify nie wymagał .env)
+    - assets/fonts/
+    # env.production w root i w assets (skrypt prepare kopiuje do obu; web ładuje z assets)
     - env.production
+    - assets/env.production
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

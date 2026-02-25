@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/config/supabase_config.dart';
 import '../models/activity.dart';
 
 /// Serwis integracji z Garmin Connect - OAuth 2.0 PKCE, pobieranie aktywności.
@@ -16,9 +16,9 @@ class GarminService {
   static const _redirectScheme = 'latwaforma';
   static const _redirectHost = 'garmin-callback';
 
-  String? get _clientId => dotenv.env['GARMIN_CLIENT_ID'];
-  String? get _clientSecret => dotenv.env['GARMIN_CLIENT_SECRET'];
-  String? get _redirectUriOverride => dotenv.env['GARMIN_REDIRECT_URI'];
+  String? get _clientId => SupabaseConfig.getEnv('GARMIN_CLIENT_ID');
+  String? get _clientSecret => SupabaseConfig.getEnv('GARMIN_CLIENT_SECRET');
+  String? get _redirectUriOverride => SupabaseConfig.getEnv('GARMIN_REDIRECT_URI');
 
   /// Do rozpoczęcia OAuth (otwarcie strony autoryzacji) wystarczy publiczny client_id.
   bool get isConfigured => (_clientId?.isNotEmpty ?? false);

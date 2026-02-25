@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../shared/models/activity.dart';
+import '../../../shared/models/favorite_activity.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/streak_updater.dart';
@@ -30,6 +31,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
   late final TextEditingController _durationController;
   String? _intensity;
   bool _isLoading = false;
+  bool _addToFavorites = false;
 
   @override
   void initState() {
@@ -148,6 +150,16 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
           intensity: _intensity,
         );
         await service.updateActivity(updatedActivity);
+        if (mounted && _addToFavorites) {
+          final fav = FavoriteActivity(
+            userId: userId,
+            name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
+            caloriesBurned: double.parse(_caloriesController.text),
+            durationMinutes: _durationController.text.isNotEmpty ? int.tryParse(_durationController.text) : null,
+            intensity: _intensity,
+          );
+          await service.createFavoriteActivity(fav);
+        }
       } else {
         // Tworzenie nowej aktywności
         final effectiveDate = widget.date ?? DateTime.now();
@@ -171,11 +183,24 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
         await service.createActivity(activity);
         AnalyticsService.instance.logActivityAdded();
         await StreakUpdater.updateStreak(userId, AppConstants.streakActivities, effectiveDate);
+        if (mounted && _addToFavorites) {
+          final fav = FavoriteActivity(
+            userId: userId,
+            name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
+            caloriesBurned: double.parse(_caloriesController.text),
+            durationMinutes: _durationController.text.isNotEmpty ? int.tryParse(_durationController.text) : null,
+            intensity: _intensity,
+          );
+          await service.createFavoriteActivity(fav);
+        }
       }
 
       if (mounted) {
         context.pop(true);
-        SuccessMessage.show(context, 'Aktywność dodana pomyślnie!');
+        SuccessMessage.show(
+          context,
+          _addToFavorites ? 'Aktywność zapisana i dodana do ulubionych!' : 'Aktywność dodana pomyślnie!',
+        );
       }
     } catch (e) {
       if (mounted) ErrorHandler.showSnackBar(context, error: e);
@@ -300,6 +325,17 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
               onChanged: (value) {
                 setState(() => _intensity = value);
               },
+            ),
+            const SizedBox(height: 16),
+            CheckboxListTile(
+              value: _addToFavorites,
+              onChanged: (value) {
+                setState(() => _addToFavorites = value ?? false);
+              },
+              title: const Text('Dodaj do ulubionych'),
+              subtitle: const Text('Będziesz mógł szybko dodać tę aktywność później'),
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
             ),
             const SizedBox(height: 32),
             SizedBox(

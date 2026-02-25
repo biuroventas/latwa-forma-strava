@@ -9,17 +9,18 @@ cd "$ROOT"
 
 # Konfiguracja Supabase w buildzie web: env.production musi istnieć (ładuje go supabase_config.dart).
 # Na Netlify CI tworzy go netlify_env.sh z zmiennych; przy lokalnym deployu bierzemy z .env.
+# Grep dopuszcza opcjonalne spacje wokół = oraz linie z CRLF (Windows).
 if [ -f "$ROOT/.env" ]; then
-  grep -E '^SUPABASE_URL=' "$ROOT/.env" > "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^SUPABASE_ANON_KEY=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^STRAVA_CLIENT_ID=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^STRAVA_CLIENT_SECRET=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^STRAVA_REDIRECT_URI=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^GARMIN_CLIENT_ID=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^GARMIN_CLIENT_SECRET=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
-  grep -E '^GARMIN_REDIRECT_URI=' "$ROOT/.env" >> "$ROOT/env.production" 2>/dev/null || true
+  { grep -E '^SUPABASE_URL\s*=' "$ROOT/.env" || true; } > "$ROOT/env.production"
+  { grep -E '^SUPABASE_ANON_KEY\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^STRAVA_CLIENT_ID\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^STRAVA_CLIENT_SECRET\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^STRAVA_REDIRECT_URI\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^GARMIN_CLIENT_ID\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^GARMIN_CLIENT_SECRET\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^GARMIN_REDIRECT_URI\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
   if [ -s "$ROOT/env.production" ]; then
-    echo "env.production utworzony z .env (Supabase, Strava w buildzie)."
+    echo "env.production utworzony z .env (Supabase, Strava, Garmin w buildzie)."
     mkdir -p "$ROOT/assets"
     cp "$ROOT/env.production" "$ROOT/assets/env.production"
   fi

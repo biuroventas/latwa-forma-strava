@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -204,46 +205,63 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
             child: SingleChildScrollView(
               controller: _scrollController,
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Zapytaj o poradę w zakresie diety, odżywiania lub aktywności fizycznej.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 280),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Zapytaj o poradę w zakresie diety, odżywiania lub aktywności fizycznej.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+                    Focus(
+                      onKeyEvent: (_, KeyEvent event) {
+                        if (event is KeyDownEvent &&
+                            event.logicalKey == LogicalKeyboardKey.enter &&
+                            !HardwareKeyboard.instance.isShiftPressed &&
+                            canAsk) {
+                          _askAi();
+                          return KeyEventResult.handled;
+                        }
+                        return KeyEventResult.ignored;
+                      },
+                      child: TextField(
+                        controller: _questionController,
+                        decoration: InputDecoration(
+                          hintText: 'np. Ile białka potrzebuję przy treningu siłowym?',
+                          border: const OutlineInputBorder(),
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          suffixIcon: IconButton(
+                            icon: _isLoading
+                                ? SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.send,
+                                    color: canAsk
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                                  ),
+                            onPressed: canAsk ? _askAi : null,
+                          ),
                         ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _questionController,
-                    decoration: InputDecoration(
-                      hintText: 'np. Ile białka potrzebuję przy treningu siłowym?',
-                      border: const OutlineInputBorder(),
-                      filled: true,
-                      suffixIcon: IconButton(
-                        icon: _isLoading
-                            ? SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              )
-                            : Icon(
-                                Icons.send,
-                                color: canAsk
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                              ),
-                        onPressed: canAsk ? _askAi : null,
+                        maxLines: 3,
+                        minLines: 1,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: canAsk ? (_) => _askAi() : null,
                       ),
                     ),
-                    maxLines: 3,
-                    minLines: 1,
-                    onSubmitted: canAsk ? (_) => _askAi() : null,
-                  ),
                   const SizedBox(height: 24),
                   if (_lastResponse != null) ...[
                     Container(
@@ -288,6 +306,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
                     ),
                   ],
                 ],
+                ),
               ),
             ),
           ),

@@ -437,16 +437,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   ? details['error'] as String
                                   : null;
                               if (serverError != null) {
-                                if (serverError.toLowerCase().contains('już ma') ||
-                                    serverError.toLowerCase().contains('already') ||
-                                    serverError.toLowerCase().contains('zarejestrowan')) {
+                                final lower = serverError.toLowerCase();
+                                // Kolejność ważna: najpierw "zaproszenie już wysłane", potem "już zarejestrowany", na końcu "prawidłowy email"
+                                if (lower.contains('wysłano już zaproszenie') ||
+                                    lower.contains('already invited') ||
+                                    lower.contains('invitation has already been sent')) {
+                                  userMessage = 'Na ten adres wysłano już zaproszenie. Sprawdź skrzynkę (w tym spam) lub podaj inny adres.';
+                                } else if (lower.contains('już ma') ||
+                                    lower.contains('already been registered') ||
+                                    lower.contains('already exists') ||
+                                    lower.contains('zarejestrowan')) {
                                   userMessage = 'Ten adres e-mail jest już zarejestrowany w Łatwa Forma. Zaproś kogoś innego.';
-                                } else if (serverError.toLowerCase().contains('prawidłowy') ||
-                                    serverError.toLowerCase().contains('e-mail')) {
-                                  userMessage = 'Podaj prawidłowy adres e-mail.';
-                                } else if (serverError.toLowerCase().contains('zbyt wiele') ||
-                                    serverError.toLowerCase().contains('rate limit')) {
+                                } else if (lower.contains('zbyt wiele') ||
+                                    lower.contains('rate limit')) {
                                   userMessage = 'Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie.';
+                                } else if (lower.contains('prawidłowy') ||
+                                    (lower.contains('e-mail') && !lower.contains('invit') && !lower.contains('wysłano'))) {
+                                  userMessage = 'Podaj prawidłowy adres e-mail.';
                                 } else {
                                   userMessage = serverError;
                                 }

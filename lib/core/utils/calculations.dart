@@ -97,9 +97,9 @@ class Calculations {
         break;
     }
 
-    // Białko: 2g na kg wagi docelowej
-    var proteinCalories = targetWeightKg * 2.0 * 4;
-    var fatCalories = targetCalories * 0.275;
+    // Białko: 2g na kg wagi docelowej; tłuszcze: procent z AppConstants
+    var proteinCalories = targetWeightKg * AppConstants.proteinPerKg * 4;
+    var fatCalories = targetCalories * AppConstants.fatPercentage;
     fatG = fatCalories / 9;
     proteinG = proteinCalories / 4;
 
@@ -129,8 +129,8 @@ class Calculations {
     required double targetCalories,
     required double targetWeightKg,
   }) {
-    var proteinCalories = targetWeightKg * 2.0 * 4;
-    var fatCalories = targetCalories * 0.275;
+    var proteinCalories = targetWeightKg * AppConstants.proteinPerKg * 4;
+    var fatCalories = targetCalories * AppConstants.fatPercentage;
     var fatG = fatCalories / 9;
     var proteinG = proteinCalories / 4;
     const minCarbsKcal = 50.0 * 4;

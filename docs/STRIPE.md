@@ -55,8 +55,8 @@ W Supabase: **Project Settings → Edge Functions → Secrets** (lub przez CLI) 
 | `STRIPE_PREMIUM_PRICE_YEARLY` | Price ID ceny rocznej 194,95 PLN recurring (price_...) |
 | `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | Price ID ceny **jednorazowej** 194,95 PLN (za rok) – płatność BLIK + karta (price_...) |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret z webhooka Stripe (whsec_...) |
-| `STRIPE_SUCCESS_URL` | URL po udanej płatności (np. strona „Dziękujemy” lub deep link) |
-| `STRIPE_CANCEL_URL` | URL po anulowaniu (np. strona lub link z powrotem do app) |
+| `STRIPE_SUCCESS_URL` | URL po udanej płatności – **użyj latwaforma.pl**: `https://latwaforma.pl/#/premium-success` (nie app.latwaforma.pl) |
+| `STRIPE_CANCEL_URL` | URL po anulowaniu – **użyj latwaforma.pl**: `https://latwaforma.pl/#/premium-cancel` |
 
 Dla kompatybilności wstecznej: jeśli ustawisz tylko `STRIPE_PREMIUM_PRICE_ID`, będzie używany jako domyślna cena (plan monthly). Plan „Rocznie (jednorazowo)” wymaga `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME`.
 
@@ -64,13 +64,18 @@ Dla kompatybilności wstecznej: jeśli ustawisz tylko `STRIPE_PREMIUM_PRICE_ID`,
 
 ### Deploy funkcji
 
-Bramka Supabase domyślnie weryfikuje JWT przed wywołaniem funkcji; przy problemach (np. po rotacji kluczy) zwraca 401, zanim kod funkcji się wykona. Funkcje `create-checkout-session` i `create-portal-session` same weryfikują użytkownika (`getUser(jwt)`), więc można wyłączyć weryfikację na bramce:
+**Wymagane, żeby płatność działała:** bramka Supabase domyślnie weryfikuje JWT przed wywołaniem funkcji. Gdy token jest uznawany za nieważny (np. opóźnienie, cache), bramka zwraca **401 zanim** kod funkcji się wykona – użytkownik nie może wykupić Premium. Funkcje `create-checkout-session` i `create-portal-session` same weryfikują użytkownika (`getUser(jwt)`), więc **trzeba** wyłączyć weryfikację na bramce:
 
 ```bash
 supabase functions deploy create-checkout-session --no-verify-jwt
 supabase functions deploy create-portal-session --no-verify-jwt
-supabase functions deploy stripe-webhook
+supabase functions deploy stripe-webhook --no-verify-jwt
 ```
+**stripe-webhook** też musi być z `--no-verify-jwt` – Stripe nie wysyła tokenu JWT, tylko nagłówek `Stripe-Signature`. Bez tego w logach Stripe (Event deliveries) zobaczysz **401 ERR** przy `checkout.session.completed`.
+
+Albo uruchom skrypt: `./scripts/deploy_stripe_functions.sh`
+
+**Jeśli „Wykup Premium” zwraca 401:** wdróż ponownie z `--no-verify-jwt` (jak wyżej). Bez tego płatność nie będzie działać bez odświeżania strony.
 
 ---
 

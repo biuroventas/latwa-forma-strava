@@ -9,6 +9,7 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
   [ -n "$STRAVA_CLIENT_SECRET" ] && echo "STRAVA_CLIENT_SECRET=$STRAVA_CLIENT_SECRET" >> env.production
   [ -n "$STRAVA_REDIRECT_URI" ] && echo "STRAVA_REDIRECT_URI=$STRAVA_REDIRECT_URI" >> env.production
   [ -n "$GARMIN_CLIENT_ID" ] && echo "GARMIN_CLIENT_ID=$GARMIN_CLIENT_ID" >> env.production
+  [ -n "$GARMIN_CLIENT_SECRET" ] && echo "GARMIN_CLIENT_SECRET=$GARMIN_CLIENT_SECRET" >> env.production
   [ -n "$GARMIN_REDIRECT_URI" ] && echo "GARMIN_REDIRECT_URI=$GARMIN_REDIRECT_URI" >> env.production
   echo "Created env.production from Netlify env vars"
 else

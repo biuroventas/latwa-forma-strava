@@ -9,16 +9,13 @@ import '../../core/constants/app_constants.dart';
 /// Adres przekierowania po OAuth (Safari / mobile) – schemat latwaforma.
 const String _oauthRedirectUrl = 'latwaforma://auth/callback';
 
-/// Na webie przekierowanie musi być na bieżącą origin strony (np. https://latwaforma.pl
-/// lub https://www.latwaforma.pl). PKCE zapisuje code_verifier w localStorage – po powrocie
-/// z Google przeglądarka musi być na tej samej domenie, inaczej „Code verifier could not be found”.
-/// W Supabase Redirect URLs dodaj obie wersje, jeśli używasz www i bez www.
+/// Na webie ZAWSZE bieżąca origin + slash – żeby powrót z Google był na tę samą domenę
+/// (np. latwaforma.pl vs www.latwaforma.pl to inny localStorage). W Supabase dodaj oba w Redirect URLs.
 String get _redirectUrl {
   if (!kIsWeb) return _oauthRedirectUrl;
   final origin = Uri.base.origin.trim();
-  // Zawsze używamy bieżącej origin (localhost, latwaforma.pl, www.latwaforma.pl),
-  // żeby po powrocie z Google localStorage był ten sam.
-  return origin.isNotEmpty ? origin : AppConstants.webAuthRedirectUrl.trim();
+  if (origin.isEmpty) return '${AppConstants.webAuthRedirectUrl.trim()}/';
+  return origin.endsWith('/') ? origin : '$origin/';
 }
 
 /// Dla magic link (e-mail) używamy HTTPS – klienty e-mail nie obsługują custom scheme.

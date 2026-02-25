@@ -216,7 +216,7 @@ W trybie Live Stripe **nie używa** tego samego webhooka co w Test. Trzeba doda�
 | `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | **Price ID** roczny jednorazowo z Kroku L2 (Live) |
 | `STRIPE_WEBHOOK_SECRET`        | **Signing secret** z Kroku L4 (Live, whsec_...) |
 
-- **STRIPE_SUCCESS_URL** i **STRIPE_CANCEL_URL** możesz **zostawić** (np. `https://latwaforma.pl/#/premium-success` i `...#/premium-cancel`), chyba że chcesz inne adresy.
+- **STRIPE_SUCCESS_URL** i **STRIPE_CANCEL_URL** muszą wskazywać na **latwaforma.pl** (gdzie działa aplikacja), np. `https://latwaforma.pl/#/premium-success` i `https://latwaforma.pl/#/premium-cancel`. **Nie używaj app.latwaforma.pl** – wtedy po płatności otworzy się stara domena.
 
 ### Krok L6. (Opcjonalnie) Stripe Customer Portal – branding
 - W Stripe: **Settings** (ikonka zębatki) → **Billing** → **Customer portal** (lub **Branding**).

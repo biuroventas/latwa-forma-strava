@@ -141,6 +141,10 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
       proteinG: _analysisResult!['proteinG'] as double,
       fatG: _analysisResult!['fatG'] as double,
       carbsG: _analysisResult!['carbsG'] as double,
+      saturatedFatG: (_analysisResult!['saturatedFatG'] as num?)?.toDouble() ?? 0,
+      sugarG: (_analysisResult!['sugarG'] as num?)?.toDouble() ?? 0,
+      fiberG: (_analysisResult!['fiberG'] as num?)?.toDouble() ?? 0,
+      saltG: (_analysisResult!['saltG'] as num?)?.toDouble() ?? 0,
       weightG: _analysisResult!['weightG'] as double?,
       source: AppConstants.mealSourceAiPhoto,
     );

@@ -1,8 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
+
+/// Ikona Google „G” – SVG z fallbackiem na Material icon gdy asset się nie załaduje.
+class _GoogleGIcon extends StatefulWidget {
+  const _GoogleGIcon({this.size = 22, this.color});
+
+  final double size;
+  final Color? color;
+
+  @override
+  State<_GoogleGIcon> createState() => _GoogleGIconState();
+}
+
+class _GoogleGIconState extends State<_GoogleGIcon> {
+  /// Na starcie pokazujemy fallback; po załadowaniu assetu przełączamy na SVG.
+  bool _useFallback = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAsset();
+  }
+
+  Future<void> _checkAsset() async {
+    try {
+      await rootBundle.load('assets/icons/google_g.svg');
+      if (mounted) setState(() => _useFallback = false);
+    } catch (_) {
+      if (mounted) setState(() => _useFallback = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_useFallback) {
+      return Icon(
+        Icons.g_mobiledata,
+        size: widget.size,
+        color: widget.color ?? Colors.white,
+      );
+    }
+    final color = widget.color ?? Colors.white;
+    return ColorFiltered(
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      child: SvgPicture.asset(
+        'assets/icons/google_g.svg',
+        width: widget.size,
+        height: widget.size,
+        fit: BoxFit.contain,
+        placeholderBuilder: (_) => Icon(
+          Icons.g_mobiledata,
+          size: widget.size,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
 
 // --- FAQ: pytania i odpowiedzi (stopka) ---
 const List<({String q, String a})> _footerFaqEntries = [
@@ -267,7 +325,15 @@ class EasyFormaOnboardingScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(OnboardingTokens.buttonRadius),
                     ),
                   ),
-                  child: const Text('Zaloguj się lub załóż konto'),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const _GoogleGIcon(size: 22, color: Colors.white),
+                      const SizedBox(width: 12),
+                      const Text('Zaloguj się lub załóż konto'),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: OnboardingTokens.betweenButtons),

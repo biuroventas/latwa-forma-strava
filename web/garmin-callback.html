@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garmin → Łatwa Forma</title>
+  <style>
+    body { font-family: system-ui, sans-serif; text-align: center; padding: 2em; margin: 0; background: #F3FFF4; min-height: 100vh; }
+    .box { background: white; max-width: 320px; margin: 2em auto; padding: 2em; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h2 { margin: 0 0 1em; font-size: 1.2em; color: #333; }
+    p { margin: 0.5em 0; color: #666; font-size: 0.95em; }
+    .ok { color: #2e7d32; font-weight: 500; margin-top: 1.5em; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Przekierowanie do Łatwa Forma</h2>
+    <p>Otwieram aplikację...</p>
+    <p id="fallback" style="display:none;" class="ok">Możesz zamknąć tę kartę i wrócić do aplikacji.</p>
+  </div>
+  <script>
+    (function() {
+      var params = window.location.search || '';
+      var code = new URLSearchParams(window.location.search).get('code');
+      var state = new URLSearchParams(window.location.search).get('state');
+      var appParams = params;
+
+      // 1) Dla aplikacji mobilnej: deep link (otwiera natywną aplikację, jeśli jest)
+      window.location.href = 'latwaforma://garmin-callback' + appParams;
+
+      // 2) Dla web: po krótkim opóźnieniu przekieruj na SPA z kodem (gdy nie ma aplikacji)
+      setTimeout(function() {
+        document.getElementById('fallback').style.display = 'block';
+        if (code) {
+          var webUrl = window.location.origin + '/#/integrations?garmin_code=' + encodeURIComponent(code) + (state ? '&state=' + encodeURIComponent(state) : '');
+          window.location.replace(webUrl);
+        }
+      }, 1500);
+    })();
+  </script>
+</body>
+</html>

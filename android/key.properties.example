@@ -1,0 +1,6 @@
+# Skopiuj jako key.properties i uzupełnij. key.properties NIE wrzucaj do gita.
+# Utwórz keystore: keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+storePassword=twoje_haslo
+keyPassword=twoje_haslo
+keyAlias=upload
+storeFile=../upload-keystore.jks

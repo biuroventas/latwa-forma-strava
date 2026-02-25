@@ -19,7 +19,7 @@ class AppConstants {
   
   // Macro Distribution (for weight loss)
   static const double proteinPerKg = 2.0; // grams per kg of target weight
-  static const double fatPercentage = 0.25; // 25% of calories
+  static const double fatPercentage = 0.275; // 27.5% of calories (jedna stała w całej aplikacji)
   static const double carbCaloriesPerGram = 4.0;
   static const double proteinCaloriesPerGram = 4.0;
   static const double fatCaloriesPerGram = 9.0;

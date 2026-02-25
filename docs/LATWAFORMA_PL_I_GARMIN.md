@@ -103,7 +103,7 @@ W **lib/core/constants/app_constants.dart** (build prod):
 
 **Supabase Auth:** Site URL np. `https://app.latwaforma.pl`; Redirect URLs jak wyżej.
 
-**Stripe (Edge Functions):** STRIPE_SUCCESS_URL / STRIPE_CANCEL_URL np. `https://app.latwaforma.pl/#/premium-success` i `https://app.latwaforma.pl/#/premium-cancel`.
+**Stripe (Edge Functions):** STRIPE_SUCCESS_URL / STRIPE_CANCEL_URL na **latwaforma.pl**: `https://latwaforma.pl/#/premium-success` i `https://latwaforma.pl/#/premium-cancel`. Skrypt: `./scripts/set_stripe_return_urls.sh`.
 
 ---
 
