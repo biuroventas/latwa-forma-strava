@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -422,14 +422,40 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           return;
         }
       } else {
-        final dir = await getTemporaryDirectory();
-        final file = File('${dir.path}/latwa_forma_raport_$fileDateStr.pdf');
-        await file.writeAsBytes(bytes);
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: 'Raport Łatwa Forma',
-          subject: 'Raport Łatwa Forma - $dateStr',
-        );
+        // Mobile: najpierw próba przez plik, przy błędzie – przez bytes (XFile.fromData)
+        final pdfFileName = 'latwa_forma_raport_$fileDateStr.pdf';
+        try {
+          final dir = await getTemporaryDirectory();
+          final file = File('${dir.path}/$pdfFileName');
+          await file.writeAsBytes(bytes);
+          await Share.shareXFiles(
+            [XFile(file.path)],
+            text: 'Raport Łatwa Forma',
+            subject: 'Raport Łatwa Forma - $dateStr',
+          );
+        } catch (_) {
+          try {
+            final xFile = XFile.fromData(
+              bytes,
+              name: pdfFileName,
+              mimeType: 'application/pdf',
+            );
+            await Share.shareXFiles(
+              [xFile],
+              text: 'Raport Łatwa Forma',
+              subject: 'Raport Łatwa Forma - $dateStr',
+            );
+          } catch (e) {
+            if (mounted) {
+              ErrorHandler.showSnackBar(
+                context,
+                error: e,
+                fallback: 'Nie udało się udostępnić PDF. Spróbuj wyeksportować do CSV.',
+              );
+            }
+            return;
+          }
+        }
       }
 
       if (mounted) {
@@ -439,7 +465,9 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           duration: const Duration(seconds: 2),
         );
       }
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Eksport PDF: $e');
+      debugPrint('$st');
       if (mounted) {
         ErrorHandler.showSnackBar(
           context,

@@ -49,8 +49,17 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const email = typeof body?.email === "string" ? body.email.trim() : "";
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const raw = typeof body?.email === "string" ? body.email : "";
+    // Normalizacja: trim, usunięcie znaków zero-width / BOM
+    const email = raw.replace(/\u200B|\u200C|\u200D|\uFEFF/g, "").trim();
+    if (!email || email.length > 254) {
+      return new Response(
+        JSON.stringify({ error: "Podaj prawidłowy adres e-mail" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    // Prosty format: coś@coś.coś (bez spacji)
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
       return new Response(
         JSON.stringify({ error: "Podaj prawidłowy adres e-mail" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
