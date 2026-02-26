@@ -148,6 +148,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
               ? int.parse(_durationController.text)
               : null,
           intensity: _intensity,
+          excludedFromBalance: widget.activity!.excludedFromBalance,
         );
         await service.updateActivity(updatedActivity);
         if (mounted && _addToFavorites) {

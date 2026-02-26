@@ -63,7 +63,7 @@ final dashboardDataProvider = FutureProvider.autoDispose.family<Map<String, dyna
   }
 
   for (var activity in activities) {
-    totalBurned += activity.caloriesBurned;
+    if (!activity.excludedFromBalance) totalBurned += activity.caloriesBurned;
   }
 
   return {

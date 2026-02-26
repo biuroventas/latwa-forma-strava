@@ -6,6 +6,8 @@ class Activity {
   final int? durationMinutes;
   final String? intensity;
   final DateTime? createdAt;
+  /// Jeśli true, aktywność nie wlicza się do „spalone” na dashboardzie.
+  final bool excludedFromBalance;
 
   Activity({
     this.id,
@@ -15,6 +17,7 @@ class Activity {
     this.durationMinutes,
     this.intensity,
     this.createdAt,
+    this.excludedFromBalance = false,
   });
 
   factory Activity.fromJson(Map<String, dynamic> json) {
@@ -26,6 +29,7 @@ class Activity {
       durationMinutes: json['duration_minutes'] as int?,
       intensity: json['intensity'] as String?,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
+      excludedFromBalance: json['excluded_from_balance'] as bool? ?? false,
     );
   }
 
@@ -38,6 +42,32 @@ class Activity {
       if (durationMinutes != null) 'duration_minutes': durationMinutes,
       if (intensity != null) 'intensity': intensity,
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
+      'excluded_from_balance': excludedFromBalance,
     };
+  }
+
+  /// Czy aktywność pochodzi z Garmin (po nazwie dodawanej w webhooku).
+  bool get isFromGarmin => name.endsWith(' (Garmin)');
+
+  Activity copyWith({
+    String? id,
+    String? userId,
+    String? name,
+    double? caloriesBurned,
+    int? durationMinutes,
+    String? intensity,
+    DateTime? createdAt,
+    bool? excludedFromBalance,
+  }) {
+    return Activity(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      name: name ?? this.name,
+      caloriesBurned: caloriesBurned ?? this.caloriesBurned,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      intensity: intensity ?? this.intensity,
+      createdAt: createdAt ?? this.createdAt,
+      excludedFromBalance: excludedFromBalance ?? this.excludedFromBalance,
+    );
   }
 }

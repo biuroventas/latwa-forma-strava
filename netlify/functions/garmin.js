@@ -95,6 +95,16 @@ async function processPushActivities(parsed) {
     const garminActivityId = String(a.activityId ?? a.summaryId ?? a.id ?? '');
     if (!garminActivityId) continue;
 
+    // Nie duplikuj: jeśli już mamy tę aktywność, pomiń (idempotentność PUSH).
+    const syncedCheck = await fetch(
+      `${supabaseUrl}/rest/v1/garmin_synced_activities?select=id&user_id=eq.${encodeURIComponent(ourUserId)}&garmin_activity_id=eq.${encodeURIComponent(garminActivityId)}`,
+      { headers: { ...headers, Accept: 'application/json' } }
+    );
+    if (syncedCheck.ok) {
+      const existing = await syncedCheck.json();
+      if (Array.isArray(existing) && existing.length > 0) continue;
+    }
+
     const activityRow = toActivityRow(ourUserId, a);
     const insertRes = await fetch(`${supabaseUrl}/rest/v1/activities`, {
       method: 'POST',

@@ -44,7 +44,6 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
   bool _isConnecting = false;
   bool _isSyncing = false;
   bool _isConnectingGarmin = false;
-  bool _isSyncingGarmin = false;
   static const _garminVerifierKey = 'garmin_pkce_verifier';
 
   @override
@@ -340,7 +339,24 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       }
       ref.invalidate(garminIntegrationProvider);
       if (mounted) {
-        SuccessMessage.show(context, 'Garmin Connect połączony pomyślnie');
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Garmin Connect połączony'),
+            content: const SingleChildScrollView(
+              child: Text(
+                'Od teraz nowe aktywności z Garmin Connect będą dodawane do Łatwa Forma automatycznie, gdy zsynchronizujesz zegarek lub urządzenie z Garmin Connect. Nie musisz nic klikać.\n\n'
+                'Gdzie zobaczysz aktywności? W aplikacji: Dashboard → Aktywności (wybierz dzień). Aktywności z Garmin mają oznaczenie ikonką zegarka.',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -440,7 +456,23 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     }
     await _supabaseService.deleteGarminIntegration(userId);
     ref.invalidate(garminIntegrationProvider);
-    if (mounted) SuccessMessage.show(context, 'Garmin Connect odłączony');
+    if (mounted) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Garmin Connect odłączony'),
+          content: const Text(
+            'Połączenie z Garmin Connect zostało usunięte. Nowe aktywności nie będą już dodawane automatycznie. Możesz połączyć ponownie w dowolnym momencie.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   /// Pobiera Garmin User ID (do Data Viewera) z Edge Function i pokazuje w dialogu.
@@ -516,269 +548,6 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         );
       }
     }
-  }
-
-  Future<void> _syncGarmin() async {
-    final userId = SupabaseConfig.auth.currentUser?.id;
-    if (userId == null) return;
-
-    final integration = await _supabaseService.getGarminIntegration(userId);
-    if (integration == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Najpierw połącz konto Garmin')),
-        );
-      }
-      return;
-    }
-
-    var accessToken = integration['access_token'] as String?;
-    var refreshToken = integration['refresh_token'] as String?;
-    final expiresAt = integration['expires_at'] != null
-        ? DateTime.parse(integration['expires_at'] as String)
-        : null;
-
-    if (!kIsWeb &&
-        expiresAt != null &&
-        DateTime.now().isAfter(expiresAt.subtract(const Duration(minutes: 5)))) {
-      if (refreshToken != null) {
-        final tokens = await _garminService.refreshToken(refreshToken);
-        accessToken = tokens.accessToken;
-        final newExpires = DateTime.now().add(Duration(seconds: tokens.expiresIn));
-        await _supabaseService.upsertGarminIntegration(
-          userId: userId,
-          accessToken: tokens.accessToken,
-          expiresAt: newExpires,
-          refreshToken: tokens.refreshToken ?? refreshToken,
-        );
-      }
-    }
-
-    // Uzupełnij garmin_user_id jeśli brak (np. po migracji) – potrzebne do odbierania push
-    final garminUserIdStored = integration['garmin_user_id'] as String?;
-    if (garminUserIdStored == null || garminUserIdStored.isEmpty) {
-      try {
-        final session = SupabaseConfig.auth.currentSession;
-        final jwt = session?.accessToken;
-        if (jwt != null) {
-          final idRes = await http.get(
-            Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),
-            headers: {'Authorization': 'Bearer $jwt'},
-          );
-          if (idRes.statusCode == 200) {
-            final idData = jsonDecode(idRes.body) as Map<String, dynamic>?;
-            final garminUserId = idData?['userId'] as String?;
-            if (garminUserId != null && garminUserId.isNotEmpty) {
-              await _supabaseService.updateGarminUserId(userId, garminUserId);
-            }
-          }
-        }
-      } catch (_) {}
-    }
-
-    setState(() => _isSyncingGarmin = true);
-    bool showedEmptyHintDialog = false;
-    try {
-      List<GarminActivity> activities;
-      if (kIsWeb) {
-        final endSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        final startSec = endSec - 30 * 86400;
-        // Odśwież sesję i przekaż JWT w nagłówku (unikamy 401 przy ...co//functions i gubieniu Authorization).
-        Session? session = SupabaseConfig.auth.currentSession;
-        try {
-          final refreshed = await SupabaseConfig.auth.refreshSession();
-          session = refreshed.session ?? session;
-        } catch (_) {}
-        final jwt = session?.accessToken;
-        if (jwt == null || jwt.isEmpty) {
-          throw Exception(
-            'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
-          );
-        }
-        final response = await SupabaseConfig.client.functions.invoke(
-          'garmin_fetch_activities',
-          body: {
-            'access_token': accessToken,
-            'upload_start_seconds': startSec,
-            'upload_end_seconds': endSec,
-            'debug': true,
-          },
-          headers: {'Authorization': 'Bearer $jwt'},
-        );
-        if (response.status != 200) {
-          final data = response.data;
-          String errStr = '${response.status}';
-          if (data is Map) {
-            final err = data['message'] ?? data['error'] ?? data['detail'];
-            final detail = data['detail']?.toString();
-            errStr = err?.toString() ?? errStr;
-            if (detail != null && detail.isNotEmpty && detail != errStr) {
-              errStr = '$errStr $detail';
-            }
-          }
-          if (response.status == 401 && errStr.toLowerCase().contains('invalid jwt')) {
-            throw Exception(
-              'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
-            );
-          }
-          throw Exception(errStr);
-        }
-        final responseBody = response.data;
-        if (responseBody is List) {
-          activities = responseBody
-              .map((e) => GarminActivity.fromJson(e as Map<String, dynamic>))
-              .toList();
-        } else if (responseBody is Map && responseBody['activities'] != null) {
-          activities = ((responseBody['activities'] as List))
-              .map((e) => GarminActivity.fromJson(e as Map<String, dynamic>))
-              .toList();
-        } else {
-          activities = [];
-        }
-        if (activities.isEmpty && responseBody is Map<String, dynamic>) {
-          final emptyHint = responseBody['empty_hint']?.toString() ?? '';
-          final debug = responseBody['_debug'] as Map<String, dynamic>?;
-          final snippet = debug?['firstResponseSnippet']?.toString() ?? '';
-          if (mounted) {
-            if (emptyHint.isNotEmpty) {
-              showedEmptyHintDialog = true;
-              showDialog<void>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Brak aktywności z Garmin'),
-                  content: SingleChildScrollView(
-                    child: SelectableText(emptyHint),
-                  ),
-                  actions: [
-                    if (snippet.isNotEmpty)
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                          _showGarminResponseDialog(context, snippet);
-                        },
-                        child: const Text('Szczegóły odpowiedzi API'),
-                      ),
-                    TextButton(
-                      onPressed: () => Navigator.of(ctx).pop(),
-                      child: const Text('Zamknij'),
-                    ),
-                  ],
-                ),
-              );
-            } else if (debug != null && snippet.isNotEmpty) {
-              _showGarminResponseDialog(context, snippet);
-            }
-          }
-        }
-      } else {
-        activities = await _garminService.fetchActivities(accessToken!);
-      }
-      final profile = await _supabaseService.getProfile(userId);
-      final weightKg = profile?.currentWeightKg ?? 70;
-
-      int imported = 0;
-      for (final ga in activities) {
-        if (ga.activityId.isEmpty) continue;
-        final alreadySynced = await _supabaseService.isGarminActivitySynced(
-          userId,
-          ga.activityId,
-        );
-        if (alreadySynced) continue;
-
-        final activity = _garminService.mapToActivity(ga, userId, weightKg);
-        final created = await _supabaseService.createActivity(activity);
-        await _supabaseService.markGarminActivitySynced(
-          userId: userId,
-          garminActivityId: ga.activityId,
-          activityId: created.id!,
-        );
-        imported++;
-      }
-
-      if (mounted) {
-        if (imported > 0) {
-          SuccessMessage.show(context, 'Zaimportowano $imported aktywności z Garmin');
-        } else if (!showedEmptyHintDialog) {
-          SuccessMessage.show(context, 'Brak nowych aktywności do importu');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        final msg = e.toString().toLowerCase();
-        final isInvalidJwt = msg.contains('invalid jwt') || msg.contains('sesja wygasła');
-        final isRevoked = msg.contains('revoked') || (msg.contains('jwt') && msg.contains('revocation'));
-        if (isRevoked) {
-          await _supabaseService.deleteGarminIntegration(userId);
-          if (!mounted) return;
-          ref.invalidate(garminIntegrationProvider);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Połączenie z Garmin zostało odłączone (np. w Garmin Connect). Kliknij „Połącz z Garmin Connect”, aby połączyć ponownie.',
-              ),
-              duration: Duration(seconds: 5),
-            ),
-          );
-        } else if (isInvalidJwt) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
-              ),
-              duration: Duration(seconds: 6),
-            ),
-          );
-        } else {
-          final msgRaw = e.toString();
-          final isTokenNotSet = msgRaw.contains('GARMIN_PULL_TOKEN nie ustawiony') ||
-              msgRaw.contains('GARMIN_PULL_TOKEN is not set');
-          final isPullTokenError = !isTokenNotSet &&
-              (msgRaw.contains('Invalid Pull Token') ||
-                  msgRaw.contains('InvalidPullToken') ||
-                  msgRaw.contains('Pull TokenException'));
-          String snackText;
-          if (isTokenNotSet) {
-            snackText = 'Synchronizacja Garmin: sekret GARMIN_PULL_TOKEN nie jest widoczny w funkcji. '
-                'Ustaw: supabase secrets set GARMIN_PULL_TOKEN=\'CPT_...\' i wdróż: supabase functions deploy garmin_fetch_activities';
-          } else if (isPullTokenError) {
-            snackText = 'Synchronizacja z Garmin jest tymczasowo niedostępna (ograniczenie po stronie Garmin API). '
-                'Możesz dodawać aktywności ręcznie. Problem zgłoś: connect-support@developer.garmin.com';
-          } else {
-            snackText = 'Błąd synchronizacji Garmin: $e';
-          }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(snackText),
-              duration: isTokenNotSet || isPullTokenError ? const Duration(seconds: 10) : const Duration(seconds: 4),
-            ),
-          );
-        }
-      }
-    } finally {
-      if (mounted) setState(() => _isSyncingGarmin = false);
-    }
-  }
-
-  void _showGarminResponseDialog(BuildContext context, String snippet) {
-    showDialog<void>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Odpowiedź Garmin (fragment)'),
-        content: SingleChildScrollView(
-          child: SelectableText(
-            snippet.isEmpty
-                ? 'Garmin zwrócił pustą odpowiedź. W środowisku Evaluation API może nie udostępniać danych Pull.'
-                : snippet,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Zamknij'),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _disconnectStrava() async {
@@ -1024,14 +793,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Text(
-                              'Importuj aktywności z zegarków i urządzeń Garmin',
+                              'Aktywności z Garmin dodawane automatycznie po synchronizacji z Garmin Connect',
                               style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            Text(
-                              'Synchronizacja z ostatnich 7 dni (limit Garmin Health API).',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
                             ),
                           ],
                         ),
@@ -1063,18 +826,30 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            FilledButton.icon(
-                              onPressed: _isSyncingGarmin ? null : _syncGarmin,
-                              icon: _isSyncingGarmin
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : const Icon(Icons.sync),
-                              label: Text(_isSyncingGarmin ? 'Synchronizuję...' : 'Synchronizuj aktywności'),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Co się dzieje po połączeniu?',
+                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Nowe aktywności z Garmin Connect będą dodawane do Łatwa Forma automatycznie, gdy zsynchronizujesz zegarek lub urządzenie z Garmin Connect. Nie musisz nic klikać.\n\nGdzie zobaczysz aktywności? W aplikacji: Dashboard → Aktywności (wybierz dzień). Aktywności z Garmin mają oznaczenie ikonką zegarka.',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 12),
                             TextButton.icon(
                               onPressed: _showGarminUserId,
                               icon: const Icon(Icons.info_outline, size: 18),

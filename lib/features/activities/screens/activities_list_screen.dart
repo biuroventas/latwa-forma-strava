@@ -9,6 +9,7 @@ import '../../../shared/services/supabase_service.dart';
 import '../../../shared/widgets/delete_confirmation_dialog.dart';
 import '../../../shared/widgets/empty_state_widget.dart';
 import '../../../shared/models/activity.dart';
+import '../../dashboard/screens/dashboard_screen.dart';
 
 final activitiesListProvider = FutureProvider.autoDispose.family<List<Activity>, DateTime>((ref, date) async {
   final userId = SupabaseConfig.auth.currentUser?.id;
@@ -133,8 +134,10 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
           int totalDuration = 0;
 
           for (var activity in activities) {
-            totalBurned += activity.caloriesBurned;
-            totalDuration += activity.durationMinutes ?? 0;
+            if (!activity.excludedFromBalance) {
+              totalBurned += activity.caloriesBurned;
+              totalDuration += activity.durationMinutes ?? 0;
+            }
           }
 
           return RefreshIndicator(
@@ -172,56 +175,111 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                     final activity = activities[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.fitness_center,
-                          color: _getIntensityColor(activity.intensity),
-                        ),
-                        title: Text(
-                          activity.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
-                          '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
-                          '${activity.intensity != null ? ' • ${_getIntensityText(activity.intensity!)}' : ''}',
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () async {
-                                final result = await context.push<bool>(AppRoutes.activitiesAdd, extra: activity);
-                                if (result == true && context.mounted) ref.invalidate(activitiesListProvider(_displayedDate));
-                              },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ListTile(
+                            leading: Icon(
+                              activity.isFromGarmin ? Icons.watch : Icons.fitness_center,
+                              color: activity.isFromGarmin
+                                  ? Colors.blue.shade700
+                                  : _getIntensityColor(activity.intensity),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () async {
-                                final confirmed = await DeleteConfirmationDialog.show(
-                                  context,
-                                  title: 'Usuń aktywność',
-                                  content: 'Czy na pewno chcesz usunąć "${activity.name}"?',
-                                );
-                                if (confirmed) {
-                                  try {
-                                    final service = SupabaseService();
-                                    await service.deleteActivity(activity.id!);
-                                    if (context.mounted) {
+                            title: Text(
+                              activity.name,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
+                              '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
+                              '${activity.intensity != null ? ' • ${_getIntensityText(activity.intensity!)}' : ''}'
+                              '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () async {
+                                    final result = await context.push<bool>(AppRoutes.activitiesAdd, extra: activity);
+                                    if (result == true && context.mounted) {
                                       ref.invalidate(activitiesListProvider(_displayedDate));
-                                      SuccessMessage.show(context, 'Aktywność usunięta');
+                                      ref.invalidate(dashboardDataProvider(_displayedDate));
                                     }
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      ErrorHandler.showSnackBar(context, error: e);
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () async {
+                                    final confirmed = await DeleteConfirmationDialog.show(
+                                      context,
+                                      title: 'Usuń aktywność',
+                                      content: 'Czy na pewno chcesz usunąć "${activity.name}"?',
+                                    );
+                                    if (confirmed) {
+                                      try {
+                                        final service = SupabaseService();
+                                        await service.deleteActivity(activity.id!);
+                                        if (context.mounted) {
+                                          ref.invalidate(activitiesListProvider(_displayedDate));
+                                          ref.invalidate(dashboardDataProvider(_displayedDate));
+                                          SuccessMessage.show(context, 'Aktywność usunięta');
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ErrorHandler.showSnackBar(context, error: e);
+                                        }
+                                      }
                                     }
-                                  }
-                                }
-                              },
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          if (activity.id != null)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.pie_chart_outline,
+                                    size: 18,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Nie licz w bilansie (spalone)',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Switch(
+                                    value: activity.excludedFromBalance,
+                                    onChanged: (bool value) async {
+                                      try {
+                                        final service = SupabaseService();
+                                        await service.updateActivity(
+                                          activity.copyWith(excludedFromBalance: value),
+                                        );
+                                        if (context.mounted) {
+                                          ref.invalidate(activitiesListProvider(_displayedDate));
+                                          ref.invalidate(dashboardDataProvider(_displayedDate));
+                                          SuccessMessage.show(
+                                            context,
+                                            value ? 'Aktywność wyłączona z bilansu' : 'Aktywność wliczana do bilansu',
+                                          );
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ErrorHandler.showSnackBar(context, error: e);
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                     );
                     },
