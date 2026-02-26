@@ -148,7 +148,9 @@ class SupabaseConfig {
       }
     }
 
-    final supabaseUrl = getEnv('SUPABASE_URL') ?? '';
+    // Bez końcowego slasha – unikamy ...co//functions/v1 (przekierowanie może gubić Authorization i dawać 401).
+    final rawUrl = (getEnv('SUPABASE_URL') ?? '').trim();
+    final supabaseUrl = rawUrl.endsWith('/') ? rawUrl.substring(0, rawUrl.length - 1) : rawUrl;
     final supabaseAnonKey = getEnv('SUPABASE_ANON_KEY') ?? '';
 
     debugPrint('🔍 Sprawdzanie konfiguracji:');

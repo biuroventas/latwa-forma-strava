@@ -527,10 +527,18 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       if (kIsWeb) {
         final endSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
         final startSec = endSec - 30 * 86400;
-        // Odśwież sesję przed wywołaniem, żeby JWT był ważny (unikamy 401 po dłuższym otwarciu karty).
+        // Odśwież sesję i przekaż JWT w nagłówku (unikamy 401 przy ...co//functions i gubieniu Authorization).
+        Session? session = SupabaseConfig.auth.currentSession;
         try {
-          await SupabaseConfig.auth.refreshSession();
+          final refreshed = await SupabaseConfig.auth.refreshSession();
+          session = refreshed.session ?? session;
         } catch (_) {}
+        final jwt = session?.accessToken;
+        if (jwt == null || jwt.isEmpty) {
+          throw Exception(
+            'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
+          );
+        }
         final response = await SupabaseConfig.client.functions.invoke(
           'garmin_fetch_activities',
           body: {
@@ -539,6 +547,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
             'upload_end_seconds': endSec,
             'debug': true,
           },
+          headers: {'Authorization': 'Bearer $jwt'},
         );
         if (response.status != 200) {
           final data = response.data;
