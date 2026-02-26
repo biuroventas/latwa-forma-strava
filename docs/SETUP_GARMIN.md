@@ -179,6 +179,30 @@ Jeśli synchronizacja przez **Pull** (przycisk „Synchronizuj”) zwraca **Inva
 
 Po przełączeniu na push **przycisk „Synchronizuj”** nadal wywołuje Pull (może dalej zwracać błąd). Aktywności będą jednak dopisywane automatycznie, gdy Garmin wyśle push (np. po synchronizacji zegarka z Garmin Connect).
 
+**Z GCDP Start Guide (Garmin):** Dostęp do API jest **server-to-server**; „ad-hoc requests for data are not permitted” – dane przychodzą wyłącznie przez webhook (PING lub PUSH). **Support GCDP (2026):** *„We are webhooks based API only. All data pushed to you via PUSH or PING notification.”* **Security review:** *„During security review, we would not be able to reach your endpoints.”* – dopóki nowa domena/URL jest w security review (zwykle 24–48 h, Start Guide 2.6.1), Garmin **nie wysyła** PING/PUSH na ten adres; po przejściu review powiadomienia wznawiają się. Endpoint **deregistration** wysyła `{"deregistrations":[{"userId":"..."}]}` gdy użytkownik odłączy app w Garmin Connect; **userPermissionsChange** – gdy użytkownik zmieni uprawnienia (np. wyłączy eksport). Nasza funkcja obsługuje oba i zapisuje aktywności z push `activities`.
+
+**Z Activity API spec:** Push `activities` ma pole **activeKilocalories** (kcal z urządzenia) – używamy go w zapisie. Activity Files tylko przez PING. Backfill (apis.garmin.com/tools) – ponowne wysłanie powiadomień za zakres dat. Production: min. 2 użytkowników, HTTP 200 w 30 s, PING/PUSH.
+
+**Z FAQ Garmin:**  
+*„Data will be removed from the Health API, Activity API, and Women's Health API in seven days after it is initially uploaded by a user device sync to Garmin Connect or when the user removes their consent to share their data with the partner, whichever comes first. The removed data is then considered historical and may be reloaded through the Backfill process.”*  
+Czyli: dane w API dostępne **7 dni** od syncu (albo do momentu wycofania zgody); potem tylko przez **Backfill**.
+
+**Kiedy przychodzą nowe dane (FAQ Garmin):**  
+*„The Health API, Activity API, and Women's Health API deliver data via PING or PUSH notifications as soon as a user syncs their device or uploads new data. This is described in Ping Service and Push Service chapters of the REST API specification.”*  
+Czyli: PING/PUSH jest wysyłany **zaraz po** syncu urządzenia z Garmin Connect lub po ręcznym uploadzie – szczegóły w specyfikacji (Ping Service, Push Service).
+
+**Przejście na produkcję (FAQ Garmin):**  
+*„The first consumer key generated through the Developer Portal is an evaluation key. This key is rate-limited and should only be used for testing, evaluation, and development. To obtain a production-level key that is not rate-limited, your integration must be verified using the Partner Verification Tool or be reviewed by Garmin for approval, depending on the API(s) included in your integration. Please refer to documentation for specific steps on obtaining a production-level key.”*  
+Czyli: pierwszy klucz = **Evaluation**, z limitami; klucz produkcyjny (bez limitów) po weryfikacji przez **Partner Verification Tool** albo po recenzji Garmin – w zależności od API. Kroki: dokumentacja + sekcja 8 (Partner Verification) w tym pliku.
+
+**Kalorie (FAQ Garmin):**  
+*„Garmin's activity tracker products track calories throughout the day. This includes calories burned while at rest (BMR) as well as calories burned from being active. Garmin's fitness products only capture and display calories for being active. Calories can be viewed by users on Garmin Connect and these will correspond to what is captured and displayed by the devices.”*  
+Czyli: **activity trackery** (np. Vivoactive) = BMR + active; **fitness products** (np. zegarki do treningu) = tylko **active**. W API (np. activeKilocalories) zwykle dostajemy kcal z aktywności; jeśli użytkownik porównuje z Garmin Connect, liczby mogą się różnić w zależności od typu urządzenia.
+
+**Czas lokalny (FAQ Garmin):**  
+*„Each summary contains a local time offset in seconds. This offset can be used with the summary start time to calculate the local start and end times as they appear to the user in Garmin Connect. These offsets are calculated by a combination of device time, user's Garmin Connect time-zone preference, and a reconciliation algorithm used to smooth data into a continuous stream when the user crosses time-zone boundaries within the summary's time range.”*  
+W praktyce: **local time = startTimeInSeconds + startTimeOffsetInSeconds** (w sekundach); offset pochodzi z czasu urządzenia, ustawienia strefy w Garmin Connect i algorytmu przy przekraczaniu granic stref.
+
 ### Odpowiedź Garmin (Developer Program, 2026-02-26)
 
 > Pull token is provided in the **PING** notification. Pull token must be included in the **URL** you are calling to get data.  
@@ -187,6 +211,10 @@ Po przełączeniu na push **przycisk „Synchronizuj”** nadal wywołuje Pull (
 **Wnioski:** Przy **PUSH** nie używamy pull – dane są w body POST. Przy **PING** token do pull nie jest stałym CPT z portalu, tylko pochodzi z **każdego powiadomienia PING** (w body) i musi być przekazany w URL przy wywołaniu API.
 
 - W razie wątpliwości: **Garmin Developer Support** (Support w portalu lub connect-support@developer.garmin.com).
+
+**Z OAuth2 PKCE spec:** Przy „Odłącz Garmin” aplikacja wywołuje DELETE `https://apis.garmin.com/wellness-api/rest/user/registration` (z tokenem użytkownika), potem usuwa wpis z naszej bazy. Refresh token ważny do **3 miesięcy**; dokładny timestamp wygaśnięcia jest w odpowiedzi OAuth2 (drugi krok flow, gdy token został utworzony). Przy problemach z OAuth2: connect-support@developer.garmin.com. Zalecane odjęcie 600 s od expires_in przy odświeżaniu access tokena.
+
+**Testowanie push (forum GCDP):** Żeby wywołać push z **pełnymi danymi** (np. konkretne pola) do testów: użyj narzędzia **Summary Resender** (apis.garmin.com/tools) – *„You can use Summary resender to resend existing summary for the user.”* – zamiast polegać tylko na Data Generator lub jednorazowym syncu z aplikacji.
 
 ---
 

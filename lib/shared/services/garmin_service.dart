@@ -95,6 +95,18 @@ class GarminService {
     );
   }
 
+  /// Usuwa rejestrację użytkownika u Garmin (DELETE user/registration).
+  /// Zgodnie z OAuth2 PKCE spec: musi być wywołane, gdy app oferuje „Odłącz” / „Disconnect”.
+  Future<void> deleteUserRegistration(String accessToken) async {
+    final res = await http.delete(
+      Uri.parse('https://apis.garmin.com/wellness-api/rest/user/registration'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    if (res.statusCode != 204 && res.statusCode != 200) {
+      debugPrint('Garmin DELETE registration: ${res.statusCode} ${res.body}');
+    }
+  }
+
   /// Odświeża access token.
   Future<GarminTokenResponse> refreshToken(String refreshToken) async {
     if (!isConfigured) {

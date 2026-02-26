@@ -424,6 +424,20 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
   Future<void> _disconnectGarmin() async {
     final userId = SupabaseConfig.auth.currentUser?.id;
     if (userId == null) return;
+    final integration = await _supabaseService.getGarminIntegration(userId);
+    var accessToken = integration?['access_token'] as String?;
+    final refreshToken = integration?['refresh_token'] as String?;
+    if (accessToken == null && refreshToken != null) {
+      try {
+        final tokens = await _garminService.refreshToken(refreshToken);
+        accessToken = tokens.accessToken;
+      } catch (_) {}
+    }
+    if (accessToken != null) {
+      try {
+        await _garminService.deleteUserRegistration(accessToken);
+      } catch (_) {}
+    }
     await _supabaseService.deleteGarminIntegration(userId);
     ref.invalidate(garminIntegrationProvider);
     if (mounted) SuccessMessage.show(context, 'Garmin Connect odłączony');

@@ -46,7 +46,8 @@ function toActivityRow(ourUserId, a) {
     : new Date().toISOString();
   const name = (a.activityName || a.activityType || 'Aktywność (Garmin)').trim();
   const displayName = (name && name.length > 0) ? `${name} (Garmin)` : 'Aktywność (Garmin)';
-  const rawCalories = a.calories ?? estimateCalories(a.activityType, durationMinutes ?? 30);
+  // Activity API spec: activeKilocalories (integer); fallback: calories, potem szacunek
+  const rawCalories = a.activeKilocalories ?? a.calories ?? estimateCalories(a.activityType, durationMinutes ?? 30);
   const calories_burned = Math.max(1, Math.round(Number(rawCalories) || 0)); // CHECK: >= 0, u nas min 1
   return {
     user_id: ourUserId,
@@ -122,6 +123,61 @@ async function processPushActivities(parsed) {
   return saved;
 }
 
+/** Garmin: deregistrations = użytkownik odłączył app w Garmin Connect. Usuwamy integrację (zgodnie z GCDP Start Guide 2.6.2). */
+async function processDeregistrations(parsed) {
+  const list = parsed?.deregistrations;
+  if (!Array.isArray(list) || list.length === 0) return;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) return;
+  const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
+  for (const item of list) {
+    const garminUserId = (item.userId ?? item.user_id ?? '').toString();
+    if (!garminUserId) continue;
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/garmin_integrations?garmin_user_id=eq.${encodeURIComponent(garminUserId)}`,
+      { method: 'DELETE', headers }
+    );
+    if (res.ok) console.log('[Garmin] deregistration: removed garmin_integration for', garminUserId);
+  }
+}
+
+/** Garmin: userPermissionsChange zawiera userId. Jeśli mamy dokładnie jeden wiersz z garmin_user_id IS NULL, uzupełniamy (backfill). */
+async function processUserPermissionsChange(parsed) {
+  const list = parsed?.userPermissionsChange;
+  if (!Array.isArray(list) || list.length === 0) return;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) return;
+  const headers = {
+    apikey: serviceKey,
+    Authorization: `Bearer ${serviceKey}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=minimal',
+  };
+  for (const item of list) {
+    const garminUserId = (item.userId ?? item.user_id ?? '').toString();
+    if (!garminUserId) continue;
+    const checkRes = await fetch(
+      `${supabaseUrl}/rest/v1/garmin_integrations?select=user_id,garmin_user_id&garmin_user_id=eq.${encodeURIComponent(garminUserId)}`,
+      { headers: { ...headers, Accept: 'application/json' } }
+    );
+    if (checkRes.ok && (await checkRes.json()).length > 0) continue;
+    const nullRes = await fetch(
+      `${supabaseUrl}/rest/v1/garmin_integrations?select=user_id&garmin_user_id=is.null`,
+      { headers: { ...headers, Accept: 'application/json' } }
+    );
+    const nullRows = nullRes.ok ? await nullRes.json() : [];
+    if (nullRows.length !== 1) continue;
+    const ourUserId = nullRows[0].user_id;
+    const patchRes = await fetch(
+      `${supabaseUrl}/rest/v1/garmin_integrations?user_id=eq.${encodeURIComponent(ourUserId)}`,
+      { method: 'PATCH', headers, body: JSON.stringify({ garmin_user_id: garminUserId }) }
+    );
+    if (patchRes.ok) console.log('[Garmin] userPermissionsChange: backfilled garmin_user_id for', ourUserId);
+  }
+}
+
 exports.handler = async function (event) {
   const method = (event.httpMethod || event.request?.method || 'GET').toUpperCase();
 
@@ -145,6 +201,12 @@ exports.handler = async function (event) {
       } catch (err) {
         console.warn('Garmin push process error:', err);
       }
+    }
+    if (parsed?.deregistrations?.length) {
+      try { await processDeregistrations(parsed); } catch (e) { console.warn('Garmin deregistrations error:', e); }
+    }
+    if (parsed?.userPermissionsChange?.length) {
+      try { await processUserPermissionsChange(parsed); } catch (e) { console.warn('Garmin userPermissionsChange error:', e); }
     }
   } else if (method === 'HEAD') {
     return {
