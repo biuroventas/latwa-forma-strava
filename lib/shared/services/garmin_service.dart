@@ -11,8 +11,6 @@ import '../models/activity.dart';
 class GarminService {
   static const _authUrl = 'https://connect.garmin.com/oauth2Confirm';
   static const _tokenUrl = 'https://diauth.garmin.com/di-oauth2-service/oauth/token';
-  /// Health API (aktywności). Przy InvalidPullTokenException: włącz Pull w healthapi.garmin.com/tools
-  static const _apiBase = 'https://healthapi.garmin.com';
   static const _redirectScheme = 'latwaforma';
   static const _redirectHost = 'garmin-callback';
 
@@ -133,50 +131,10 @@ class GarminService {
     );
   }
 
-  /// Pobiera aktywności z Garmin (Activity API / Wellness API).
-  Future<List<GarminActivity>> fetchActivities(
-    String accessToken, {
-    int lastDays = 30,
-  }) async {
-    final endMs = DateTime.now().millisecondsSinceEpoch;
-    final startMs = DateTime.now()
-        .subtract(Duration(days: lastDays))
-        .millisecondsSinceEpoch;
+  /// Aktywności z Garmin przychodzą wyłącznie przez PUSH (webhook na latwaforma.pl/api/garmin).
+  /// Nie wywołujemy Pull API – zgodnie z wymogami Garmin (webhooks only).
 
-    final uri = Uri.parse('$_apiBase/wellness-api/rest/activities').replace(
-      queryParameters: {
-        'uploadStartTimeInSeconds': (startMs ~/ 1000).toString(),
-        'uploadEndTimeInSeconds': (endMs ~/ 1000).toString(),
-      },
-    );
-
-    final res = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json',
-      },
-    );
-
-    if (res.statusCode != 200) {
-      throw Exception('Błąd Garmin API: ${res.statusCode} ${res.body}');
-    }
-
-    final body = jsonDecode(res.body);
-    if (body is List) {
-      return body
-          .map((e) => GarminActivity.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-    if (body is Map && body['activities'] != null) {
-      return (body['activities'] as List)
-          .map((e) => GarminActivity.fromJson(e as Map<String, dynamic>))
-          .toList();
-    }
-    return [];
-  }
-
-  /// Mapuje aktywność Garmin na model Activity.
+  /// Mapuje aktywność Garmin na model Activity (używane przy parsowaniu payloadu PUSH po stronie serwera).
   Activity mapToActivity(GarminActivity g, String userId, double weightKg) {
     double calories = _estimateCalories(g, weightKg);
     final startDate = DateTime.fromMillisecondsSinceEpoch(g.startTimeMs);

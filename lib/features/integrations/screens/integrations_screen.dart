@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -338,26 +337,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         // Nie blokuj sukcesu – garmin_user_id można uzupełnić później przy sync
       }
       ref.invalidate(garminIntegrationProvider);
-      if (mounted) {
-        await showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Garmin Connect połączony'),
-            content: const SingleChildScrollView(
-              child: Text(
-                'Od teraz nowe aktywności z Garmin Connect będą dodawane do Łatwa Forma automatycznie, gdy zsynchronizujesz zegarek lub urządzenie z Garmin Connect. Nie musisz nic klikać.\n\n'
-                'Gdzie zobaczysz aktywności? W aplikacji: Dashboard → Aktywności (wybierz dzień). Aktywności z Garmin mają oznaczenie ikonką zegarka.',
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
+      if (mounted) SuccessMessage.show(context, 'Połączono pomyślnie!');
     } catch (e) {
       if (mounted) {
         final msg = e.toString();
@@ -440,19 +420,45 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
   Future<void> _disconnectGarmin() async {
     final userId = SupabaseConfig.auth.currentUser?.id;
     if (userId == null) return;
-    final integration = await _supabaseService.getGarminIntegration(userId);
-    var accessToken = integration?['access_token'] as String?;
-    final refreshToken = integration?['refresh_token'] as String?;
-    if (accessToken == null && refreshToken != null) {
-      try {
-        final tokens = await _garminService.refreshToken(refreshToken);
-        accessToken = tokens.accessToken;
-      } catch (_) {}
-    }
-    if (accessToken != null) {
-      try {
-        await _garminService.deleteUserRegistration(accessToken);
-      } catch (_) {}
+    if (kIsWeb) {
+      final session = SupabaseConfig.auth.currentSession;
+      final jwt = session?.accessToken;
+      if (jwt != null) {
+        try {
+          final uri = Uri.parse('${Uri.base.origin}/api/garmin-disconnect');
+          final res = await http.post(
+            uri,
+            headers: {'Authorization': 'Bearer $jwt', 'Content-Type': 'application/json'},
+            body: '{}',
+          );
+          if (res.statusCode != 200) {
+            final err = jsonDecode(res.body) as Map<String, dynamic>?;
+            throw Exception(err?['error'] ?? 'Błąd odłączania: ${res.statusCode}');
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Nie udało się wywołać odłączenia u Garmin: $e')),
+            );
+          }
+          return;
+        }
+      }
+    } else {
+      final integration = await _supabaseService.getGarminIntegration(userId);
+      var accessToken = integration?['access_token'] as String?;
+      final refreshToken = integration?['refresh_token'] as String?;
+      if (accessToken == null && refreshToken != null) {
+        try {
+          final tokens = await _garminService.refreshToken(refreshToken);
+          accessToken = tokens.accessToken;
+        } catch (_) {}
+      }
+      if (accessToken != null) {
+        try {
+          await _garminService.deleteUserRegistration(accessToken);
+        } catch (_) {}
+      }
     }
     await _supabaseService.deleteGarminIntegration(userId);
     ref.invalidate(garminIntegrationProvider);
@@ -472,81 +478,6 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
           ],
         ),
       );
-    }
-  }
-
-  /// Pobiera Garmin User ID (do Data Viewera) z Edge Function i pokazuje w dialogu.
-  Future<void> _showGarminUserId() async {
-    Session? session = SupabaseConfig.auth.currentSession;
-    try {
-      final refreshed = await SupabaseConfig.auth.refreshSession();
-      session = refreshed.session ?? session;
-    } catch (_) {}
-    final jwt = session?.accessToken;
-    if (jwt == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sesja wygasła. Zaloguj się ponownie.')),
-        );
-      }
-      return;
-    }
-    final url = Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id');
-    try {
-      final res = await http.get(
-        url,
-        headers: {'Authorization': 'Bearer $jwt'},
-      );
-      if (res.statusCode != 200) {
-        final err = jsonDecode(res.body) as Map<String, dynamic>?;
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(err?['error'] ?? res.body)),
-          );
-        }
-        return;
-      }
-      final data = jsonDecode(res.body) as Map<String, dynamic>;
-      final garminUserId = data['userId'] as String?;
-      if (garminUserId == null || garminUserId.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Brak User ID w odpowiedzi')),
-          );
-        }
-        return;
-      }
-      if (!mounted) return;
-      showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Garmin User ID (do Data Viewera)'),
-          content: SelectableText(garminUserId),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Zamknij'),
-            ),
-            FilledButton.icon(
-              onPressed: () {
-                Clipboard.setData(ClipboardData(text: garminUserId));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Skopiowano do schowka')),
-                );
-                Navigator.of(ctx).pop();
-              },
-              icon: const Icon(Icons.copy),
-              label: const Text('Kopiuj'),
-            ),
-          ],
-        ),
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
-        );
-      }
     }
   }
 
@@ -832,30 +763,12 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                 color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Co się dzieje po połączeniu?',
-                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Nowe aktywności z Garmin Connect będą dodawane do Łatwa Forma automatycznie, gdy zsynchronizujesz zegarek lub urządzenie z Garmin Connect. Nie musisz nic klikać.\n\nGdzie zobaczysz aktywności? W aplikacji: Dashboard → Aktywności (wybierz dzień). Aktywności z Garmin mają oznaczenie ikonką zegarka.',
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                  ),
-                                ],
+                              child: Text(
+                                'Aktywności z Garmin trafiają automatycznie po syncu zegarka z Garmin Connect. Zobacz je w: Dashboard → Aktywności (wybierz dzień). Oznaczone ikonką zegarka.',
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
                             const SizedBox(height: 12),
-                            TextButton.icon(
-                              onPressed: _showGarminUserId,
-                              icon: const Icon(Icons.info_outline, size: 18),
-                              label: const Text('Pokaż Garmin User ID (do Data Viewera)'),
-                            ),
-                            const SizedBox(height: 8),
                             TextButton(
                               onPressed: _isConnectingGarmin ? null : _disconnectGarmin,
                               child: const Text('Odłącz Garmin'),

@@ -34,3 +34,8 @@
   to = "/.netlify/functions/garmin"
   status = 200
   force = true
+[[redirects]]
+  from = "/api/garmin-disconnect"
+  to = "/.netlify/functions/garmin-disconnect"
+  status = 200
+  force = true
