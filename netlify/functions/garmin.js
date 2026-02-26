@@ -133,7 +133,8 @@ exports.handler = async function (event) {
     responseBody = { ok: true, received: true };
     const parsed = parseBody(event);
     const keys = parsed && typeof parsed === 'object' ? Object.keys(parsed).join(',') : 'empty';
-    console.log('Garmin backchannel POST received, keys:', keys);
+    const bodyPreview = typeof event.body === 'string' ? event.body.substring(0, 200) : '(binary)';
+    console.log('[Garmin] POST received at', new Date().toISOString(), '| body keys:', keys, '| preview:', bodyPreview);
 
     if (parsed?.activities?.length) {
       try {

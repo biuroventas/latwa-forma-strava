@@ -320,8 +320,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       );
       // Pobierz Garmin User ID i zapisz (potrzebne do odbierania push – mapowanie payloadu na user_id)
       try {
-        final session = await SupabaseConfig.auth.getSession();
-        final jwt = session.data.session?.accessToken;
+        final session = SupabaseConfig.auth.currentSession;
+        final jwt = session?.accessToken;
         if (jwt != null) {
           final idRes = await http.get(
             Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),
@@ -541,10 +541,11 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     }
 
     // Uzupełnij garmin_user_id jeśli brak (np. po migracji) – potrzebne do odbierania push
-    if (integration['garmin_user_id'] == null || (integration['garmin_user_id'] as String?).isEmpty) {
+    final garminUserIdStored = integration['garmin_user_id'] as String?;
+    if (garminUserIdStored == null || garminUserIdStored.isEmpty) {
       try {
-        final session = await SupabaseConfig.auth.getSession();
-        final jwt = session.data.session?.accessToken;
+        final session = SupabaseConfig.auth.currentSession;
+        final jwt = session?.accessToken;
         if (jwt != null) {
           final idRes = await http.get(
             Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),

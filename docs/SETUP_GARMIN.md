@@ -94,7 +94,7 @@ Plik `web/garmin-callback.html` jest w repozytorium i przy buildzie trafia do `b
 - **„Garmin nie jest skonfigurowane”** – brak `GARMIN_CLIENT_ID` lub `GARMIN_CLIENT_SECRET` w załadowanym env (sprawdź `.env` lokalnie, `env.production` / zmienne builda na web).
 - **Błąd redirect_uri / invalid redirect** – w Garmin Developer Portal w ustawieniach aplikacji Redirect URL musi być **identyczny** z tym, którego używa aplikacja (w tym protokół, domena, ścieżka). Dla web – ten sam co `GARMIN_REDIRECT_URI`.
 - **Evaluation vs produkcja** – na razie używaj tylko Evaluation; użycie aplikacji eval w produkcji komercyjnej może skutkować wyłączeniem. Po uzyskaniu dostępu do produkcji załóż osobną aplikację w portalu i wpisz nowe Consumer Key/Secret do konfiguracji produkcyjnej.
-- **InvalidPullTokenException / Invalid Pull Token** – (1) W **API Configuration** (healthapi.garmin.com/tools/apiConfiguration) w sekcji „Data shared from Garmin Connect to your app” **zaznacz „Enabled” przy „Activity”** i kliknij **Save** – bez włączonego Activity API pull może zwracać InvalidPullTokenException. (2) Potrzebny jest **Consumer Pull Token**: https://healthapi.garmin.com/tools/consumerPullToken → Create Token, skopiuj token, `supabase secrets set GARMIN_PULL_TOKEN='CPT_...'`, potem `supabase functions deploy garmin_fetch_activities`.
+- **InvalidPullTokenException / Invalid Pull Token** – Zgodnie z odpowiedzią Garmin (Developer Program): przy **PING** token do pull jest **w body powiadomienia PING** i musi być przekazany **w URL** przy wywołaniu API; statyczny Consumer Pull Token z portalu nie wystarcza. Przy **PUSH** nie wywołuj pull – dane przychodzą w POST na Twój URL (patrz sekcja 9). U nas: Endpoint Configuration ustawiona na **PUSH** → dane w body POST → zapis w `netlify/functions/garmin.js`.
 - **Data Viewer / sync zwraca puste** – jeśli w Data Viewerze (healthapi.garmin.com/tools/dataViewer) dla Twojego User ID w zakresie 7 dni pojawia się „Could not find data”, to samo API używa Łatwa Forma przy synchronizacji; sync nie będzie miał czego pobrać. W środowisku **Evaluation** dane mogą być udostępniane z opóźnieniem lub tylko przez **Push** (webhook). Warto odczekać 24–48 h po skonfigurowaniu Endpoint Configuration albo skontaktować się z Garmin (Support w portalu).
 
 ---
@@ -178,6 +178,14 @@ Jeśli synchronizacja przez **Pull** (przycisk „Synchronizuj”) zwraca **Inva
    Wgraj zmiany (w tym `netlify/functions/garmin.js`) przez **push do Gita**, żeby Netlify zbudował i wgrał funkcję.
 
 Po przełączeniu na push **przycisk „Synchronizuj”** nadal wywołuje Pull (może dalej zwracać błąd). Aktywności będą jednak dopisywane automatycznie, gdy Garmin wyśle push (np. po synchronizacji zegarka z Garmin Connect).
+
+### Odpowiedź Garmin (Developer Program, 2026-02-26)
+
+> Pull token is provided in the **PING** notification. Pull token must be included in the **URL** you are calling to get data.  
+> I see that your webhooks are set for **PUSH** notifications – data will be provided via HTTP POST and be included in the body. Why are you trying to pull data?
+
+**Wnioski:** Przy **PUSH** nie używamy pull – dane są w body POST. Przy **PING** token do pull nie jest stałym CPT z portalu, tylko pochodzi z **każdego powiadomienia PING** (w body) i musi być przekazany w URL przy wywołaniu API.
+
 - W razie wątpliwości: **Garmin Developer Support** (Support w portalu lub connect-support@developer.garmin.com).
 
 ---
