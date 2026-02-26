@@ -432,8 +432,15 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
             body: '{}',
           );
           if (res.statusCode != 200) {
-            final err = jsonDecode(res.body) as Map<String, dynamic>?;
-            throw Exception(err?['error'] ?? 'Błąd odłączania: ${res.statusCode}');
+            String msg = 'Błąd odłączania: ${res.statusCode}';
+            final body = res.body.trim();
+            if (body.startsWith('{')) {
+              try {
+                final err = jsonDecode(body) as Map<String, dynamic>?;
+                msg = err?['error']?.toString() ?? msg;
+              } catch (_) {}
+            }
+            throw Exception(msg);
           }
         } catch (e) {
           if (mounted) {
@@ -764,7 +771,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                'Aktywności z Garmin trafiają automatycznie po syncu zegarka z Garmin Connect. Zobacz je w: Dashboard → Aktywności (wybierz dzień). Oznaczone ikonką zegarka.',
+                                'Wszystkie nowe aktywności z Garmin Connect są importowane do aplikacji. To Ty decydujesz, którą wliczyć do bilansu.',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
