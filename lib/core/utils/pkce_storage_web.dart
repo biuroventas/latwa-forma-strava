@@ -3,27 +3,32 @@ import 'dart:html' as html;
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Na webie zapisuje code_verifier w natywnym localStorage przeglądarki,
-/// żeby przetrwał pełne przeładowanie strony po powrocie z Google (PKCE).
+/// Na webie zapisuje code_verifier w localStorage i sessionStorage,
+/// żeby przetrwał przeładowanie po powrocie z Google (PKCE). Zapis do obu
+/// zmniejsza ryzyko „Code verifier could not be found” w części przeglądarek.
 class WebLocalStoragePkceStorage extends GotrueAsyncStorage {
   const WebLocalStoragePkceStorage();
 
-  static html.Storage? get _storage => html.window.localStorage;
+  static html.Storage? get _local => html.window.localStorage;
+  static html.Storage? get _session => html.window.sessionStorage;
 
   @override
   Future<String?> getItem({required String key}) async {
-    final s = _storage;
-    return s == null ? null : s[key];
+    final v = _local?[key];
+    if (v != null && v.isNotEmpty) return v;
+    return _session?[key];
   }
 
   @override
   Future<void> setItem({required String key, required String value}) async {
-    _storage?[key] = value;
+    _local?[key] = value;
+    _session?[key] = value;
   }
 
   @override
   Future<void> removeItem({required String key}) async {
-    _storage?.remove(key);
+    _local?.remove(key);
+    _session?.remove(key);
   }
 }
 

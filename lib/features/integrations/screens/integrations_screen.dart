@@ -527,32 +527,31 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       if (kIsWeb) {
         final endSec = DateTime.now().millisecondsSinceEpoch ~/ 1000;
         final startSec = endSec - 30 * 86400;
-        Session? session = SupabaseConfig.auth.currentSession;
+        // Odśwież sesję przed wywołaniem, żeby JWT był ważny (unikamy 401 po dłuższym otwarciu karty).
         try {
-          final refreshed = await SupabaseConfig.auth.refreshSession();
-          if (refreshed.session != null) session = refreshed.session;
+          await SupabaseConfig.auth.refreshSession();
         } catch (_) {}
-        final jwt = session?.accessToken;
-        if (jwt == null) throw Exception('Brak sesji');
-        final url = Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_fetch_activities');
-        final res = await http.post(
-          url,
-          headers: {
-            'Authorization': 'Bearer $jwt',
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
+        final response = await SupabaseConfig.client.functions.invoke(
+          'garmin_fetch_activities',
+          body: {
             'access_token': accessToken,
             'upload_start_seconds': startSec,
             'upload_end_seconds': endSec,
             'debug': true,
-          }),
+          },
         );
-        if (res.statusCode != 200) {
-          final err = jsonDecode(res.body) as Map<String, dynamic>?;
-          throw Exception(err?['detail'] ?? err?['error'] ?? res.body);
+        if (response.status != 200) {
+          final data = response.data;
+          final err = data is Map ? (data['message'] ?? data['error'] ?? data['detail']) : data;
+          final errStr = err?.toString() ?? '${response.status}';
+          if (response.status == 401 && errStr.toLowerCase().contains('invalid jwt')) {
+            throw Exception(
+              'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
+            );
+          }
+          throw Exception(errStr);
         }
-        final responseBody = jsonDecode(res.body);
+        final responseBody = response.data;
         if (responseBody is List) {
           activities = responseBody
               .map((e) => GarminActivity.fromJson(e as Map<String, dynamic>))
@@ -634,6 +633,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     } catch (e) {
       if (mounted) {
         final msg = e.toString().toLowerCase();
+        final isInvalidJwt = msg.contains('invalid jwt') || msg.contains('sesja wygasła');
         final isRevoked = msg.contains('revoked') || (msg.contains('jwt') && msg.contains('revocation'));
         if (isRevoked) {
           await _supabaseService.deleteGarminIntegration(userId);
@@ -647,9 +647,29 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
               duration: Duration(seconds: 5),
             ),
           );
-        } else {
+        } else if (isInvalidJwt) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Błąd synchronizacji Garmin: $e')),
+            const SnackBar(
+              content: Text(
+                'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
+              ),
+              duration: Duration(seconds: 6),
+            ),
+          );
+        } else {
+          final msgRaw = e.toString();
+          final isPullTokenError = msgRaw.contains('Invalid Pull Token') ||
+              msgRaw.contains('InvalidPullToken') ||
+              msgRaw.contains('Pull TokenException');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                isPullTokenError
+                    ? 'Synchronizacja Garmin: wygasł lub brakuje Consumer Pull Token. Administrator musi wygenerować nowy w healthapi.garmin.com (API Pull Token) i ustawić GARMIN_PULL_TOKEN w Supabase.'
+                    : 'Błąd synchronizacji Garmin: $e',
+              ),
+              duration: isPullTokenError ? const Duration(seconds: 8) : const Duration(seconds: 4),
+            ),
           );
         }
       }
