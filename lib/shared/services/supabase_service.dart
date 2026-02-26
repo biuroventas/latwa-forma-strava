@@ -570,6 +570,7 @@ class SupabaseService {
     required String accessToken,
     required DateTime expiresAt,
     String? refreshToken,
+    String? garminUserId,
   }) async {
     await _client.from('garmin_integrations').upsert(
       {
@@ -577,10 +578,19 @@ class SupabaseService {
         'access_token': accessToken,
         'expires_at': expiresAt.toIso8601String(),
         ...? (refreshToken != null ? {'refresh_token': refreshToken} : null),
+        ...? (garminUserId != null ? {'garmin_user_id': garminUserId} : null),
         'updated_at': DateTime.now().toIso8601String(),
       },
       onConflict: 'user_id',
     );
+  }
+
+  /// Aktualizuje tylko garmin_user_id (np. po pierwszym połączeniu, dla push).
+  Future<void> updateGarminUserId(String userId, String garminUserId) async {
+    await _client.from('garmin_integrations').update({
+      'garmin_user_id': garminUserId,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('user_id', userId);
   }
 
   Future<void> deleteGarminIntegration(String userId) async {

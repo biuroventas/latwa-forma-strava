@@ -318,6 +318,26 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         expiresAt: expiresAt,
         refreshToken: tokens.refreshToken,
       );
+      // Pobierz Garmin User ID i zapisz (potrzebne do odbierania push – mapowanie payloadu na user_id)
+      try {
+        final session = await SupabaseConfig.auth.getSession();
+        final jwt = session.data.session?.accessToken;
+        if (jwt != null) {
+          final idRes = await http.get(
+            Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),
+            headers: {'Authorization': 'Bearer $jwt'},
+          );
+          if (idRes.statusCode == 200) {
+            final idData = jsonDecode(idRes.body) as Map<String, dynamic>?;
+            final garminUserId = idData?['userId'] as String?;
+            if (garminUserId != null && garminUserId.isNotEmpty) {
+              await _supabaseService.updateGarminUserId(userId, garminUserId);
+            }
+          }
+        }
+      } catch (_) {
+        // Nie blokuj sukcesu – garmin_user_id można uzupełnić później przy sync
+      }
       ref.invalidate(garminIntegrationProvider);
       if (mounted) {
         SuccessMessage.show(context, 'Garmin Connect połączony pomyślnie');
@@ -520,6 +540,27 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       }
     }
 
+    // Uzupełnij garmin_user_id jeśli brak (np. po migracji) – potrzebne do odbierania push
+    if (integration['garmin_user_id'] == null || (integration['garmin_user_id'] as String?).isEmpty) {
+      try {
+        final session = await SupabaseConfig.auth.getSession();
+        final jwt = session.data.session?.accessToken;
+        if (jwt != null) {
+          final idRes = await http.get(
+            Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),
+            headers: {'Authorization': 'Bearer $jwt'},
+          );
+          if (idRes.statusCode == 200) {
+            final idData = jsonDecode(idRes.body) as Map<String, dynamic>?;
+            final garminUserId = idData?['userId'] as String?;
+            if (garminUserId != null && garminUserId.isNotEmpty) {
+              await _supabaseService.updateGarminUserId(userId, garminUserId);
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
     setState(() => _isSyncingGarmin = true);
     bool showedEmptyHintDialog = false;
     try {
@@ -551,8 +592,15 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         );
         if (response.status != 200) {
           final data = response.data;
-          final err = data is Map ? (data['message'] ?? data['error'] ?? data['detail']) : data;
-          final errStr = err?.toString() ?? '${response.status}';
+          String errStr = '${response.status}';
+          if (data is Map) {
+            final err = data['message'] ?? data['error'] ?? data['detail'];
+            final detail = data['detail']?.toString();
+            errStr = err?.toString() ?? errStr;
+            if (detail != null && detail.isNotEmpty && detail != errStr) {
+              errStr = '$errStr $detail';
+            }
+          }
           if (response.status == 401 && errStr.toLowerCase().contains('invalid jwt')) {
             throw Exception(
               'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem spróbuj synchronizacji Garmin.',
@@ -667,17 +715,26 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
           );
         } else {
           final msgRaw = e.toString();
-          final isPullTokenError = msgRaw.contains('Invalid Pull Token') ||
-              msgRaw.contains('InvalidPullToken') ||
-              msgRaw.contains('Pull TokenException');
+          final isTokenNotSet = msgRaw.contains('GARMIN_PULL_TOKEN nie ustawiony') ||
+              msgRaw.contains('GARMIN_PULL_TOKEN is not set');
+          final isPullTokenError = !isTokenNotSet &&
+              (msgRaw.contains('Invalid Pull Token') ||
+                  msgRaw.contains('InvalidPullToken') ||
+                  msgRaw.contains('Pull TokenException'));
+          String snackText;
+          if (isTokenNotSet) {
+            snackText = 'Synchronizacja Garmin: sekret GARMIN_PULL_TOKEN nie jest widoczny w funkcji. '
+                'Ustaw: supabase secrets set GARMIN_PULL_TOKEN=\'CPT_...\' i wdróż: supabase functions deploy garmin_fetch_activities';
+          } else if (isPullTokenError) {
+            snackText = 'Synchronizacja z Garmin jest tymczasowo niedostępna (ograniczenie po stronie Garmin API). '
+                'Możesz dodawać aktywności ręcznie. Problem zgłoś: connect-support@developer.garmin.com';
+          } else {
+            snackText = 'Błąd synchronizacji Garmin: $e';
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                isPullTokenError
-                    ? 'Synchronizacja Garmin: wygasł lub brakuje Consumer Pull Token. Administrator musi wygenerować nowy w healthapi.garmin.com (API Pull Token) i ustawić GARMIN_PULL_TOKEN w Supabase.'
-                    : 'Błąd synchronizacji Garmin: $e',
-              ),
-              duration: isPullTokenError ? const Duration(seconds: 8) : const Duration(seconds: 4),
+              content: Text(snackText),
+              duration: isTokenNotSet || isPullTokenError ? const Duration(seconds: 10) : const Duration(seconds: 4),
             ),
           );
         }

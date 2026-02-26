@@ -94,7 +94,7 @@ Plik `web/garmin-callback.html` jest w repozytorium i przy buildzie trafia do `b
 - **„Garmin nie jest skonfigurowane”** – brak `GARMIN_CLIENT_ID` lub `GARMIN_CLIENT_SECRET` w załadowanym env (sprawdź `.env` lokalnie, `env.production` / zmienne builda na web).
 - **Błąd redirect_uri / invalid redirect** – w Garmin Developer Portal w ustawieniach aplikacji Redirect URL musi być **identyczny** z tym, którego używa aplikacja (w tym protokół, domena, ścieżka). Dla web – ten sam co `GARMIN_REDIRECT_URI`.
 - **Evaluation vs produkcja** – na razie używaj tylko Evaluation; użycie aplikacji eval w produkcji komercyjnej może skutkować wyłączeniem. Po uzyskaniu dostępu do produkcji załóż osobną aplikację w portalu i wpisz nowe Consumer Key/Secret do konfiguracji produkcyjnej.
-- **InvalidPullTokenException / Invalid Pull Token** – potrzebny jest **Consumer Pull Token**. Zaloguj się w **API Tools**: https://healthapi.garmin.com/tools/login → **API Pull Token** → **Create Token**. Skopiuj wygenerowany token (np. `CPT...`) i ustaw go w Supabase jako sekret Edge Function: `supabase secrets set GARMIN_PULL_TOKEN='CPT_twoj_token'`. **Uwaga:** token jest tymczasowy (ma datę wygaśnięcia). Po wygaśnięciu wygeneruj nowy w portalu i zaktualizuj sekret.
+- **InvalidPullTokenException / Invalid Pull Token** – (1) W **API Configuration** (healthapi.garmin.com/tools/apiConfiguration) w sekcji „Data shared from Garmin Connect to your app” **zaznacz „Enabled” przy „Activity”** i kliknij **Save** – bez włączonego Activity API pull może zwracać InvalidPullTokenException. (2) Potrzebny jest **Consumer Pull Token**: https://healthapi.garmin.com/tools/consumerPullToken → Create Token, skopiuj token, `supabase secrets set GARMIN_PULL_TOKEN='CPT_...'`, potem `supabase functions deploy garmin_fetch_activities`.
 - **Data Viewer / sync zwraca puste** – jeśli w Data Viewerze (healthapi.garmin.com/tools/dataViewer) dla Twojego User ID w zakresie 7 dni pojawia się „Could not find data”, to samo API używa Łatwa Forma przy synchronizacji; sync nie będzie miał czego pobrać. W środowisku **Evaluation** dane mogą być udostępniane z opóźnieniem lub tylko przez **Push** (webhook). Warto odczekać 24–48 h po skonfigurowaniu Endpoint Configuration albo skontaktować się z Garmin (Support w portalu).
 
 ---
@@ -146,10 +146,38 @@ W **Pull Test** każdy wiersz to **pull** = żądanie pobrania danych (np. wywo�
 
 **Co zrobić:** Endpoint musi zwracać **200** i minimalne JSON (np. `{}`) na POST – tak jest w `netlify/functions/garmin.js`. Żeby zobaczyć, czy Garmin w ogóle wysyła pingi: **Netlify → Functions → garmin → Logs**. Jeśli po zsynchronizowaniu zegarka z Garmin Connect pojawią się wpisy „Garmin backchannel POST: ping”, backchannel działa; Pull Test nadal może pokazywać błąd dla pulli wywołanych przyciskiem „Synchronizuj”.
 
-### Jeśli nadal „without data in the last 24 hours”
+### Jeśli nadal „without data in the last 24 hours“
 
 - W Netlify (Functions → garmin) sprawdź logi – czy są wywołania z ostatnich 24 h.
 - W portalu Garmin upewnij się, że wymagane summary domains mają ten sam Callback URL.
+
+---
+
+## 9. Tryb Push zamiast Pull (unikanie InvalidPullTokenException)
+
+Jeśli synchronizacja przez **Pull** (przycisk „Synchronizuj”) zwraca **InvalidPullTokenException**, możesz przejść na **Push**: Garmin sam wysyła dane aktywności na `https://latwaforma.pl/api/garmin`, a Netlify Function zapisuje je do Supabase.
+
+**Kroki:**
+
+1. **Migracja i zapis Garmin User ID**  
+   - Wdróż migrację `20250225000001_garmin_user_id_for_push.sql` (kolumna `garmin_integrations.garmin_user_id`).  
+   - Po połączeniu konta Garmin aplikacja zapisuje `garmin_user_id` (albo uzupełnia go przy pierwszej synchronizacji).  
+   - Istniejący użytkownik: niech raz kliknie „Synchronizuj” – w tle uzupełnimy `garmin_user_id`.
+
+2. **W portalu Garmin (Endpoint Configuration)**  
+   - Dla domen związanych z aktywnościami (np. **ACTIVITY_DETAIL**, **ACTIVITY_FILE_DATA**) ustaw **Upload Type** na **push** (zamiast ping).  
+   - Callback URL bez zmian: `https://latwaforma.pl/api/garmin`.
+
+3. **Netlify – zmienne środowiskowe**  
+   W ustawieniach funkcji (lub Site → Environment variables) ustaw:  
+   - `SUPABASE_URL` = URL projektu Supabase (np. `https://xxx.supabase.co`)  
+   - `SUPABASE_SERVICE_ROLE_KEY` = klucz service role (Supabase → Settings → API)  
+   Bez tych zmiennych endpoint nadal zwróci 200 dla Garmin, ale aktywności z push nie będą zapisywane do bazy.
+
+4. **Deploy**  
+   Wgraj zmiany (w tym `netlify/functions/garmin.js`) przez **push do Gita**, żeby Netlify zbudował i wgrał funkcję.
+
+Po przełączeniu na push **przycisk „Synchronizuj”** nadal wywołuje Pull (może dalej zwracać błąd). Aktywności będą jednak dopisywane automatycznie, gdy Garmin wyśle push (np. po synchronizacji zegarka z Garmin Connect).
 - W razie wątpliwości: **Garmin Developer Support** (Support w portalu lub connect-support@developer.garmin.com).
 
 ---
