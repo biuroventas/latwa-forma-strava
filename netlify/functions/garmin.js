@@ -35,23 +35,25 @@ function estimateCalories(activityType, durationMinutes) {
   return Math.round(met * 70 * (minutes / 60)); // ~70 kg domyślnie
 }
 
-/** Jedna aktywność z push Garmin → rekord do tabeli activities. */
+/** Jedna aktywność z push Garmin → rekord do tabeli activities. Wartości zgodne z CHECK (calories_burned >= 0, duration_minutes IS NULL OR duration_minutes > 0). */
 function toActivityRow(ourUserId, a) {
   const startTimeInSeconds = a.startTimeInSeconds ?? a.startTimeGmt ?? 0;
   const durationSec = a.durationInSeconds ?? a.activeDurationInSeconds ?? 0;
-  const durationMinutes = durationSec > 0 ? Math.floor(durationSec / 60) : null;
+  const rawMinutes = durationSec > 0 ? Math.floor(durationSec / 60) : 0;
+  const durationMinutes = rawMinutes > 0 ? rawMinutes : null; // CHECK: null lub > 0, nigdy 0
   const startDate = startTimeInSeconds
     ? new Date(startTimeInSeconds * 1000).toISOString()
     : new Date().toISOString();
   const name = (a.activityName || a.activityType || 'Aktywność (Garmin)').trim();
-  const displayName = name ? `${name} (Garmin)` : 'Aktywność (Garmin)';
-  const calories = a.calories ?? estimateCalories(a.activityType, durationMinutes);
+  const displayName = (name && name.length > 0) ? `${name} (Garmin)` : 'Aktywność (Garmin)';
+  const rawCalories = a.calories ?? estimateCalories(a.activityType, durationMinutes ?? 30);
+  const calories_burned = Math.max(1, Math.round(Number(rawCalories) || 0)); // CHECK: >= 0, u nas min 1
   return {
     user_id: ourUserId,
     name: displayName,
-    calories_burned: calories,
+    calories_burned,
     duration_minutes: durationMinutes,
-    intensity: a.activityType || 'OTHER',
+    intensity: (a.activityType || 'OTHER').substring(0, 100) || 'OTHER',
     created_at: startDate,
   };
 }
