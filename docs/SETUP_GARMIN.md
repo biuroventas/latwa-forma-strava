@@ -136,10 +136,15 @@ Strona: **Partner Verification** w Garmin (np. `apis.garmin.com/tools/partnerVer
 4. **Apply for Production Key**  
    Gdy **All Tests** są zielone, użyj **Apply for Production Key** i dokończ weryfikację zgodnie z instrukcjami Garmin.
 
-### „Could not find corresponding ping request” (pull notifications)
+### „Could not find corresponding ping request” (pull notifications) – wszystkie rekordy na czerwono
 
-Ten błąd w logu **Pull notifications** oznacza, że Garmin wysłał **ping** na Twój callback (żeby powiadomić o nowych danych), ale nie dostał poprawnej odpowiedzi **200**. Bez tego Garmin nie łączy pingu z powiadomieniem pull i raportuje brak „corresponding ping request”.  
-**Rozwiązanie:** Upewnij się, że endpoint `https://latwaforma.pl/api/garmin` jest wdrożony (deploy z Gita, nie tylko `build/web`) i zwraca **200** dla GET i POST. Wtedy kolejne pingi będą zaliczane i błąd nie powinien się pojawiać.
+W **Pull Test** każdy wiersz to **pull** = żądanie pobrania danych (np. wywołanie Garmin API po aktywności). **„Corresponding ping”** = wcześniejsze powiadomienie (ping), które Garmin **wysłał** na Twój backchannel (`https://latwaforma.pl/api/garmin`), zanim ten pull się pojawił.
+
+**Dlaczego u nas wszystkie pull-e są „bez pingu”:** W Łatwej Formie użytkownik klika **„Synchronizuj aktywności”** → aplikacja (lub Edge Function) **od razu** wywołuje Garmin Health API (GET activities). To jest **pull** inicjowany przez nas. Garmin **nie wysyła** wcześniej pinga na nasz URL, bo to my sami odpytujemy API. Dlatego przy każdym takim pullu Garmin nie ma „corresponding ping request” i pokazuje błąd. To **zachowanie oczekiwane** przy tym modelu (sync na żądanie użytkownika).
+
+**Kiedy byłby „corresponding ping”:** Gdyby najpierw użytkownik zsynchronizował zegarek z Garmin Connect i pojawiły się nowe dane → Garmin mógłby wysłać **ping** (POST) na `https://latwaforma.pl/api/garmin` → wtedy kolejny pull mógłby mieć ten ping przypisany. Przy samym kliku „Synchronizuj” w aplikacji pingu nie ma.
+
+**Co zrobić:** Endpoint musi zwracać **200** i minimalne JSON (np. `{}`) na POST – tak jest w `netlify/functions/garmin.js`. Żeby zobaczyć, czy Garmin w ogóle wysyła pingi: **Netlify → Functions → garmin → Logs**. Jeśli po zsynchronizowaniu zegarka z Garmin Connect pojawią się wpisy „Garmin backchannel POST: ping”, backchannel działa; Pull Test nadal może pokazywać błąd dla pulli wywołanych przyciskiem „Synchronizuj”.
 
 ### Jeśli nadal „without data in the last 24 hours”
 

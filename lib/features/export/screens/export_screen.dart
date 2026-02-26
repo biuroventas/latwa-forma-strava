@@ -151,24 +151,26 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
     }
   }
 
-  /// Dozwolone znaki w PDF (ASCII + polskie), reszta → '?' (unikamy FormatException UTF-8).
-  static String _sanitizeForPdf(String s) {
+  /// Na webie: tylko ASCII (bez czcionki TTF), żeby uniknąć FormatException UTF-8 w pakiecie pdf.
+  static const _plToAscii = {
+    0x104: 'A', 0x105: 'a', 0x106: 'C', 0x107: 'c', 0x118: 'E', 0x119: 'e',
+    0x141: 'L', 0x142: 'l', 0x143: 'N', 0x144: 'n', 0xD3: 'O', 0xF3: 'o',
+    0x15A: 'S', 0x15B: 's', 0x179: 'Z', 0x17A: 'z', 0x17B: 'Z', 0x17C: 'z',
+    0xA0: ' ', 0x2013: '-', 0x2022: '*',
+  };
+  static String _toAsciiForPdf(String s) {
     if (s.isEmpty) return s;
     final buf = StringBuffer();
     for (final rune in s.runes) {
-      if (rune <= 0x7F && rune >= 0x20) {
+      if (rune >= 0x20 && rune <= 0x7E) {
         buf.writeCharCode(rune);
-      } else if (rune == 0xA0 || rune == 0x104 || rune == 0x105 || rune == 0x106 || rune == 0x107 ||
-          rune == 0x118 || rune == 0x119 || rune == 0x141 || rune == 0x142 || rune == 0x143 || rune == 0x144 ||
-          rune == 0xD3 || rune == 0xF3 || rune == 0x15A || rune == 0x15B || rune == 0x179 || rune == 0x17A ||
-          rune == 0x17B || rune == 0x17C || rune == 0x2013 || rune == 0x2022) {
-        buf.write(String.fromCharCode(rune));
       } else {
-        buf.write('?');
+        buf.write(_plToAscii[rune] ?? '?');
       }
     }
     return buf.toString();
   }
+
 
   Future<void> _exportToPDF() async {
     final canProceed = await checkPremiumOrNavigate(
@@ -197,24 +199,10 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         ..sort((a, b) => (a.createdAt ?? DateTime(0)).compareTo(b.createdAt ?? DateTime(0)));
       final weightLogs = await service.getWeightLogs(userId, limit: 100);
 
-      // Czcionka z obsługą polskich znaków (ą, ć, ę, ł, ń, ó, ś, ź, ż)
-      ByteData fontData;
-      try {
-        fontData = await rootBundle.load('assets/fonts/OpenSans-Regular.ttf');
-      } catch (_) {
-        if (mounted) {
-          ErrorHandler.showSnackBar(
-            context,
-            error: Exception('font'),
-            fallback: 'Błąd ładowania czcionki. Odśwież stronę (F5) i spróbuj ponownie.',
-          );
-        }
-        return;
-      }
-      final ttfFont = pw.Font.ttf(fontData);
-      final pdfTheme = pw.ThemeData.withFont(base: ttfFont);
+      // Wszędzie (web + mobile): bez czcionki TTF, tylko ASCII – unikamy FormatException UTF-8 w pakiecie pdf.
+      String pdfText(String s) => _toAsciiForPdf(s);
 
-      final pdf = pw.Document(theme: pdfTheme);
+      final pdf = pw.Document();
       final now = DateTime.now();
       final dateStr = '${now.day}.${now.month}.${now.year}';
       final fileDateStr = now.toIso8601String().split('T')[0];
@@ -226,7 +214,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           header: (ctx) => pw.Padding(
             padding: const pw.EdgeInsets.only(bottom: 12),
             child: pw.Text(
-              _sanitizeForPdf('Łatwa Forma – Raport'),
+              pdfText('Łatwa Forma – Raport'),
               style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                     fontWeight: pw.FontWeight.bold,
                     fontSize: 16,
@@ -236,7 +224,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
           footer: (ctx) => pw.Padding(
             padding: const pw.EdgeInsets.only(top: 12),
             child: pw.Text(
-              _sanitizeForPdf('Strona ${ctx.pageNumber} z ${ctx.pagesCount} • Wygenerowano $dateStr'),
+              pdfText('Strona ${ctx.pageNumber} z ${ctx.pagesCount} • Wygenerowano $dateStr'),
               style: pw.Theme.of(ctx).defaultTextStyle.copyWith(fontSize: 8),
             ),
           ),
@@ -244,7 +232,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             pw.Header(
               level: 0,
               child: pw.Text(
-                'Podsumowanie profilu',
+                pdfText('Podsumowanie profilu'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -254,14 +242,14 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             if (profile != null) ...[
               pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 8),
-                child: pw.Text(_sanitizeForPdf(
+                child: pw.Text(pdfText(
                   'Płeć: ${profile.gender == "male" ? "Mężczyzna" : profile.gender == "female" ? "Kobieta" : "Inna"} • '
                   'Wiek: ${profile.age} lat • Wzrost: ${profile.heightCm.toStringAsFixed(0)} cm',
                 )),
               ),
               pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 8),
-                child: pw.Text(_sanitizeForPdf(
+                child: pw.Text(pdfText(
                   'Waga: ${profile.currentWeightKg.toStringAsFixed(1)} kg • '
                   'Cel: ${profile.targetWeightKg.toStringAsFixed(1)} kg • '
                   'Cel kaloryczny: ${profile.targetCalories?.toStringAsFixed(0) ?? "-"} kcal',
@@ -269,7 +257,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
               ),
               pw.Padding(
                 padding: const pw.EdgeInsets.only(bottom: 16),
-                child: pw.Text(_sanitizeForPdf(
+                child: pw.Text(pdfText(
                   profile.goal == 'weight_loss'
                       ? 'Cel: Utrata wagi'
                       : profile.goal == 'weight_gain'
@@ -277,11 +265,11 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                           : 'Cel: Utrzymanie wagi',
                 )),
               ),
-            ] else pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text('Brak profilu')),
+            ] else pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text(pdfText('Brak profilu'))),
             pw.Header(
               level: 0,
               child: pw.Text(
-                _sanitizeForPdf('Ostatnie 30 dni – posiłki'),
+                pdfText('Ostatnie 30 dni – posiłki'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -289,7 +277,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
               ),
             ),
             if (meals.isEmpty)
-              pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text('Brak posiłków'))
+              pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text(pdfText('Brak posiłków')))
             else
               pw.Table(
                 border: pw.TableBorder.all(color: PdfColors.grey300),
@@ -312,7 +300,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                         ),
                         pw.Padding(
                           child: pw.Text(() {
-                            final safe = _sanitizeForPdf(m.name);
+                            final safe = pdfText(m.name);
                             return safe.length > 40 ? '${safe.substring(0, 40)}...' : safe;
                           }()),
                           padding: const pw.EdgeInsets.all(6),
@@ -330,7 +318,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             pw.Header(
               level: 0,
               child: pw.Text(
-                _sanitizeForPdf('Ostatnie 30 dni – aktywności'),
+                pdfText('Ostatnie 30 dni – aktywności'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -338,7 +326,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
               ),
             ),
             if (activities.isEmpty)
-              pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text('Brak aktywności'))
+              pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text(pdfText('Brak aktywności')))
             else
               pw.Table(
                 border: pw.TableBorder.all(color: PdfColors.grey300),
@@ -361,7 +349,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                         ),
                         pw.Padding(
                           child: pw.Text(() {
-                            final safe = _sanitizeForPdf(a.name);
+                            final safe = pdfText(a.name);
                             return safe.length > 40 ? '${safe.substring(0, 40)}...' : safe;
                           }()),
                           padding: const pw.EdgeInsets.all(6),
@@ -379,7 +367,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             pw.Header(
               level: 0,
               child: pw.Text(
-                _sanitizeForPdf('Historia wagi'),
+                pdfText('Historia wagi'),
                 style: pw.Theme.of(ctx).defaultTextStyle.copyWith(
                       fontWeight: pw.FontWeight.bold,
                       fontSize: 14,
@@ -387,7 +375,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
               ),
             ),
             if (weightLogs.isEmpty)
-              pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text('Brak pomiarów'))
+              pw.Padding(padding: const pw.EdgeInsets.only(bottom: 16), child: pw.Text(pdfText('Brak pomiarów')))
             else
               pw.Table(
                 border: pw.TableBorder.all(color: PdfColors.grey300),
