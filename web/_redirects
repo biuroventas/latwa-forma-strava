@@ -1,2 +1,3 @@
 /api/garmin  /.netlify/functions/garmin  200
+/api/garmin-disconnect  /.netlify/functions/garmin-disconnect  200
 /*    /index.html   200

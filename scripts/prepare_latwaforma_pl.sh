@@ -55,8 +55,8 @@ cp "$ROOT/web/terms.html" "$BUILD_WEB/"
 mkdir -p "$BUILD_WEB/auth_redirect"
 cp "$ROOT/web/auth_redirect/index.html" "$BUILD_WEB/auth_redirect/" 2>/dev/null || true
 
-# SPA: /api/garmin i warianty (Netlify Function), potem env, na końcu fallback na index.html.
-printf '%s\n%s\n%s\n%s\n%s\n' '/api/garmin  /.netlify/functions/garmin  200' '/api/garmin/  /.netlify/functions/garmin  200' '/api/garmin/*  /.netlify/functions/garmin  200' '/env.production  /env.production  200' '/*    /index.html   200' > "$BUILD_WEB/_redirects"
+# SPA: /api/garmin, /api/garmin-disconnect (Netlify Functions), potem env, na końcu fallback na index.html.
+printf '%s\n%s\n%s\n%s\n%s\n%s\n' '/api/garmin  /.netlify/functions/garmin  200' '/api/garmin/  /.netlify/functions/garmin  200' '/api/garmin/*  /.netlify/functions/garmin  200' '/api/garmin-disconnect  /.netlify/functions/garmin-disconnect  200' '/env.production  /env.production  200' '/*    /index.html   200' > "$BUILD_WEB/_redirects"
 
 # Długi cache dla JS i assets – szybsze ponowne wejścia
 cat > "$BUILD_WEB/_headers" << 'EOF'
