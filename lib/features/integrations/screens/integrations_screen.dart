@@ -709,16 +709,18 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.watch,
-                          color: Colors.blue.shade800,
-                          size: 32,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/images/garmin_connect_logo.png',
+                          width: 48,
+                          height: 48,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.watch,
+                            color: Colors.blue.shade800,
+                            size: 48,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -733,6 +735,13 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                             Text(
                               'Aktywności z Garmin dodawane automatycznie po synchronizacji z Garmin Connect',
                               style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Activity data provided by Garmin devices.',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontStyle: FontStyle.italic,
+                              ),
                             ),
                           ],
                         ),
