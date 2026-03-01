@@ -124,7 +124,7 @@ class SupabaseService {
   Future<List<Activity>> getActivities(String userId, {DateTime? date}) async {
     var query = _client
         .from('activities')
-        .select()
+        .select('id, user_id, name, calories_burned, duration_minutes, activity_type, created_at, excluded_from_balance')
         .eq('user_id', userId);
 
     if (date != null) {
@@ -643,5 +643,52 @@ class SupabaseService {
     if (reason != null) data['reason'] = reason;
     
     await _client.from('goal_history').insert(data);
+  }
+
+  // Products (catalog from OFF import / user / restaurant)
+  /// Mapuje wiersz z tabeli products na format używany w UI (BarcodeProductScreen, ProductSearchScreen).
+  static Map<String, dynamic> _productRowToMap(Map<String, dynamic> row) {
+    double toDouble(dynamic v) {
+      if (v == null) return 0.0;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0.0;
+      return 0.0;
+    }
+
+    return {
+      'name': row['name'] as String? ?? 'Produkt',
+      'barcode': row['barcode'] as String? ?? '',
+      'calories': toDouble(row['calories_per_100g']),
+      'proteinG': toDouble(row['protein_g']),
+      'fatG': toDouble(row['fat_g']),
+      'carbsG': toDouble(row['carbs_g']),
+      'weightG': row['weight_g'] != null ? toDouble(row['weight_g']) : null,
+      'imageUrl': row['image_url'] as String?,
+      'brand': row['brand'] as String?,
+      'ingredients': row['ingredients'] as String?,
+    };
+  }
+
+  /// Pobiera produkt po kodzie kreskowym. Zwraca mapę w formacie UI lub null.
+  Future<Map<String, dynamic>?> getProductByBarcode(String barcode) async {
+    final response = await _client
+        .from('products')
+        .select()
+        .eq('barcode', barcode)
+        .maybeSingle();
+    if (response == null) return null;
+    return _productRowToMap(response);
+  }
+
+  /// Wyszukuje produkty po nazwie (ilike). Zwraca listę map w formacie UI.
+  Future<List<Map<String, dynamic>>> searchProducts(String query, {int limit = 24}) async {
+    if (query.trim().isEmpty) return [];
+    final q = query.trim().toLowerCase();
+    final response = await _client
+        .from('products')
+        .select()
+        .ilike('name', '%$q%')
+        .limit(limit);
+    return (response as List).map((row) => _productRowToMap(row as Map<String, dynamic>)).toList();
   }
 }

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:io' show Platform;
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/router/app_router.dart';
-import '../../../shared/services/open_food_facts_service.dart';
+import '../../../shared/services/product_service.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
   const BarcodeScannerScreen({super.key});
@@ -14,7 +14,7 @@ class BarcodeScannerScreen extends StatefulWidget {
 }
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
-  final OpenFoodFactsService _offService = OpenFoodFactsService();
+  final ProductService _productService = ProductService();
   bool _isProcessing = false;
   String? _lastScannedCode;
   final TextEditingController _barcodeController = TextEditingController();
@@ -66,14 +66,14 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     setState(() => _isProcessing = true);
 
     try {
-      // Pobierz dane produktu z Open Food Facts
-      final product = await _offService.getProductByBarcode(code);
+      // Najpierw własna baza (Supabase), potem Open Food Facts
+      final product = await _productService.getProductByBarcode(code);
       
       if (!mounted) return;
 
       if (product == null) {
         _showErrorDialog('Nie znaleziono produktu', 
-            'Produkt o kodzie $code nie został znaleziony w bazie Open Food Facts.');
+            'Produkt o kodzie $code nie został znaleziony w bazie produktów.');
         setState(() => _isProcessing = false);
         return;
       }

@@ -251,6 +251,9 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
       case 'barcode':
         result = await context.push<bool>(AppRoutes.barcodeScanner);
         break;
+      case 'search_products':
+        result = await context.push<bool>(AppRoutes.productSearch);
+        break;
       case 'favorites':
         result = await context.push<bool>(
           AppRoutes.favorites,
@@ -340,6 +343,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
           const SizedBox(height: 8),
           _buildAddOptionTile(context: context, icon: Icons.qr_code_scanner, label: 'Kod kreskowy', color: Colors.blue, option: 'barcode'),
           const SizedBox(height: 8),
+          _buildAddOptionTile(context: context, icon: Icons.search, label: 'Wyszukaj produkt', color: Colors.indigo, option: 'search_products'),
+          const SizedBox(height: 8),
           _buildAddOptionTile(context: context, icon: Icons.favorite_border, label: 'Ulubione', color: Colors.pink, option: 'favorites'),
         ],
       ),
@@ -362,6 +367,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             Expanded(child: _buildCompactTile(context, Icons.restaurant_menu, 'Składniki', Colors.teal, 'ingredients', tileHeight)),
             SizedBox(width: gap),
             Expanded(child: _buildCompactTile(context, Icons.qr_code_scanner, 'Kod kreskowy', Colors.blue, 'barcode', tileHeight)),
+            SizedBox(width: gap),
+            Expanded(child: _buildCompactTile(context, Icons.search, 'Wyszukaj', Colors.indigo, 'search_products', tileHeight)),
             SizedBox(width: gap),
             Expanded(child: _buildCompactTile(context, Icons.favorite_border, 'Ulubione', Colors.pink, 'favorites', tileHeight)),
           ],

@@ -5,13 +5,19 @@ import 'package:http/http.dart' as http;
 class OpenFoodFactsService {
   static const String baseUrl = 'https://world.openfoodfacts.org/api/v2';
   static const String productUrl = '$baseUrl/product';
-  static const String searchUrl = '$baseUrl/cgi/search.pl';
+  /// Full-text search tylko w API v1 (cgi/search.pl), bez /api/v2
+  static const String searchBaseUrl = 'https://world.openfoodfacts.org';
+
+  static const _userAgent = 'LatwaForma/1.0 (Flutter; diet tracker)';
 
   /// Pobiera informacje o produkcie na podstawie kodu kreskowego (EAN)
   Future<Map<String, dynamic>?> getProductByBarcode(String barcode) async {
     try {
       final url = Uri.parse('$productUrl/$barcode.json');
-      final response = await http.get(url);
+      final response = await http.get(
+        url,
+        headers: {'User-Agent': _userAgent},
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -83,5 +89,44 @@ class OpenFoodFactsService {
       return double.tryParse(match.group(1)!.replaceAll(',', '.'));
     }
     return null;
+  }
+
+  /// Wyszukuje produkty po nazwie (API v1, full-text). Limit ~10 req/min.
+  /// Zwraca listę w tym samym formacie co getProductByBarcode (do reuse w UI).
+  Future<List<Map<String, dynamic>>> searchProducts(String query, {int pageSize = 20}) async {
+    if (query.trim().isEmpty) return [];
+    try {
+      final url = Uri.parse('$searchBaseUrl/cgi/search.pl').replace(
+        queryParameters: {
+          'search_terms': query.trim(),
+          'search_simple': '1',
+          'action': 'process',
+          'json': '1',
+          'page_size': pageSize.toString(),
+        },
+      );
+      final response = await http.get(
+        url,
+        headers: {'User-Agent': _userAgent},
+      );
+      if (response.statusCode != 200) return [];
+      final data = json.decode(response.body) as Map<String, dynamic>?;
+      final products = data?['products'] as List<dynamic>?;
+      if (products == null || products.isEmpty) return [];
+      final result = <Map<String, dynamic>>[];
+      for (final p in products) {
+        if (p is! Map<String, dynamic>) continue;
+        try {
+          final parsed = _parseProduct(p);
+          if ((parsed['name'] as String? ?? '').isNotEmpty) result.add(parsed);
+        } catch (_) {
+          // Pomiń produkty z niepełnymi danymi
+        }
+      }
+      return result;
+    } catch (e) {
+      debugPrint('Błąd wyszukiwania produktów: $e');
+      return [];
+    }
   }
 }

@@ -20,6 +20,7 @@ import '../../features/meals/screens/add_meal_screen.dart';
 import '../../features/meals/screens/ingredients_meal_screen.dart';
 import '../../features/meals/screens/barcode_scanner_screen.dart';
 import '../../features/meals/screens/barcode_product_screen.dart';
+import '../../features/meals/screens/product_search_screen.dart';
 import '../../features/meals/screens/ai_photo_screen.dart';
 import '../../features/favorites/screens/edit_favorite_meal_screen.dart';
 import '../../features/favorites/screens/favorite_meals_screen.dart';
@@ -65,6 +66,7 @@ class AppRoutes {
   static const ingredientsMeal = '/meals/ingredients';
   static const barcodeScanner = '/meals/barcode';
   static const barcodeProduct = '/meals/barcode/product';
+  static const productSearch = '/meals/search';
   static const aiPhoto = '/meals/ai-photo';
   static const editFavorite = '/favorites/edit';
   static const aiAdvice = '/ai-advice';
@@ -280,6 +282,10 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
       GoRoute(
         path: AppRoutes.barcodeScanner,
         pageBuilder: (_, state) => _noTransitionPage(state, const BarcodeScannerScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.productSearch,
+        pageBuilder: (_, state) => _noTransitionPage(state, const ProductSearchScreen()),
       ),
       GoRoute(
         path: AppRoutes.barcodeProduct,

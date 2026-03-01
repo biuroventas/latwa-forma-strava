@@ -1,0 +1,9 @@
+{
+  "name": "import-off-products",
+  "description": "Import Polish Open Food Facts subset into Supabase products table",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
