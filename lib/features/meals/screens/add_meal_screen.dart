@@ -265,6 +265,9 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     if (mounted && result == true) context.pop(true);
   }
 
+  /// Wysokość jednego kafelka „Szybkie dodawanie” – wspólna dla wszystkich, żeby tekst się nie ucinał.
+  static const double _quickAddTileHeight = 88.0;
+
   Widget _buildAddOptionTile({
     required BuildContext context,
     required IconData icon,
@@ -272,8 +275,10 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     required Color color,
     required String option,
     double? minWidth,
+    double? height,
   }) {
     final surface = Theme.of(context).colorScheme.surface;
+    final useHeight = height ?? _quickAddTileHeight;
     return Material(
       color: surface,
       elevation: 1,
@@ -283,6 +288,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         onTap: () => _navigateToOption(option),
         borderRadius: BorderRadius.circular(12),
         child: Container(
+          height: useHeight,
           constraints: minWidth != null ? BoxConstraints(minWidth: minWidth) : null,
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           decoration: BoxDecoration(
