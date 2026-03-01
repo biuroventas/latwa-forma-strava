@@ -140,6 +140,9 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
             }
           }
 
+          final garminActivities = activities.where((a) => a.isFromGarmin).toList();
+          final otherActivities = activities.where((a) => !a.isFromGarmin).toList();
+
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(activitiesListProvider(_displayedDate)),
             child: CustomScrollView(
@@ -169,31 +172,61 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                     ),
                   ),
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                    final activity = activities[index];
-                    return Card(
+                if (garminActivities.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Text(
+                        'Dane aktywności pochodzą z urządzeń Garmin.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (garminActivities.isNotEmpty)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final activity = garminActivities[index];
+                        return Card(
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           ListTile(
-                            leading: Icon(
-                              activity.isFromGarmin ? Icons.watch : Icons.fitness_center,
-                              color: activity.isFromGarmin
-                                  ? Colors.blue.shade700
-                                  : _getIntensityColor(activity.intensity),
-                            ),
+                            leading: activity.isFromGarmin
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Image.asset(
+                                      'assets/images/garmin_connect_logo.png',
+                                      width: 28,
+                                      height: 28,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.watch,
+                                        color: Colors.blue.shade700,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.fitness_center,
+                                    color: _getActivityTypeColor(activity.activityType),
+                                    size: 28,
+                                  ),
                             title: Text(
-                              activity.name,
+                              activity.isFromGarmin
+                                  ? activity.name.replaceFirst(' (Garmin)', '')
+                                  : activity.name,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            subtitle: Text(
+subtitle: Text(
                               '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
                               '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
-                              '${activity.intensity != null ? ' • ${_getIntensityText(activity.intensity!)}' : ''}'
+                              ' • ${_getActivityTypeDisplayName(activity.activityType)}'
                               '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
                             ),
                             trailing: Row(
@@ -215,7 +248,7 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                                     final confirmed = await DeleteConfirmationDialog.show(
                                       context,
                                       title: 'Usuń aktywność',
-                                      content: 'Czy na pewno chcesz usunąć "${activity.name}"?',
+                                      content: 'Czy na pewno chcesz usunąć "${activity.isFromGarmin ? activity.name.replaceFirst(' (Garmin)', '') : activity.name}"?',
                                     );
                                     if (confirmed) {
                                       try {
@@ -282,10 +315,157 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                         ],
                       ),
                     );
-                    },
-                    childCount: activities.length,
+                      },
+                      childCount: garminActivities.length,
+                    ),
                   ),
-                ),
+                if (garminActivities.isNotEmpty && otherActivities.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        'Pozostałe aktywności.',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (otherActivities.isNotEmpty)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final activity = otherActivities[index];
+                        return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ListTile(
+                            leading: activity.isFromGarmin
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: Image.asset(
+                                      'assets/images/garmin_connect_logo.png',
+                                      width: 28,
+                                      height: 28,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.watch,
+                                        color: Colors.blue.shade700,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.fitness_center,
+                                    color: _getActivityTypeColor(activity.activityType),
+                                    size: 28,
+                                  ),
+                            title: Text(
+                              activity.isFromGarmin
+                                  ? activity.name.replaceFirst(' (Garmin)', '')
+                                  : activity.name,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
+                              '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
+                              ' • ${_getActivityTypeDisplayName(activity.activityType)}'
+                              '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () async {
+                                    final result = await context.push<bool>(AppRoutes.activitiesAdd, extra: activity);
+                                    if (result == true && context.mounted) {
+                                      ref.invalidate(activitiesListProvider(_displayedDate));
+                                      ref.invalidate(dashboardDataProvider(_displayedDate));
+                                    }
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () async {
+                                    final confirmed = await DeleteConfirmationDialog.show(
+                                      context,
+                                      title: 'Usuń aktywność',
+                                      content: 'Czy na pewno chcesz usunąć "${activity.isFromGarmin ? activity.name.replaceFirst(' (Garmin)', '') : activity.name}"?',
+                                    );
+                                    if (confirmed) {
+                                      try {
+                                        final service = SupabaseService();
+                                        await service.deleteActivity(activity.id!);
+                                        if (context.mounted) {
+                                          ref.invalidate(activitiesListProvider(_displayedDate));
+                                          ref.invalidate(dashboardDataProvider(_displayedDate));
+                                          SuccessMessage.show(context, 'Aktywność usunięta');
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ErrorHandler.showSnackBar(context, error: e);
+                                        }
+                                      }
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (activity.id != null)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.pie_chart_outline,
+                                    size: 18,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Nie licz w bilansie (spalone)',
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Switch(
+                                    value: activity.excludedFromBalance,
+                                    onChanged: (bool value) async {
+                                      try {
+                                        final service = SupabaseService();
+                                        await service.updateActivity(
+                                          activity.copyWith(excludedFromBalance: value),
+                                        );
+                                        if (context.mounted) {
+                                          ref.invalidate(activitiesListProvider(_displayedDate));
+                                          ref.invalidate(dashboardDataProvider(_displayedDate));
+                                          SuccessMessage.show(
+                                            context,
+                                            value ? 'Aktywność wyłączona z bilansu' : 'Aktywność wliczana do bilansu',
+                                          );
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ErrorHandler.showSnackBar(context, error: e);
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    );
+                      },
+                      childCount: otherActivities.length,
+                    ),
+                  ),
               ],
             ),
           );
@@ -335,34 +515,34 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
     );
   }
 
-  Color _getIntensityColor(String? intensity) {
-    switch (intensity) {
-      case 'low':
-        return Colors.green;
-      case 'moderate':
-        return Colors.orange;
-      case 'high':
-        return Colors.red;
-      case 'very_high':
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
+  Color _getActivityTypeColor(String? activityType) {
+    if (activityType == null || activityType.isEmpty) return Colors.grey;
+    final t = activityType.toLowerCase();
+    if (t == 'low') return Colors.green;
+    if (t == 'moderate') return Colors.orange;
+    if (t == 'high') return Colors.red;
+    if (t == 'very_high') return Colors.purple;
+    return Colors.grey;
   }
 
-  String _getIntensityText(String intensity) {
-    switch (intensity) {
-      case 'low':
-        return 'Niska';
-      case 'moderate':
-        return 'Umiarkowana';
-      case 'high':
-        return 'Wysoka';
-      case 'very_high':
-        return 'Bardzo wysoka';
-      default:
-        return intensity;
-    }
+  /// Etykieta typu aktywności: Garmin (RUNNING→Bieg) i legacy (high→Wysoka).
+  String _getActivityTypeDisplayName(String? activityType) {
+    if (activityType == null || activityType.isEmpty) return 'Inna';
+    final t = activityType.toUpperCase();
+    if (t == 'LOW') return 'Niska';
+    if (t == 'MODERATE') return 'Umiarkowana';
+    if (t == 'HIGH') return 'Wysoka';
+    if (t == 'VERY_HIGH') return 'Bardzo wysoka';
+    if (t.contains('RUN')) return 'Bieg';
+    if (t.contains('CYCLE') || t.contains('BIKE')) return 'Kolarstwo';
+    if (t.contains('SWIM')) return 'Pływanie';
+    if (t.contains('WALK')) return 'Chodzenie';
+    if (t.contains('HIKE')) return 'Wędrówka';
+    if (t.contains('ROW')) return 'Wioślarstwo';
+    if (t.contains('TENNIS')) return 'Tenis';
+    if (t.contains('YOGA')) return 'Joga';
+    if (t.contains('STRENGTH') || t.contains('TRAINING')) return 'Trening';
+    return activityType;
   }
 
   String _formatDuration(int minutes) {

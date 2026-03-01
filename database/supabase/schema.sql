@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS activities (
   name VARCHAR(255) NOT NULL,
   calories_burned DECIMAL(8,2) NOT NULL CHECK (calories_burned >= 0),
   duration_minutes INTEGER CHECK (duration_minutes > 0),
-  intensity VARCHAR(20) CHECK (intensity IN ('low', 'moderate', 'high', 'very_high')),
+  activity_type TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

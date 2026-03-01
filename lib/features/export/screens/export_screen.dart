@@ -67,16 +67,20 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
       }
       csv.writeln();
       
-      // Sekcja posiłków, aktywności i wagi
+      // Sekcja posiłków, aktywności i wagi (Garmin: attribution adjacent to data per API Brand Guidelines)
       csv.writeln('=== DANE DZIENNIKA ===');
-      csv.writeln('Typ,Nazwa,Wartość,Data');
+      if (activities.any((a) => a.isFromGarmin)) {
+        csv.writeln('# Dane aktywności mogą obejmować dane z urządzeń Garmin.');
+      }
+      csv.writeln('Typ,Nazwa,Wartość,Data,Źródło danych');
       
       for (var meal in meals) {
-        csv.writeln('Posiłek,"${meal.name.replaceAll('"', '""')}",${meal.calories} kcal,${meal.createdAt?.toIso8601String() ?? ""}');
+        csv.writeln('Posiłek,"${meal.name.replaceAll('"', '""')}",${meal.calories} kcal,${meal.createdAt?.toIso8601String() ?? ""},');
       }
       
       for (var activity in activities) {
-        csv.writeln('Aktywność,"${activity.name.replaceAll('"', '""')}",${activity.caloriesBurned} kcal,${activity.createdAt?.toIso8601String() ?? ""}');
+        final source = activity.isFromGarmin ? 'Garmin' : '';
+        csv.writeln('Aktywność,"${activity.name.replaceAll('"', '""')}",${activity.caloriesBurned} kcal,${activity.createdAt?.toIso8601String() ?? ""},$source');
       }
       
       for (var weight in weightLogs) {
@@ -362,6 +366,14 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                     );
                   }),
                 ],
+              ),
+            if (activities.any((a) => a.isFromGarmin))
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(top: 8),
+                child: pw.Text(
+                  pdfText('Dane aktywności pochodzą z urządzeń Garmin.'),
+                  style: pw.Theme.of(ctx).defaultTextStyle.copyWith(fontSize: 8),
+                ),
               ),
             pw.SizedBox(height: 20),
             pw.Header(

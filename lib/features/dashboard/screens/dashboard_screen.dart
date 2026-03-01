@@ -759,9 +759,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          if (activity.isFromGarmin)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: Image.asset(
+                                  'assets/images/garmin_connect_logo.png',
+                                  width: 24,
+                                  height: 24,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, __, ___) => Icon(Icons.watch, size: 24, color: Colors.blue.shade700),
+                                ),
+                              ),
+                            ),
                           Expanded(
                             child: Text(
-                              activity.name,
+                              activity.isFromGarmin
+                                  ? activity.name.replaceFirst(' (Garmin)', '')
+                                  : activity.name,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ),

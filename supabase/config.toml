@@ -1,0 +1,4 @@
+# Konfiguracja Edge Functions. verify_jwt = false na bramce – weryfikację JWT
+# robimy w kodzie funkcji (getClaims), żeby działało z nowymi JWT Signing Keys.
+[functions.garmin_fetch_activities]
+verify_jwt = false

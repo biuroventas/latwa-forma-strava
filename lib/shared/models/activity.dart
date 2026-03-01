@@ -4,7 +4,8 @@ class Activity {
   final String name;
   final double caloriesBurned;
   final int? durationMinutes;
-  final String? intensity;
+  /// Typ aktywności, np. RUNNING, CYCLING (Garmin/Strava) lub legacy: low, moderate, high, very_high.
+  final String? activityType;
   final DateTime? createdAt;
   /// Jeśli true, aktywność nie wlicza się do „spalone” na dashboardzie.
   final bool excludedFromBalance;
@@ -15,7 +16,7 @@ class Activity {
     required this.name,
     required this.caloriesBurned,
     this.durationMinutes,
-    this.intensity,
+    this.activityType,
     this.createdAt,
     this.excludedFromBalance = false,
   });
@@ -27,7 +28,7 @@ class Activity {
       name: json['name'] as String,
       caloriesBurned: (json['calories_burned'] as num).toDouble(),
       durationMinutes: json['duration_minutes'] as int?,
-      intensity: json['intensity'] as String?,
+      activityType: (json['activity_type'] ?? json['activityType']) as String?,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
       excludedFromBalance: json['excluded_from_balance'] as bool? ?? false,
     );
@@ -40,7 +41,7 @@ class Activity {
       'name': name,
       'calories_burned': caloriesBurned,
       if (durationMinutes != null) 'duration_minutes': durationMinutes,
-      if (intensity != null) 'intensity': intensity,
+      if (activityType != null) 'activity_type': activityType,
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
       'excluded_from_balance': excludedFromBalance,
     };
@@ -55,7 +56,7 @@ class Activity {
     String? name,
     double? caloriesBurned,
     int? durationMinutes,
-    String? intensity,
+    String? activityType,
     DateTime? createdAt,
     bool? excludedFromBalance,
   }) {
@@ -65,7 +66,7 @@ class Activity {
       name: name ?? this.name,
       caloriesBurned: caloriesBurned ?? this.caloriesBurned,
       durationMinutes: durationMinutes ?? this.durationMinutes,
-      intensity: intensity ?? this.intensity,
+      activityType: activityType ?? this.activityType,
       createdAt: createdAt ?? this.createdAt,
       excludedFromBalance: excludedFromBalance ?? this.excludedFromBalance,
     );

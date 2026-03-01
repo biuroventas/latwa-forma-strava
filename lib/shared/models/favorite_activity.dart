@@ -6,7 +6,7 @@ class FavoriteActivity {
   final String name;
   final double caloriesBurned;
   final int? durationMinutes;
-  final String? intensity;
+  final String? activityType;
   final DateTime? createdAt;
 
   FavoriteActivity({
@@ -15,7 +15,7 @@ class FavoriteActivity {
     required this.name,
     required this.caloriesBurned,
     this.durationMinutes,
-    this.intensity,
+    this.activityType,
     this.createdAt,
   });
 
@@ -26,7 +26,7 @@ class FavoriteActivity {
       name: json['name'] as String,
       caloriesBurned: (json['calories_burned'] as num).toDouble(),
       durationMinutes: json['duration_minutes'] as int?,
-      intensity: json['intensity'] as String?,
+      activityType: json['activity_type'] as String?,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
     );
   }
@@ -38,7 +38,7 @@ class FavoriteActivity {
       'name': name,
       'calories_burned': caloriesBurned,
       if (durationMinutes != null) 'duration_minutes': durationMinutes,
-      if (intensity != null) 'intensity': intensity,
+      if (activityType != null) 'activity_type': activityType,
     };
   }
 
@@ -48,7 +48,7 @@ class FavoriteActivity {
       name: name,
       caloriesBurned: caloriesBurned,
       durationMinutes: durationMinutes,
-      intensity: intensity,
+      activityType: activityType,
       createdAt: createdAt,
     );
   }

@@ -36,6 +36,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _currentWeightController = TextEditingController();
   final _targetWeightController = TextEditingController();
   final _weeklyRateController = TextEditingController();
+  final _waterGoalController = TextEditingController();
 
   // Dane edycji
   String? _gender;
@@ -90,6 +91,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _currentWeightController.dispose();
     _targetWeightController.dispose();
     _weeklyRateController.dispose();
+    _waterGoalController.dispose();
     super.dispose();
   }
 
@@ -188,6 +190,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       final suggestedWater = Calculations.calculateDailyWaterGoalMl(profile.currentWeightKg);
       _waterGoalMl = profile.waterGoalMl ?? suggestedWater;
       _initialWaterGoalMl = _waterGoalMl;
+      _waterGoalController.text = (_waterGoalMl ?? suggestedWater).toStringAsFixed(0);
       _manualWeeklyWeightChange = profile.weeklyWeightChange ??
           (_goal == AppConstants.goalWeightLoss
               ? AppConstants.defaultWeightLossRate
@@ -1282,6 +1285,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       isDense: true,
                       contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                     ),
+                    onChanged: (s) {
+                      final v = int.tryParse(s.trim());
+                      if (v != null && v >= 13 && v <= 100) {
+                        setState(() {
+                          _age = v;
+                        });
+                        _triggerRecalcFromProfileFields();
+                      }
+                    },
                     onSubmitted: (s) {
                       final v = int.tryParse(s.trim());
                       if (v != null && v >= 13 && v <= 100) {
@@ -1289,6 +1301,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _age = v;
                           _ageController.text = v.toString();
                         });
+                        _triggerRecalcFromProfileFields();
                       }
                     },
                   ),
@@ -1328,6 +1341,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       isDense: true,
                       contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                     ),
+                    onChanged: (s) {
+                      final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                      if (v != null && v >= 100 && v <= 250) {
+                        setState(() {
+                          _heightCm = v.round().toDouble();
+                        });
+                        _triggerRecalcFromProfileFields();
+                      }
+                    },
                     onSubmitted: (s) {
                       final v = double.tryParse(s.trim().replaceAll(',', '.'));
                       if (v != null && v >= 100 && v <= 250) {
@@ -1335,6 +1357,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _heightCm = v.round().toDouble();
                           _heightController.text = v.round().toString();
                         });
+                        _triggerRecalcFromProfileFields();
                       }
                     },
                   ),
@@ -1376,6 +1399,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       isDense: true,
                       contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                     ),
+                    onChanged: (s) {
+                      final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                      if (v != null && v >= 30 && v <= 300) {
+                        setState(() {
+                          _currentWeightKg = v;
+                          _targetWeightKg ??= v;
+                        });
+                        _updateGoalFromWeights();
+                      }
+                    },
                     onSubmitted: (s) {
                       final v = double.tryParse(s.trim().replaceAll(',', '.'));
                       if (v != null && v >= 30 && v <= 300) {
@@ -1383,8 +1416,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _currentWeightKg = v;
                           _targetWeightKg ??= v;
                           _currentWeightController.text = v.toStringAsFixed(1);
-                          _updateGoalFromWeights();
                         });
+                        _updateGoalFromWeights();
                       }
                     },
                   ),
@@ -1425,14 +1458,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       isDense: true,
                       contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                     ),
+                    onChanged: (s) {
+                      final v = double.tryParse(s.trim().replaceAll(',', '.'));
+                      if (v != null && v >= 30 && v <= 300) {
+                        setState(() {
+                          _targetWeightKg = v;
+                        });
+                        _updateGoalFromWeights();
+                      }
+                    },
                     onSubmitted: (s) {
                       final v = double.tryParse(s.trim().replaceAll(',', '.'));
                       if (v != null && v >= 30 && v <= 300) {
                         setState(() {
                           _targetWeightKg = v;
                           _targetWeightController.text = v.toStringAsFixed(1);
-                          _updateGoalFromWeights();
                         });
+                        _updateGoalFromWeights();
                       }
                     },
                   ),
@@ -1482,7 +1524,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Text('Cel wody (ml)', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
             TextFormField(
-              initialValue: (_waterGoalMl ?? profile.waterGoalMl ?? AppConstants.defaultWaterGoal).toStringAsFixed(0),
+              controller: _waterGoalController,
               decoration: const InputDecoration(
                 hintText: '2000',
                 suffixText: 'ml',
@@ -1587,6 +1629,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  /// Po zmianie wieku lub wzrostu (ręczne pole) przelicz BMR/TDEE i makra.
+  void _triggerRecalcFromProfileFields() {
+    if (_gender == null || _age == null || _heightCm == null || _activityLevel == null) return;
+    if (_currentWeightKg == null || _targetWeightKg == null || _goal == null) return;
+    if (_goal == AppConstants.goalMaintain) {
+      _recalculateFromWeightsForMaintain();
+    } else {
+      if (_manualWeeklyWeightChange == null || _manualWeeklyWeightChange! <= 0) {
+        _manualWeeklyWeightChange = _goal == AppConstants.goalWeightLoss
+            ? AppConstants.defaultWeightLossRate
+            : AppConstants.defaultWeightGainRate;
+        _weeklyRateController.text = _manualWeeklyWeightChange!.toStringAsFixed(1);
+      }
+      _recalculateFromRate();
+    }
+  }
+
   Widget _buildActivityLevelOption(String title, String description, String value) {
     final isSelected = _activityLevel == value;
     return Card(
@@ -1634,6 +1693,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           currentWeightKg: _currentWeightKg!,
           targetWeightKg: _targetWeightKg!,
         );
+        // Przy zmianie aktualnej wagi zaktualizuj sugerowany cel wody (jeśli użytkownik go nie edytował)
+        if (_waterGoalMl == null || _waterGoalMl == _initialWaterGoalMl) {
+          final suggested = Calculations.calculateDailyWaterGoalMl(_currentWeightKg!);
+          _waterGoalMl = suggested;
+          _waterGoalController.text = suggested.toStringAsFixed(0);
+        }
       });
       // Automatyczne przeliczenie kalorii i makroskładników przy zmianie wagi
       if (_gender != null && _age != null && _heightCm != null && _activityLevel != null) {

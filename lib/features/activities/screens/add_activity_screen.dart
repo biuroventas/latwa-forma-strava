@@ -29,7 +29,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _caloriesController;
   late final TextEditingController _durationController;
-  String? _intensity;
+  String? _activityType;
   bool _isLoading = false;
   bool _addToFavorites = false;
 
@@ -40,7 +40,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
     _nameController = TextEditingController(text: activity?.name ?? '');
     _caloriesController = TextEditingController(text: activity?.caloriesBurned.toStringAsFixed(0) ?? '');
     _durationController = TextEditingController(text: activity?.durationMinutes?.toString() ?? '');
-    _intensity = activity?.intensity;
+    _activityType = activity?.activityType;
   }
 
   @override
@@ -104,7 +104,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
         name: 'Spalone $kcal kcal',
         caloriesBurned: kcal.toDouble(),
         durationMinutes: null,
-        intensity: null,
+        activityType: null,
         createdAt: createdAt,
       );
 
@@ -147,7 +147,8 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
           durationMinutes: _durationController.text.isNotEmpty
               ? int.parse(_durationController.text)
               : null,
-          intensity: _intensity,
+          activityType: _activityType,
+          createdAt: widget.activity!.createdAt,
           excludedFromBalance: widget.activity!.excludedFromBalance,
         );
         await service.updateActivity(updatedActivity);
@@ -157,7 +158,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
             caloriesBurned: double.parse(_caloriesController.text),
             durationMinutes: _durationController.text.isNotEmpty ? int.tryParse(_durationController.text) : null,
-            intensity: _intensity,
+            activityType: _activityType,
           );
           await service.createFavoriteActivity(fav);
         }
@@ -178,7 +179,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
           durationMinutes: _durationController.text.isNotEmpty
               ? int.parse(_durationController.text)
               : null,
-          intensity: _intensity,
+          activityType: _activityType,
           createdAt: createdAt,
         );
         await service.createActivity(activity);
@@ -190,7 +191,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
             caloriesBurned: double.parse(_caloriesController.text),
             durationMinutes: _durationController.text.isNotEmpty ? int.tryParse(_durationController.text) : null,
-            intensity: _intensity,
+            activityType: _activityType,
           );
           await service.createFavoriteActivity(fav);
         }
@@ -313,18 +314,25 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              initialValue: _intensity,
+              value: _activityType,
               decoration: const InputDecoration(
-                labelText: 'Intensywność - opcjonalnie',
+                labelText: 'Typ aktywności - opcjonalnie',
               ),
-              items: const [
-                DropdownMenuItem(value: 'low', child: Text('Niska')),
-                DropdownMenuItem(value: 'moderate', child: Text('Umiarkowana')),
-                DropdownMenuItem(value: 'high', child: Text('Wysoka')),
-                DropdownMenuItem(value: 'very_high', child: Text('Bardzo wysoka')),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('—')),
+                const DropdownMenuItem(value: 'RUNNING', child: Text('Bieg')),
+                const DropdownMenuItem(value: 'CYCLING', child: Text('Kolarstwo')),
+                const DropdownMenuItem(value: 'WALKING', child: Text('Chodzenie')),
+                const DropdownMenuItem(value: 'SWIMMING', child: Text('Pływanie')),
+                const DropdownMenuItem(value: 'HIKING', child: Text('Wędrówka')),
+                const DropdownMenuItem(value: 'OTHER', child: Text('Inna')),
+                if (_activityType != null &&
+                    _activityType!.isNotEmpty &&
+                    !const ['RUNNING', 'CYCLING', 'WALKING', 'SWIMMING', 'HIKING', 'OTHER'].contains(_activityType))
+                  DropdownMenuItem(value: _activityType, child: Text(_activityType!)),
               ],
               onChanged: (value) {
-                setState(() => _intensity = value);
+                setState(() => _activityType = value);
               },
             ),
             const SizedBox(height: 16),

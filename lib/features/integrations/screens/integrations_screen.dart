@@ -43,6 +43,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
   bool _isConnecting = false;
   bool _isSyncing = false;
   bool _isConnectingGarmin = false;
+  bool _isEnsuringGarminUserId = false;
   static const _garminVerifierKey = 'garmin_pkce_verifier';
 
   @override
@@ -417,6 +418,66 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     }
   }
 
+  /// Pobiera Garmin User ID z API i zapisuje w bazie – bez tego push z aktywnościami nie trafi do Twojego konta.
+  Future<void> _ensureGarminUserId() async {
+    final userId = SupabaseConfig.auth.currentUser?.id;
+    if (userId == null) return;
+    final session = SupabaseConfig.auth.currentSession;
+    final jwt = session?.accessToken;
+    if (jwt == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Zaloguj się ponownie, aby uzupełnić dane Garmin.')),
+        );
+      }
+      return;
+    }
+    setState(() => _isEnsuringGarminUserId = true);
+    try {
+      final idRes = await http.get(
+        Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),
+        headers: {'Authorization': 'Bearer $jwt'},
+      );
+      if (idRes.statusCode != 200) {
+        final err = jsonDecode(idRes.body) as Map<String, dynamic>?;
+        final msg = err?['error'] ?? err?['detail'] ?? 'Błąd ${idRes.statusCode}';
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Nie udało się: $msg')),
+          );
+        }
+        return;
+      }
+      final idData = jsonDecode(idRes.body) as Map<String, dynamic>?;
+      final garminUserId = idData?['userId'] as String?;
+      if (garminUserId == null || garminUserId.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Garmin nie zwrócił User ID. Spróbuj odłączyć i połączyć ponownie.')),
+          );
+        }
+        return;
+      }
+      await _supabaseService.updateGarminUserId(userId, garminUserId);
+      ref.invalidate(garminIntegrationProvider);
+      if (mounted) {
+        SuccessMessage.show(
+          context,
+          'Dane do odbierania aktywności zapisane. Nowe treningi z Garmin Connect będą się pojawiać w aplikacji.',
+          duration: const Duration(seconds: 4),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Błąd: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isEnsuringGarminUserId = false);
+    }
+  }
+
   Future<void> _disconnectGarmin() async {
     final userId = SupabaseConfig.auth.currentUser?.id;
     if (userId == null) return;
@@ -738,7 +799,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Activity data provided by Garmin devices.',
+                              'Dane aktywności pochodzą z urządzeń Garmin.',
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontStyle: FontStyle.italic,
                               ),
@@ -782,6 +843,44 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               child: Text(
                                 'Wszystkie nowe aktywności z Garmin Connect są importowane do aplikacji. To Ty decydujesz, którą wliczyć do bilansu.',
                                 style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: (data['garmin_user_id'] == null ||
+                                        (data['garmin_user_id'] is String && (data['garmin_user_id'] as String).trim().isEmpty))
+                                    ? Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.5)
+                                    : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (data['garmin_user_id'] == null ||
+                                      (data['garmin_user_id'] is String && (data['garmin_user_id'] as String).trim().isEmpty))
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Text(
+                                        'Żeby aktywności z Garmin pojawiały się w aplikacji, zapisz dane połączenia (ID Garmin).',
+                                        style: Theme.of(context).textTheme.bodySmall,
+                                      ),
+                                    ),
+                                  FilledButton.tonalIcon(
+                                    onPressed: _isEnsuringGarminUserId ? null : _ensureGarminUserId,
+                                    icon: _isEnsuringGarminUserId
+                                        ? const SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          )
+                                        : const Icon(Icons.sync, size: 18),
+                                    label: Text(
+                                      _isEnsuringGarminUserId ? 'Zapisuję...' : 'Uzupełnij dane do odbierania aktywności',
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 12),

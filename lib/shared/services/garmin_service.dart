@@ -148,7 +148,7 @@ class GarminService {
       name: name,
       caloriesBurned: calories,
       durationMinutes: durationMin > 0 ? durationMin : null,
-      intensity: g.activityType,
+      activityType: g.activityType,
       createdAt: startDate,
     );
   }

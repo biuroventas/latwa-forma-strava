@@ -162,7 +162,7 @@ class StravaService {
       name: name,
       caloriesBurned: calories,
       durationMinutes: durationMin > 0 ? durationMin : null,
-      intensity: s.type,
+      activityType: s.type,
       createdAt: startDate,
     );
   }
