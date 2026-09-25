@@ -12,9 +12,14 @@ import '../../../core/router/app_router.dart';
 import '../../../core/utils/calculations.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/models/user_profile.dart';
+import '../../../shared/services/revenuecat_service.dart';
 import '../../../shared/services/supabase_service.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
+import '../../../shared/widgets/health_disclaimer.dart';
+import '../../../shared/widgets/language_switch.dart';
 import '../../../shared/widgets/save_progress_checker.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
+import '../../legal/legal_document_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -101,22 +106,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go(AppRoutes.dashboard);
-            }
-          },
-        ),
-        title: const Text('Profil'),
+        automaticallyImplyLeading: false,
+        leading: context.canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => context.pop(),
+              )
+            : null,
+        title: Text(context.l10n.profTitle),
         actions: [
           if (!_isEditing) ...[
             IconButton(
               icon: const Icon(Icons.notifications),
-              tooltip: 'Powiadomienia',
+              tooltip: context.l10n.profNotifications,
               onPressed: () => context.push(AppRoutes.notifications),
             ),
             IconButton(
@@ -139,26 +141,94 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
         ],
       ),
+      bottomNavigationBar: _buildLegalLinks(context),
       body: profile.when(
         data: (data) {
           if (data == null) {
-            return const Center(child: Text('Brak profilu'));
+            return Center(child: Text(context.l10n.profNoProfile));
           }
           if (_isEditing) {
             return _buildEditForm(context, data);
           }
-          return _buildProfileContent(context, data);
+          final isAnonymous = SupabaseConfig.auth.currentUser?.isAnonymous ?? false;
+          if (!isAnonymous) {
+            return _buildProfileContent(context, data);
+          }
+          return Column(
+            children: [
+              Material(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.l10n.profSaveProgress,
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              context.l10n.profSaveProgressHint,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final userId = SupabaseConfig.auth.currentUser?.id;
+                          if (userId == null || !context.mounted) return;
+                          final count = await SupabaseService().getMealsCount(userId);
+                          if (!context.mounted) return;
+                          await SaveProgressChecker.showSaveProgressModal(
+                            context,
+                            mealsCount: count,
+                            onInvalidate: () {
+                              ref.invalidate(profileProvider);
+                              ref.invalidate(dashboardDataProvider);
+                            },
+                          );
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          disabledForegroundColor: Colors.white70,
+                          overlayColor: Colors.black26,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        ),
+                        icon: const Icon(Icons.save_alt, size: 18, color: Colors.white),
+                        label: Text(context.l10n.profSaveProgress),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(child: _buildProfileContent(context, data)),
+            ],
+          );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Błąd: $error'),
+              Text(context.l10n.profErrorWithDetail(error: '$error')),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(profileProvider),
-                child: const Text('Spróbuj ponownie'),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -232,35 +302,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
     final provider = user.appMetadata['provider'] as String?;
     if (provider != null) {
-      if (provider == 'google') return 'Konto Google';
-      if (provider == 'email') return 'Konto e-mail';
+      if (provider == 'google') return context.l10n.profAccountGoogle;
+      if (provider == 'email') return context.l10n.profAccountEmail;
     }
-    return 'Konto zalogowane';
+    return context.l10n.profAccountSignedIn;
   }
 
   void _handleSignOut(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Wyloguj się'),
-        content: const Text(
-          'Czy na pewno chcesz się wylogować? Możesz ponownie zalogować się później.',
-        ),
+        title: Text(context.l10n.profSignOutTitle),
+        content: Text(context.l10n.profSignOutBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Wyloguj'),
+            child: Text(context.l10n.profSignOutConfirm),
           ),
         ],
       ),
     );
     if (confirmed != true || !context.mounted) return;
     try {
+      await RevenueCatService.instance.logOut();
       await SupabaseConfig.auth.signOut();
       await markSignOut();
     } catch (e) {
@@ -273,24 +342,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   void _handleDeleteAccount(BuildContext context) async {
+    final isAnonymous = SupabaseConfig.auth.currentUser?.isAnonymous ?? false;
+    final l10n = context.l10n;
+    final title = isAnonymous ? l10n.profDeleteData : l10n.profDeleteAccountTitle;
+    final body = isAnonymous ? l10n.profDeleteDataBody : l10n.profDeleteAccountBody;
+    final confirmLabel = isAnonymous ? l10n.profDeleteData : l10n.profDeleteAccountTitle;
+    final successMsg = isAnonymous ? l10n.profDataDeleted : l10n.profAccountDeleted;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Usuń konto'),
-        content: const Text(
-          'Twoje dane zostaną całkowicie usunięte i nie będzie można ich przywrócić. '
-          'Gdy wrócisz do aplikacji, trzeba będzie uzupełnić profil od nowa.\n\n'
-          'Czy na pewno chcesz usunąć konto?',
-        ),
+        title: Text(title),
+        content: Text(body),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Anuluj'),
+            child: Text(l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Usuń konto'),
+            child: Text(confirmLabel),
           ),
         ],
       ),
@@ -308,29 +380,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (!context.mounted) return;
       if (response.status != 200 || (response.data is Map && (response.data as Map)['error'] != null)) {
         final err = response.data is Map ? (response.data as Map)['error'] : response.status;
-        final msg = _getDeleteAccountErrorMessage(err, response.status);
+        final msg = _getDeleteAccountErrorMessage(err, response.status, l10n);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(msg), backgroundColor: Colors.red),
         );
         return;
       }
-      // Konto usunięte – wyloguj i przekieruj na ekran startowy
+      await RevenueCatService.instance.logOut();
       await SupabaseConfig.auth.signOut();
       await markSignOut();
       if (!context.mounted) return;
       context.go(AppRoutes.welcome);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Konto zostało usunięte'),
+          SnackBar(
+            content: Text(successMsg),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
-      debugPrint('Delete account error: $e');
+      debugPrint('Delete account/data error: $e');
       if (context.mounted) {
-        final msg = _getDeleteAccountErrorMessage(e.toString(), null);
+        final msg = _getDeleteAccountErrorMessage(e.toString(), null, l10n);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(msg), backgroundColor: Colors.red),
         );
@@ -338,18 +410,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  String _getDeleteAccountErrorMessage(Object? err, int? status) {
+  String _getDeleteAccountErrorMessage(Object? err, int? status, AppLocalizations l10n) {
     final s = err?.toString() ?? status?.toString() ?? '';
     if (s.contains('404') || s.contains('NOT_FOUND')) {
-      return 'Usługa usuwania konta jest niedostępna. Skontaktuj się z nami: ${AppConstants.contactEmail}';
+      return l10n.profDeleteUnavailable(email: AppConstants.contactEmail);
     }
     if (s.contains('401') || s.contains('Nieprawidłowa sesja')) {
-      return 'Sesja wygasła. Zaloguj się ponownie i spróbuj jeszcze raz.';
+      return l10n.profSessionExpiredRetry;
     }
     if (s.contains('403') || s.contains('forbidden')) {
-      return 'Brak uprawnień do wykonania tej operacji.';
+      return l10n.profNoPermission;
     }
-    return 'Nie udało się usunąć konta. Spróbuj ponownie później.';
+    return l10n.profDeleteFailed;
   }
 
   Future<void> _showInviteDialog(BuildContext context) async {
@@ -360,13 +432,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         bool loading = false;
         return StatefulBuilder(
           builder: (ctx, setState) => AlertDialog(
-            title: const Text('Zaproś znajomego'),
+            title: Text(context.l10n.profInviteTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Podaj adres e-mail osoby, której chcesz wysłać zaproszenie do Łatwa Forma.',
+                  context.l10n.profInviteBody,
                   style: Theme.of(ctx).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -374,9 +446,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   controller: controller,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
-                  decoration: const InputDecoration(
-                    labelText: 'Adres e-mail',
-                    hintText: 'np. znajomy@example.com',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.profEmailLabel,
+                    hintText: context.l10n.profEmailHintFriend,
                   ),
                   enabled: !loading,
                 ),
@@ -385,7 +457,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             actions: [
               TextButton(
                 onPressed: loading ? null : () => Navigator.of(ctx).pop(),
-                child: const Text('Anuluj'),
+                child: Text(context.l10n.commonCancel),
               ),
               FilledButton(
                 onPressed: loading
@@ -404,8 +476,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Navigator.of(ctx).pop({
                               'success': false,
                               'error': kIsWeb
-                                  ? 'Sesja wygasła. Odśwież stronę (F5) i zaloguj się ponownie, potem wyślij zaproszenie.'
-                                  : 'Zaloguj się ponownie i spróbuj jeszcze raz.',
+                                  ? context.l10n.profSessionExpiredWebInvite
+                                  : context.l10n.profLoginAgainRetry,
                             });
                             return;
                           }
@@ -419,13 +491,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           final data = response.data is Map ? response.data as Map<String, dynamic>? : null;
                           final err = data?['error'] ?? response.status;
                           if (response.status == 200 && data?['success'] == true) {
-                            Navigator.of(ctx).pop({'success': true, 'message': data?['message'] ?? 'Zaproszenie wysłane'});
+                            Navigator.of(ctx).pop({'success': true, 'message': data?['message'] ?? context.l10n.profInviteSent});
                           } else if (response.status == 401) {
                             Navigator.of(ctx).pop({
                               'success': false,
                               'error': kIsWeb
-                                  ? 'Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.'
-                                  : 'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem wyślij zaproszenie.',
+                                  ? context.l10n.profSessionExpiredWebRetry
+                                  : context.l10n.profSessionExpiredInviteMobile,
                             });
                           } else {
                             Navigator.of(ctx).pop({'success': false, 'error': err.toString()});
@@ -445,32 +517,32 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                 if (lower.contains('wysłano już zaproszenie') ||
                                     lower.contains('already invited') ||
                                     lower.contains('invitation has already been sent')) {
-                                  userMessage = 'Na ten adres wysłano już zaproszenie. Sprawdź skrzynkę (w tym spam) lub podaj inny adres.';
+                                  userMessage = context.l10n.profInviteAlreadySent;
                                 } else if (lower.contains('już ma') ||
                                     lower.contains('already been registered') ||
                                     lower.contains('already exists') ||
                                     lower.contains('zarejestrowan')) {
-                                  userMessage = 'Ten adres e-mail jest już zarejestrowany w Łatwa Forma. Zaproś kogoś innego.';
+                                  userMessage = context.l10n.profEmailAlreadyRegistered;
                                 } else if (lower.contains('zbyt wiele') ||
                                     lower.contains('rate limit')) {
-                                  userMessage = 'Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie.';
+                                  userMessage = context.l10n.profInviteRateLimit;
                                 } else if (lower.contains('prawidłowy') ||
                                     (lower.contains('e-mail') && !lower.contains('invit') && !lower.contains('wysłano'))) {
-                                  userMessage = 'Podaj prawidłowy adres e-mail.';
+                                  userMessage = context.l10n.profEnterValidEmail;
                                 } else {
                                   userMessage = serverError;
                                 }
                               } else {
-                                userMessage = 'Nie udało się wysłać zaproszenia. Spróbuj ponownie.';
+                                userMessage = context.l10n.profInviteSendFailed;
                               }
                             } else {
                               final msg = e.toString();
                               final is401 = msg.contains('401') || msg.contains('Invalid JWT');
                               userMessage = is401 && kIsWeb
-                                  ? 'Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie.'
+                                  ? context.l10n.profSessionExpiredWebShort
                                   : is401
-                                      ? 'Sesja wygasła. Wyloguj się i zaloguj ponownie.'
-                                      : 'Nie udało się wysłać zaproszenia. Spróbuj ponownie.';
+                                      ? context.l10n.profSessionExpiredSignOutIn
+                                      : context.l10n.profInviteSendFailed;
                             }
                             Navigator.of(ctx).pop({'success': false, 'error': userMessage});
                           }
@@ -482,7 +554,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Wyślij zaproszenie'),
+                    : Text(context.l10n.profSendInvite),
               ),
             ],
           ),
@@ -494,7 +566,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (result['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']?.toString() ?? 'Zaproszenie wysłane!'),
+          content: Text(result['message']?.toString() ?? context.l10n.profInviteSentExclaim),
           backgroundColor: Colors.green,
         ),
       );
@@ -517,62 +589,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isAnonymous)
-            Card(
-              child: InkWell(
-                onTap: () async {
-                  final userId = SupabaseConfig.auth.currentUser?.id;
-                  if (userId == null || !context.mounted) return;
-                  final count = await SupabaseService().getMealsCount(userId);
-                  if (!context.mounted) return;
-                  await SaveProgressChecker.showSaveProgressModal(
-                    context,
-                    mealsCount: count,
-                    onInvalidate: () {
-                      ref.invalidate(profileProvider);
-                      ref.invalidate(dashboardDataProvider);
-                    },
-                  );
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.save_alt,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 32,
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Zapisz postępy',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Zaloguj się przez email lub Google, aby nie stracić danych',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ],
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.language,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 32,
                   ),
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      context.l10n.language,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ),
+                  const LanguageSwitch(),
+                ],
               ),
             ),
-          if (isAnonymous) const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 16),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -580,17 +621,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Dane podstawowe',
+                    context.l10n.profBasicData,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
-                  _buildProfileRow(context, 'Płeć', _getGenderText(profile.gender)),
-                  _buildProfileRow(context, 'Wiek', '${profile.age} lat'),
-                  _buildProfileRow(context, 'Wzrost', '${profile.heightCm.toStringAsFixed(0)} cm'),
-                  _buildProfileRow(context, 'Aktualna waga', '${profile.currentWeightKg.toStringAsFixed(1)} kg'),
-                  _buildProfileRow(context, 'Waga docelowa', '${profile.targetWeightKg.toStringAsFixed(1)} kg'),
-                  _buildProfileRow(context, 'Poziom aktywności', _getActivityLevelText(profile.activityLevel)),
-                  _buildProfileRow(context, 'Cel', _getGoalText(profile.goal)),
+                  _buildProfileRow(context, context.l10n.profGender, _getGenderText(profile.gender)),
+                  _buildProfileRow(context, context.l10n.profAge, context.l10n.profAgeYears(age: profile.age)),
+                  _buildProfileRow(context, context.l10n.profHeight, '${profile.heightCm.toStringAsFixed(0)} cm'),
+                  _buildProfileRow(context, context.l10n.profCurrentWeight, '${profile.currentWeightKg.toStringAsFixed(1)} kg'),
+                  _buildProfileRow(context, context.l10n.profTargetWeight, '${profile.targetWeightKg.toStringAsFixed(1)} kg'),
+                  _buildProfileRow(context, context.l10n.profActivityLevel, _getActivityLevelText(profile.activityLevel)),
+                  _buildProfileRow(context, context.l10n.profGoal, _getGoalText(profile.goal)),
                 ],
               ),
             ),
@@ -604,24 +645,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Obliczenia',
+                      context.l10n.profCalculations,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
                     if (profile.bmr != null)
                       _buildProfileRow(context, 'BMR', '${profile.bmr!.toStringAsFixed(0)} kcal',
-                        explanation: 'Zapotrzebowanie kaloryczne w spoczynku – ile kalorii spalasz bez aktywności.'),
+                        explanation: context.l10n.profBmrExplain),
                     if (profile.tdee != null)
                       _buildProfileRow(context, 'TDEE', '${profile.tdee!.toStringAsFixed(0)} kcal',
-                        explanation: 'Całkowite dzienne zapotrzebowanie – ile kalorii spalasz w ciągu dnia z uwzględnieniem aktywności.'),
+                        explanation: context.l10n.profTdeeExplain),
                     if (profile.targetCalories != null)
-                      _buildProfileRow(context, 'Cel kaloryczny', '${profile.targetCalories!.toStringAsFixed(0)} kcal',
-                        explanation: 'Zalecane dzienne spożycie kalorii do osiągnięcia celu wagowego.'),
+                      _buildProfileRow(context, context.l10n.profCalorieGoal, '${profile.targetCalories!.toStringAsFixed(0)} kcal',
+                        explanation: context.l10n.profCalorieGoalExplain),
                     _buildProfileRow(
                       context,
-                      'Cel picia wody',
+                      context.l10n.profWaterGoal,
                       '${(profile.waterGoalMl ?? Calculations.calculateDailyWaterGoalMl(profile.currentWeightKg)).toStringAsFixed(0)} ml',
-                      explanation: Calculations.waterGoalExplanation(profile.currentWeightKg),
+                      explanation: _waterGoalExplanationL10n(context, profile.currentWeightKg),
                     ),
                   ],
                 ),
@@ -638,21 +679,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Makroskładniki',
+                      context.l10n.profMacros,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
                     if (profile.targetProteinG != null)
-                      _buildProfileRow(context, 'Białko', '${profile.targetProteinG!.toStringAsFixed(0)} g'),
+                      _buildProfileRow(context, context.l10n.profProtein, '${profile.targetProteinG!.toStringAsFixed(0)} g'),
                     if (profile.targetFatG != null)
-                      _buildProfileRow(context, 'Tłuszcze', '${profile.targetFatG!.toStringAsFixed(0)} g'),
+                      _buildProfileRow(context, context.l10n.profFat, '${profile.targetFatG!.toStringAsFixed(0)} g'),
                     if (profile.targetCarbsG != null)
-                      _buildProfileRow(context, 'Węglowodany', '${profile.targetCarbsG!.toStringAsFixed(0)} g'),
+                      _buildProfileRow(context, context.l10n.profCarbs, '${profile.targetCarbsG!.toStringAsFixed(0)} g'),
                   ],
                 ),
               ),
             ),
-          if (profile.targetDate != null) ...[
+          if (profile.goal == AppConstants.goalMaintain ||
+              (profile.currentWeightKg - profile.targetWeightKg).abs() < 0.5) ...[
             const SizedBox(height: 16),
             Card(
               child: Padding(
@@ -661,7 +703,45 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Termin osiągnięcia celu:',
+                      context.l10n.profMaintainNoDateTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      context.l10n.profMaintainNoDateBody,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FilledButton.icon(
+                        onPressed: () => _startEditing(profile),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          overlayColor: Colors.black26,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                        icon: const Icon(Icons.edit_outlined, size: 18, color: Colors.white),
+                        label: Text(context.l10n.profMaintainNoDateCta),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ] else if (profile.targetDate != null) ...[
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.l10n.profTargetDateTitle,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -673,7 +753,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Działaj zgodnie z planem, a ten dzień się nie opóźni.',
+                      context.l10n.profTargetDateHint,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontStyle: FontStyle.italic,
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -681,7 +761,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Chcesz przyspieszyć cel? Edytuj tempo zmiany wagi w trybie edycji profilu (ikona ołówka u góry).',
+                      context.l10n.profSpeedUpHint,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -711,14 +791,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Porada AI',
+                            context.l10n.profAiAdvice,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Zapytaj o dietę, odżywianie i aktywność',
+                            context.l10n.profAiAdviceHint,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -753,14 +833,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Kalkulator BMI',
+                            context.l10n.profBmiTitle,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Sprawdź swój wskaźnik masy ciała',
+                            context.l10n.profBmiHint,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -784,7 +864,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               final trialRemaining = ref.watch(trialRemainingProvider);
               final showActive = profile.isPremium || isInTrial;
               final remainingText = trialRemaining != null
-                  ? 'Pozostało: ${trialRemaining.inHours}h ${trialRemaining.inMinutes % 60}min'
+                  ? context.l10n.profTrialLeft(
+                      hours: trialRemaining.inHours,
+                      minutes: trialRemaining.inMinutes % 60,
+                    )
                   : null;
               return Card(
                 child: InkWell(
@@ -805,11 +888,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Text(
-                                    hasPremiumAccess ? 'Łatwa Forma Premium' : 'Subskrypcja Premium',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                  Expanded(
+                                    child: Text(
+                                      hasPremiumAccess ? context.l10n.profPremiumTitleActive : context.l10n.profPremiumTitle,
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                   if (showActive) ...[
                                     const SizedBox(width: 8),
@@ -820,7 +906,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
-                                        'Aktywna',
+                                        context.l10n.profActive,
                                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                                               color: Colors.amber.shade900,
                                               fontWeight: FontWeight.bold,
@@ -843,8 +929,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 hasPremiumAccess
-                                    ? 'Nieograniczona AI, eksport PDF, integracje'
-                                    : 'Odblokuj pełny potencjał – AI, PDF, integracje',
+                                    ? context.l10n.profPremiumHintActive
+                                    : context.l10n.profPremiumHint,
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ],
@@ -881,14 +967,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Integracje',
+                            context.l10n.profIntegrations,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Strava, Garmin – importuj aktywności i spalone kalorie',
+                            context.l10n.profIntegrationsHint,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -923,14 +1009,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Eksport danych',
+                            context.l10n.profExport,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Wyeksportuj swoje dane do CSV',
+                            context.l10n.profExportHint,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -966,14 +1052,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Zaproś znajomego',
+                              context.l10n.profInviteTitle,
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Wyślij zaproszenie e-mailem do aplikacji Łatwa Forma',
+                              context.l10n.profInviteHint,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -990,10 +1076,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
           const SizedBox(height: 24),
-          _buildLegalLinks(context),
-          if (!isAnonymous && user != null) ...[
+          const HealthDisclaimer(),
+          if (user != null) ...[
             const SizedBox(height: 16),
-            _buildAccountSection(context, user),
+            if (!isAnonymous)
+              _buildAccountSection(context, user)
+            else
+              _buildAnonymousDataSection(context),
           ],
         ],
       ),
@@ -1001,36 +1090,87 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildLegalLinks(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextButton(
-            onPressed: () => _openUrl(AppConstants.privacyPolicyUrl),
-            child: Text(
-              'Polityka prywatności',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isAnonymous = SupabaseConfig.auth.currentUser?.isAnonymous ?? false;
+    final linkStyle = theme.textTheme.labelMedium?.copyWith(
+      color: theme.colorScheme.primary,
+      height: 1.2,
+    );
+    final sepStyle = theme.textTheme.labelMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.55),
+      height: 1.2,
+    );
+    final deleteStyle = theme.textTheme.labelMedium?.copyWith(
+      color: theme.colorScheme.error.withValues(alpha: 0.85),
+      height: 1.2,
+    );
+
+    ButtonStyle compactLinkStyle() => TextButton.styleFrom(
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          visualDensity: VisualDensity.compact,
+        );
+
+    Widget sep() => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Text('·', style: sepStyle),
+        );
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1B2B1C) : const Color(0xFFE8F5E9),
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.35 : 0.18),
           ),
-          Text(
-            ' • ',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 0,
+                runSpacing: 2,
+                children: [
+                  TextButton(
+                    style: compactLinkStyle(),
+                    onPressed: () => openLegalOrExternal(context, AppConstants.privacyPolicyUrl),
+                    child: Text(context.l10n.profPrivacy, style: linkStyle),
+                  ),
+                  sep(),
+                  TextButton(
+                    style: compactLinkStyle(),
+                    onPressed: () => openLegalOrExternal(context, AppConstants.termsUrl),
+                    child: Text(context.l10n.profTerms, style: linkStyle),
+                  ),
+                  sep(),
+                  TextButton(
+                    style: compactLinkStyle(),
+                    onPressed: () => _openUrl(AppConstants.appleEulaUrl),
+                    child: Text(context.l10n.profEula, style: linkStyle),
+                  ),
+                ],
+              ),
+              // Gość: tylko „Usuń dane” w sekcji urządzenia. Konto: „Usuń konto” w stopce.
+              if (!isAnonymous) ...[
+                const SizedBox(height: 2),
+                TextButton(
+                  style: compactLinkStyle(),
+                  onPressed: () => _handleDeleteAccount(context),
+                  child: Text(context.l10n.profDeleteAccountTitle, style: deleteStyle),
                 ),
+              ],
+            ],
           ),
-          TextButton(
-            onPressed: () => _openUrl(AppConstants.termsUrl),
-            child: Text(
-              'Regulamin',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1087,7 +1227,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Twoje konto',
+                        context.l10n.profYourAccount,
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                               letterSpacing: 0.5,
@@ -1123,21 +1263,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => _handleSignOut(context),
                     icon: const Icon(Icons.logout_rounded, size: 18),
-                    label: const Text('Wyloguj się'),
+                    label: Text(context.l10n.profSignOutTitle),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                TextButton.icon(
+                FilledButton.icon(
                   onPressed: () => _handleDeleteAccount(context),
-                  icon: Icon(Icons.delete_outline_rounded, size: 18, color: Theme.of(context).colorScheme.error),
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.white),
                   label: Text(
-                    'Usuń konto',
-                    style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 13),
+                    context.l10n.profDeleteAccountTitle,
+                    style: const TextStyle(fontSize: 13),
                   ),
-                  style: TextButton.styleFrom(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Colors.white,
+                    overlayColor: Colors.black26,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   ),
                 ),
@@ -1145,6 +1288,52 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAnonymousDataSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.l10n.profDeviceData,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            context.l10n.profDeviceDataHint,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton.icon(
+              onPressed: () => _handleDeleteAccount(context),
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+                foregroundColor: Colors.white,
+                overlayColor: Colors.black26,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.white),
+              label: Text(context.l10n.profDeleteData),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1193,29 +1382,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  String _waterGoalExplanationL10n(BuildContext context, double weightKg) {
+    final goal = Calculations.calculateDailyWaterGoalMl(weightKg);
+    final mlPerKg = AppConstants.waterMlPerKg.toInt();
+    final rawMl = (weightKg * AppConstants.waterMlPerKg).round();
+    final weightStr = weightKg == weightKg.roundToDouble()
+        ? weightKg.toStringAsFixed(0)
+        : weightKg.toStringAsFixed(1);
+    return context.l10n.profWaterGoalExplanation(
+      mlPerKg: mlPerKg,
+      weightKg: weightStr,
+      rawMl: rawMl,
+      goalMl: goal.round(),
+    );
+  }
+
   String _getGenderText(String gender) {
     switch (gender) {
       case 'male':
-        return 'Mężczyzna';
+        return context.l10n.profGenderMale;
       case 'female':
-        return 'Kobieta';
+        return context.l10n.profGenderFemale;
       default:
-        return 'Inna';
+        return context.l10n.profGenderOther;
     }
   }
 
   String _getActivityLevelText(String level) {
     switch (level) {
       case 'sedentary':
-        return 'Siedzący';
+        return context.l10n.profActSedentary;
       case 'light':
-        return 'Lekka';
+        return context.l10n.profActLight;
       case 'moderate':
-        return 'Umiarkowana';
+        return context.l10n.profActModerate;
       case 'intense':
-        return 'Intensywna';
+        return context.l10n.profActIntense;
       case 'very_intense':
-        return 'Bardzo intensywna';
+        return context.l10n.profActVeryIntense;
       default:
         return level;
     }
@@ -1224,11 +1428,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _getGoalText(String goal) {
     switch (goal) {
       case 'weight_loss':
-        return 'Utrata wagi';
+        return context.l10n.profGoalLoss;
       case 'weight_gain':
-        return 'Przybranie wagi';
+        return context.l10n.profGoalGain;
       case 'maintain':
-        return 'Utrzymanie wagi';
+        return context.l10n.profGoalMaintain;
       default:
         return goal;
     }
@@ -1243,18 +1447,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Płeć
-            Text('Płeć *', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profGenderRequired, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
             Row(
               children: [
-                Expanded(child: _buildGenderOption('Mężczyzna', AppConstants.genderMale)),
+                Expanded(child: _buildGenderOption(context.l10n.profGenderMale, AppConstants.genderMale)),
                 const SizedBox(width: 8),
-                Expanded(child: _buildGenderOption('Kobieta', AppConstants.genderFemale)),
+                Expanded(child: _buildGenderOption(context.l10n.profGenderFemale, AppConstants.genderFemale)),
               ],
             ),
             const SizedBox(height: 16),
             // Wiek
-            Text('Wiek *', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profAgeRequired, style: Theme.of(context).textTheme.titleMedium),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1279,11 +1483,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   child: TextField(
                     controller: _ageController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      suffixText: 'lat',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      suffixText: context.l10n.profYearsSuffix,
+                      border: const OutlineInputBorder(),
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                     ),
                     onChanged: (s) {
                       final v = int.tryParse(s.trim());
@@ -1310,7 +1514,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             // Wzrost
-            Text('Wzrost (cm) *', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profHeightRequired, style: Theme.of(context).textTheme.titleMedium),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1366,7 +1570,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             // Aktualna waga
-            Text('Aktualna waga (kg) *', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profCurrentWeightRequired, style: Theme.of(context).textTheme.titleMedium),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1426,7 +1630,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             // Waga docelowa
-            Text('Waga docelowa (kg) *', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profTargetWeightRequired, style: Theme.of(context).textTheme.titleMedium),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1500,7 +1704,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  'Różnica między wagami musi wynosić co najmniej 1 kg',
+                  context.l10n.profWeightDiffError,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -1508,27 +1712,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             const SizedBox(height: 16),
             // Poziom aktywności
-            Text('Poziom aktywności *', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profActivityRequired, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 6),
-            _buildActivityLevelOption('Siedzący', 'Brak aktywności lub minimalna', AppConstants.activitySedentary),
+            _buildActivityLevelOption(context.l10n.profActSedentary, context.l10n.profActSedentaryDesc, AppConstants.activitySedentary),
             const SizedBox(height: 4),
-            _buildActivityLevelOption('Lekka', '1-3 treningi / tydzień', AppConstants.activityLight),
+            _buildActivityLevelOption(context.l10n.profActLight, context.l10n.profActLightDesc, AppConstants.activityLight),
             const SizedBox(height: 4),
-            _buildActivityLevelOption('Umiarkowana', '3-5 treningów / tydzień', AppConstants.activityModerate),
+            _buildActivityLevelOption(context.l10n.profActModerate, context.l10n.profActModerateDesc, AppConstants.activityModerate),
             const SizedBox(height: 4),
-            _buildActivityLevelOption('Intensywna', '6-7 treningów / tydzień', AppConstants.activityIntense),
+            _buildActivityLevelOption(context.l10n.profActIntense, context.l10n.profActIntenseDesc, AppConstants.activityIntense),
             const SizedBox(height: 4),
-            _buildActivityLevelOption('Bardzo intensywna', '2x dziennie / ciężka praca', AppConstants.activityVeryIntense),
+            _buildActivityLevelOption(context.l10n.profActVeryIntense, context.l10n.profActVeryIntenseDesc, AppConstants.activityVeryIntense),
             const SizedBox(height: 16),
             // Cel wody
-            Text('Cel wody (ml)', style: Theme.of(context).textTheme.titleMedium),
+            Text(context.l10n.profWaterGoalMl, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 4),
             TextFormField(
               controller: _waterGoalController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: '2000',
                 suffixText: 'ml',
-                helperText: 'Możesz zmienić ręcznie. Poniżej wyjaśnienie, skąd bierze się propozycja.',
+                helperText: context.l10n.profWaterGoalHelper,
               ),
               keyboardType: TextInputType.number,
               onChanged: (v) {
@@ -1538,7 +1742,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              Calculations.waterGoalExplanation(_currentWeightKg ?? profile.currentWeightKg),
+              _waterGoalExplanationL10n(context, _currentWeightKg ?? profile.currentWeightKg),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1567,9 +1771,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text(
-                        'Zapisz zmiany',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    : Text(
+                        context.l10n.profSaveChanges,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
               ),
             ),
@@ -1830,7 +2034,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              '1g = $kcalPerG kcal',
+              context.l10n.profMacroPerGram(kcal: kcalPerG),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1844,9 +2048,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String _getGoalDescriptionText() {
     if (_currentWeightKg == null || _targetWeightKg == null) return '';
     final diff = _targetWeightKg! - _currentWeightKg!;
-    if (diff < -0.5) return 'Chcę schudnąć.';
-    if (diff > 0.5) return 'Chcę przybrać na wadze.';
-    return 'Chcę utrzymać obecną wagę.';
+    if (diff < -0.5) return context.l10n.profWantLose;
+    if (diff > 0.5) return context.l10n.profWantGain;
+    return context.l10n.onbGoalUnchangedSameWeight;
   }
 
   Widget _buildPlanPremiumGateCard(BuildContext context) {
@@ -1861,7 +2065,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Icon(Icons.lock_outline, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Dostosuj plan',
+                  context.l10n.profAdjustPlan,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -1870,7 +2074,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Własny cel kaloryczny i makroskładniki są dostępne w Premium.',
+              context.l10n.profPlanPremiumOnly,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1881,7 +2085,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => context.push(AppRoutes.premium),
                 icon: const Icon(Icons.workspace_premium, size: 20),
-                label: const Text('Zobacz Premium'),
+                label: Text(context.l10n.profSeePremium),
               ),
             ),
           ],
@@ -1923,7 +2127,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Dostosuj plan',
+              context.l10n.profAdjustPlan,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -1932,7 +2136,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Row(
               children: [
                 Text(
-                  'Tempo zmiany wagi',
+                  context.l10n.profWeightRate,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const Spacer(),
@@ -1944,7 +2148,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '${clampedRate.toStringAsFixed(1)} kg/tydz.',
+                      context.l10n.profRateKgWeek(rate: clampedRate.toStringAsFixed(1)),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.primary,
@@ -1953,7 +2157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   )
                 else
                   Text(
-                    '0 kg/tydz.',
+                    context.l10n.profRateZero,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -1967,7 +2171,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 min: minRate,
                 max: maxRate,
                 divisions: ((maxRate - minRate) / 0.1).round().clamp(1, 100),
-                label: '${clampedRate.toStringAsFixed(1)} kg/tydz.',
+                label: context.l10n.profRateKgWeek(rate: clampedRate.toStringAsFixed(1)),
                 onChanged: (value) {
                   setState(() {
                     _manualWeeklyWeightChange = value;
@@ -1980,7 +2184,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ] else ...[
               const SizedBox(height: 8),
               Text(
-                'Dla utrzymania wagi tempo = 0',
+                context.l10n.profMaintainRateZero,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -2002,7 +2206,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Zalecane tempo: 0,5 kg/tydz. – bezpieczne i zdrowe. Szybsze chudnięcie może być niezdrowe (utrata mięśni, niedobory, zmęczenie).',
+                        context.l10n.profRecommendedRate,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.blue.shade900,
                               height: 1.35,
@@ -2033,23 +2237,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Expanded(child: _buildMacroChip(context, 'Białko', protein, Colors.blue)),
+                        Expanded(child: _buildMacroChip(context, context.l10n.profProtein, protein, Colors.blue)),
                         const SizedBox(width: 8),
-                        Expanded(child: _buildMacroChip(context, 'Tłuszcze', fat, Colors.orange)),
+                        Expanded(child: _buildMacroChip(context, context.l10n.profFat, fat, Colors.orange)),
                         const SizedBox(width: 8),
-                        Expanded(child: _buildMacroChip(context, 'Węgle', carbs, Colors.green)),
+                        Expanded(child: _buildMacroChip(context, context.l10n.profCarbsShort, carbs, Colors.green)),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Szacunkowy termin osiągnięcia celu: $dateStr',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                    ),
+                    if (!isMaintain)
+                      Text(
+                        context.l10n.profEstTargetDate(date: dateStr),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                      )
+                    else
+                      Text(
+                        context.l10n.onbGoalUnchangedSameWeight,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                      ),
                   ] else
                     Text(
-                      'Przesuń suwak, aby zobaczyć plan',
+                      context.l10n.profMoveSlider,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                 ],
@@ -2058,7 +2270,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 16),
             ExpansionTile(
               title: Text(
-                'Własny cel kaloryczny',
+                context.l10n.profCustomCalorieGoal,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               childrenPadding: const EdgeInsets.only(top: 16),
@@ -2071,7 +2283,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       TextField(
                         controller: _customCaloriesController,
                         decoration: InputDecoration(
-                          labelText: 'Cel (kcal)',
+                          labelText: context.l10n.profGoalKcal,
                           border: const OutlineInputBorder(),
                           errorText: _calorieWarning,
                           errorMaxLines: 5,
@@ -2094,7 +2306,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Zostaw puste, aby obliczyć z tempa.',
+                        context.l10n.profLeaveEmptyFromRate,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
@@ -2107,7 +2319,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 8),
             ExpansionTile(
               title: Text(
-                'Własne makroskładniki',
+                context.l10n.profCustomMacros,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               childrenPadding: const EdgeInsets.only(top: 16),
@@ -2123,7 +2335,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Expanded(
                             child: _buildMacroInputCard(
                               context,
-                              label: 'Białko',
+                              label: context.l10n.profProtein,
                               controller: _proteinController,
                               color: Colors.blue,
                               kcalPerG: 4,
@@ -2133,7 +2345,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Expanded(
                             child: _buildMacroInputCard(
                               context,
-                              label: 'Tłuszcze',
+                              label: context.l10n.profFat,
                               controller: _fatController,
                               color: Colors.orange,
                               kcalPerG: 9,
@@ -2143,7 +2355,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           Expanded(
                             child: _buildMacroInputCard(
                               context,
-                              label: 'Węgle',
+                              label: context.l10n.profCarbsShort,
                               controller: _carbsController,
                               color: Colors.green,
                               kcalPerG: 4,
@@ -2153,7 +2365,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Kalorie i termin przeliczą się automatycznie.',
+                        context.l10n.profMacrosAutoRecalc,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
@@ -2161,7 +2373,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       if (_macroPreviewKcal > 0) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Suma: ${_macroPreviewKcal.toStringAsFixed(0)} kcal',
+                          context.l10n.profMacroSum(kcal: _macroPreviewKcal.toStringAsFixed(0)),
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w500,
                                 color: Theme.of(context).colorScheme.primary,
@@ -2308,7 +2520,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final fat = _parseMacro(_fatController.text) ?? 0;
     final carbs = _parseMacro(_carbsController.text) ?? 0;
     if (protein < 0 || fat < 0 || carbs < 0) {
-      setState(() => _macroWarning = 'Wartości nie mogą być ujemne.');
+      setState(() => _macroWarning = context.l10n.profValuesNotNegative);
       return;
     }
     final calories = (protein * 4) + (fat * 9) + (carbs * 4);
@@ -2320,14 +2532,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     String? macroWarning;
     if (protein > AppConstants.maxProteinG || fat > AppConstants.maxFatG || carbs > AppConstants.maxCarbsG) {
       final parts = <String>[];
-      if (protein > AppConstants.maxProteinG) parts.add('białko max ${AppConstants.maxProteinG.toStringAsFixed(0)} g');
-      if (fat > AppConstants.maxFatG) parts.add('tłuszcze max ${AppConstants.maxFatG.toStringAsFixed(0)} g');
-      if (carbs > AppConstants.maxCarbsG) parts.add('węglowodany max ${AppConstants.maxCarbsG.toStringAsFixed(0)} g');
-      macroWarning = '⚠️ Wartości przekraczają zalecane limity dzienne: ${parts.join(', ')}. '
-          'Wprowadź realistyczne wartości dla zdrowej diety.';
+      if (protein > AppConstants.maxProteinG) parts.add(context.l10n.profMacroMaxProtein(g: AppConstants.maxProteinG.toStringAsFixed(0)));
+      if (fat > AppConstants.maxFatG) parts.add(context.l10n.profMacroMaxFat(g: AppConstants.maxFatG.toStringAsFixed(0)));
+      if (carbs > AppConstants.maxCarbsG) parts.add(context.l10n.profMacroMaxCarbs(g: AppConstants.maxCarbsG.toStringAsFixed(0)));
+      macroWarning = context.l10n.profMacroOverLimit(parts: parts.join(', '));
     } else if (calories > AppConstants.maxCaloriesFromMacros) {
-      macroWarning = '⚠️ Łączna liczba kalorii (${calories.toStringAsFixed(0)} kcal) jest nierealistyczna dla dziennego zapotrzebowania. '
-          'Zalecane maksimum to ok. ${AppConstants.maxCaloriesFromMacros.toStringAsFixed(0)} kcal/dzień.';
+      macroWarning = context.l10n.profMacroCaloriesUnreal(
+        calories: calories.toStringAsFixed(0),
+        max: AppConstants.maxCaloriesFromMacros.toStringAsFixed(0),
+      );
     }
     if (macroWarning != null) {
       setState(() {
@@ -2349,9 +2562,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (_goal! == AppConstants.goalWeightLoss) {
       if (calories >= tdee) {
         setState(() {
-          _macroWarning = 'Twój cel to chudnięcie (waga docelowa niższa niż obecna), '
-              'ale wprowadzone makroskładniki dają ${(calories - tdee).toStringAsFixed(0)} kcal powyżej zapotrzebowania (TDEE: ${tdee.toStringAsFixed(0)} kcal). '
-              'Zmniejsz kalorie/makroskładniki, aby osiągnąć deficyt.';
+          _macroWarning = context.l10n.profMacroLossSurplus(
+            surplus: (calories - tdee).toStringAsFixed(0),
+            tdee: tdee.toStringAsFixed(0),
+          );
           _calorieWarning = null;
         });
         return;
@@ -2359,9 +2573,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } else if (_goal! == AppConstants.goalWeightGain) {
       if (calories <= tdee) {
         setState(() {
-          _macroWarning = 'Twój cel to przybieranie na wadze (waga docelowa wyższa niż obecna), '
-              'ale wprowadzone makroskładniki dają deficyt (TDEE: ${tdee.toStringAsFixed(0)} kcal). '
-              'Zwiększ kalorie/makroskładniki, aby osiągnąć nadwyżkę.';
+          _macroWarning = context.l10n.profMacroGainDeficit(tdee: tdee.toStringAsFixed(0));
           _calorieWarning = null;
         });
         return;
@@ -2419,45 +2631,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       // Dla utraty wagi: cel powinien być poniżej TDEE
       if (calorieDifference > 0) {
         // Nadwyżka kaloryczna przy chudnięciu - niemożliwe
-        warning = '⚠️ Cel kaloryczny jest wyższy niż TDEE (${tdee.toStringAsFixed(0)} kcal). '
-            'Aby schudnąć, musisz mieć deficyt kaloryczny. '
-            'Maksymalny bezpieczny deficyt to ~1100 kcal/dzień (ok. 1 kg/tydzień).';
+        warning = context.l10n.profWarnCalAboveTdeeLoss(tdee: tdee.toStringAsFixed(0));
       } else if (calorieDifference < -1500) {
         // Zbyt duży deficyt
-        warning = '⚠️ Deficyt kaloryczny jest bardzo duży (${(-calorieDifference).toStringAsFixed(0)} kcal/dzień). '
-            'Zalecany maksymalny deficyt to 1000-1500 kcal/dzień dla bezpiecznej utraty wagi.';
+        warning = context.l10n.profWarnDeficitHuge(deficit: (-calorieDifference).toStringAsFixed(0));
       } else if (calorieDifference < -100) {
         // OK - deficyt w rozsądnym zakresie
         warning = null;
       } else {
         // Za mały deficyt lub brak deficytu
-        warning = '⚠️ Deficyt kaloryczny jest bardzo mały. '
-            'Dla skutecznej utraty wagi zalecany jest deficyt 500-1000 kcal/dzień.';
+        warning = context.l10n.profWarnDeficitTiny;
       }
     } else if (_goal! == AppConstants.goalWeightGain) {
       // Dla przybrania wagi: cel powinien być powyżej TDEE
       if (calorieDifference < 0) {
         // Deficyt kaloryczny przy przybieraniu - niemożliwe
-        warning = '⚠️ Cel kaloryczny jest niższy niż TDEE (${tdee.toStringAsFixed(0)} kcal). '
-            'Aby przybrać na wadze, musisz mieć nadwyżkę kaloryczną. '
-            'Zalecana nadwyżka to 250-500 kcal/dzień (ok. 0.25-0.5 kg/tydzień).';
+        warning = context.l10n.profWarnCalBelowTdeeGain(tdee: tdee.toStringAsFixed(0));
       } else if (calorieDifference > 1000) {
         // Zbyt duża nadwyżka
-        warning = '⚠️ Nadwyżka kaloryczna jest bardzo duża (${calorieDifference.toStringAsFixed(0)} kcal/dzień). '
-            'Zalecana nadwyżka to 250-500 kcal/dzień dla zdrowego przybierania na wadze.';
+        warning = context.l10n.profWarnSurplusHuge(surplus: calorieDifference.toStringAsFixed(0));
       } else if (calorieDifference > 100) {
         // OK - nadwyżka w rozsądnym zakresie
         warning = null;
       } else {
         // Za mała nadwyżka
-        warning = '⚠️ Nadwyżka kaloryczna jest bardzo mała. '
-            'Dla skutecznego przybierania na wadze zalecana jest nadwyżka 250-500 kcal/dzień.';
+        warning = context.l10n.profWarnSurplusTiny;
       }
     } else {
       // Utrzymanie wagi: cel powinien być blisko TDEE
       if (calorieDifference.abs() > 200) {
-        warning = '⚠️ Cel kaloryczny różni się znacznie od TDEE (${tdee.toStringAsFixed(0)} kcal). '
-            'Dla utrzymania wagi cel powinien być zbliżony do TDEE (±100-200 kcal).';
+        warning = context.l10n.profWarnMaintainFar(tdee: tdee.toStringAsFixed(0));
       } else {
         warning = null;
       }
@@ -2535,6 +2738,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!_canProceed() || _isSaving) return;
     
     final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
     
     // Walidacja przed zapisaniem - sprawdź czy nie ma absurdalnych wartości
     if (_manualTargetCalories != null) {
@@ -2560,8 +2764,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         messenger.showSnackBar(
           SnackBar(
             content: Text(
-              'Nie można zapisać: Cel kaloryczny (${_manualTargetCalories!.toStringAsFixed(0)} kcal) jest wyższy niż TDEE (${tdee.toStringAsFixed(0)} kcal). '
-              'Aby schudnąć, musisz mieć deficyt kaloryczny.',
+              context.l10n.profCannotSaveLoss(
+                calories: _manualTargetCalories!.toStringAsFixed(0),
+                tdee: tdee.toStringAsFixed(0),
+              ),
             ),
             duration: const Duration(seconds: 2),
             backgroundColor: Colors.red,
@@ -2574,8 +2780,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         messenger.showSnackBar(
           SnackBar(
             content: Text(
-              'Nie można zapisać: Cel kaloryczny (${_manualTargetCalories!.toStringAsFixed(0)} kcal) jest niższy niż TDEE (${tdee.toStringAsFixed(0)} kcal). '
-              'Aby przybrać na wadze, musisz mieć nadwyżkę kaloryczną.',
+              context.l10n.profCannotSaveGain(
+                calories: _manualTargetCalories!.toStringAsFixed(0),
+                tdee: tdee.toStringAsFixed(0),
+              ),
             ),
             duration: const Duration(seconds: 2),
             backgroundColor: Colors.red,
@@ -2592,7 +2800,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
       if (userId == null) {
-        throw Exception('Użytkownik nie jest zalogowany');
+        throw Exception(context.l10n.profUserNotLoggedIn);
       }
 
       // Przelicz wartości (zawsze obliczamy BMR i TDEE)
@@ -2649,14 +2857,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         targetFatG = (macros['fat'] as num?)?.toDouble();
         targetCarbsG = (macros['carbs'] as num?)?.toDouble();
         
-        // Przelicz datę używając ręcznego tempa lub domyślnego
-        if (weeklyWeightChange != null && weeklyWeightChange > 0) {
+        // Przelicz datę — przy utrzymaniu wagi brak terminu
+        if (_goal == AppConstants.goalMaintain) {
+          targetDate = null;
+          weeklyWeightChange = null;
+        } else if (weeklyWeightChange != null && weeklyWeightChange > 0) {
           final weightDiff = (_targetWeightKg! - _currentWeightKg!).abs();
-          if (weightDiff > 0) {
+          if (weightDiff >= 0.5) {
             final weeksNeeded = (weightDiff / weeklyWeightChange).ceil();
             targetDate = DateTime.now().add(Duration(days: weeksNeeded * 7));
           } else {
-            targetDate = DateTime.now().add(const Duration(days: 365));
+            targetDate = null;
           }
         } else {
           targetDate = Calculations.calculateTargetDate(
@@ -2664,7 +2875,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             targetWeight: _targetWeightKg!,
             goal: _goal!,
           );
-          // Użyj domyślnego tempa jeśli nie jest ustawione ręcznie
           if (_goal! == AppConstants.goalWeightLoss) {
             weeklyWeightChange = AppConstants.defaultWeightLossRate;
           } else if (_goal! == AppConstants.goalWeightGain) {
@@ -2723,38 +2933,36 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             newTargetDate: targetDate,
             oldWeeklyWeightChange: oldProfile.weeklyWeightChange,
             newWeeklyWeightChange: weeklyWeightChange,
-            reason: 'Edycja profilu',
+            reason: l10n.profGoalHistoryEdit,
           );
         }
       }
 
-      if (mounted) {
-        setState(() {
-          _isEditing = false;
-          _isSaving = false;
-        });
-        
-        ref.invalidate(profileProvider);
-        // Odśwież również dashboard, aby pokazał zaktualizowany cel
-        ref.invalidate(dashboardDataProvider);
-        
-        if (!mounted) return;
-        messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Profil zaktualizowany pomyślnie! Cel został przeliczony.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
+      if (!context.mounted) return;
+      setState(() {
+        _isEditing = false;
+        _isSaving = false;
+      });
+      
+      ref.invalidate(profileProvider);
+      // Odśwież również dashboard, aby pokazał zaktualizowany cel
+      ref.invalidate(dashboardDataProvider);
+      
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.profUpdatedSuccess),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       setState(() {
         _isSaving = false;
       });
       
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Błąd podczas zapisywania: $e'),
+          content: Text(l10n.profSaveError(error: '$e')),
           duration: const Duration(seconds: 2),
         ),
       );

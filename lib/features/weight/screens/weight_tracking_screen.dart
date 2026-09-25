@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/guest/guest_trial.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../shared/models/weight_log.dart';
 import '../../../core/constants/app_constants.dart';
@@ -52,7 +54,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
   Future<void> _saveWeight() async {
     if (_weightController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Podaj wagę')),
+        SnackBar(content: Text(context.l10n.trackEnterWeight)),
       );
       return;
     }
@@ -60,7 +62,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
     final weight = double.tryParse(_weightController.text);
     if (weight == null || weight < 30 || weight > 300) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Podaj poprawną wagę (30-300 kg)')),
+        SnackBar(content: Text(context.l10n.trackEnterValidWeight)),
       );
       return;
     }
@@ -70,7 +72,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
       if (userId == null) {
-        throw Exception('Użytkownik nie jest zalogowany');
+        throw Exception(context.l10n.trackUserNotLoggedIn);
       }
 
       final weightLog = WeightLog(
@@ -94,13 +96,14 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Waga zapisana pomyślnie!')),
+          SnackBar(content: Text(context.l10n.trackWeightSaved)),
         );
       }
     } catch (e) {
+      if (e is GuestTrialEndedException) return;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
+          SnackBar(content: Text(context.l10n.trackErrorWithDetails(error: '$e'))),
         );
       }
     } finally {
@@ -116,7 +119,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Waga'),
+        title: Text(context.l10n.trackWeight),
       ),
       body: weightLogsAsync.when(
         data: (logs) {
@@ -136,7 +139,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                     child: Column(
                       children: [
                         Text(
-                          'Regularne pomiary pomagają trzymać cel. Każdy wpis przybliża Cię do wymarzonej formy!',
+                          context.l10n.trackWeightMotivation,
                           style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -144,9 +147,9 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                         // Formularz dodawania wagi
                         TextField(
                           controller: _weightController,
-                          decoration: const InputDecoration(
-                            labelText: 'Waga (kg)',
-                            hintText: 'np. 75.5',
+                          decoration: InputDecoration(
+                            labelText: context.l10n.trackWeightKg,
+                            hintText: context.l10n.trackWeightHintExample,
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.monitor_weight),
                           ),
@@ -161,9 +164,9 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                               initialDate: _selectedDate ?? DateTime.now(),
                               firstDate: DateTime.now().subtract(const Duration(days: 365 * 2)), // 2 lata wstecz
                               lastDate: DateTime.now(), // Nie można wybrać przyszłości
-                              helpText: 'Wybierz datę pomiaru',
-                              cancelText: 'Anuluj',
-                              confirmText: 'Wybierz',
+                              helpText: context.l10n.trackPickMeasurementDate,
+                              cancelText: context.l10n.commonCancel,
+                              confirmText: context.l10n.trackChoose,
                             );
                             if (picked != null) {
                               // Jeśli wybrano datę, ustaw również godzinę (domyślnie 12:00)
@@ -180,15 +183,15 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                             }
                           },
                           child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Data pomiaru',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.calendar_today),
+                            decoration: InputDecoration(
+                              labelText: context.l10n.trackMeasurementDate,
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.calendar_today),
                             ),
                             child: Text(
                               _selectedDate != null
                                   ? '${_selectedDate!.day}.${_selectedDate!.month}.${_selectedDate!.year}'
-                                  : 'Wybierz datę',
+                                  : context.l10n.trackSelectDate,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ),
@@ -209,7 +212,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
-                                    'Pomiar zostanie zapisany z wybraną datą',
+                                    context.l10n.trackMeasurementSavedWithDate,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                           color: Theme.of(context).colorScheme.primary,
                                         ),
@@ -228,7 +231,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                             ),
                             child: _isSaving
                                 ? const CircularProgressIndicator()
-                                : const Text('Zapisz wagę'),
+                                : Text(context.l10n.trackSaveWeight),
                           ),
                         ),
                       ],
@@ -239,7 +242,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                 // Wykres
                 if (logs.isNotEmpty) ...[
                   Text(
-                    'Historia wagi',
+                    context.l10n.trackWeightHistory,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
@@ -255,7 +258,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                   const SizedBox(height: 24),
                   // Lista ostatnich pomiarów
                   Text(
-                    'Ostatnie pomiary',
+                    context.l10n.trackRecentMeasurements,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
@@ -267,7 +270,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                           subtitle: Text(
                             log.createdAt != null
                                 ? _formatDate(log.createdAt!)
-                                : 'Brak daty',
+                                : context.l10n.trackNoDate,
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
@@ -275,21 +278,21 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                               final confirmed = await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Usuń pomiar'),
+                                  title: Text(context.l10n.trackDeleteMeasurementTitle),
                                   content: Text(
-                                    'Czy na pewno chcesz usunąć pomiar ${log.weightKg.toStringAsFixed(1)} kg?',
+                                    context.l10n.trackDeleteWeightConfirm(weight: log.weightKg.toStringAsFixed(1)),
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => context.pop(false),
-                                      child: const Text('Anuluj'),
+                                      child: Text(context.l10n.commonCancel),
                                     ),
                                     TextButton(
                                       onPressed: () => context.pop(true),
                                       style: TextButton.styleFrom(
                                         foregroundColor: Colors.red,
                                       ),
-                                      child: const Text('Usuń'),
+                                      child: Text(context.l10n.commonDelete),
                                     ),
                                   ],
                                 ),
@@ -303,13 +306,13 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                                     ref.invalidate(weightLogsProvider);
                                     ref.invalidate(dashboardDataProvider(DateTime.now()));
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Pomiar usunięty')),
+                                      SnackBar(content: Text(context.l10n.trackMeasurementDeleted)),
                                     );
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Błąd: $e')),
+                                      SnackBar(content: Text(context.l10n.trackErrorWithDetails(error: '$e'))),
                                     );
                                   }
                                 }
@@ -331,14 +334,14 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Brak pomiarów wagi',
+                            context.l10n.trackNoWeightMeasurements,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Colors.grey.shade600,
                                 ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Dodaj pierwszy pomiar, aby zobaczyć historię',
+                            context.l10n.trackAddFirstMeasurementHint,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Colors.grey.shade600,
                                 ),
@@ -360,11 +363,11 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Błąd: $error'),
+              Text(context.l10n.trackErrorWithDetails(error: '$error')),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(weightLogsProvider),
-                child: const Text('Spróbuj ponownie'),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -375,7 +378,7 @@ class _WeightTrackingScreenState extends ConsumerState<WeightTrackingScreen> {
 
   Widget _buildWeightChart(List<WeightLog> logs) {
     if (logs.isEmpty) {
-      return const Center(child: Text('Brak danych do wyświetlenia'));
+      return Center(child: Text(context.l10n.trackNoDataToDisplay));
     }
 
     // Sortuj po dacie (od najstarszych)

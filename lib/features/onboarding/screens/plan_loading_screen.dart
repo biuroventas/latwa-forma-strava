@@ -2,6 +2,8 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 
 class PlanLoadingScreen extends StatefulWidget {
@@ -9,10 +11,12 @@ class PlanLoadingScreen extends StatefulWidget {
     super.key,
     this.targetCalories,
     this.targetDate,
+    this.goal,
   });
 
   final double? targetCalories;
   final DateTime? targetDate;
+  final String? goal;
 
   @override
   State<PlanLoadingScreen> createState() => _PlanLoadingScreenState();
@@ -32,30 +36,32 @@ class _MilestoneStep {
 
 class _PlanLoadingScreenState extends State<PlanLoadingScreen>
     with TickerProviderStateMixin {
-  static const List<_MilestoneStep> _steps = [
-    _MilestoneStep(
-      icon: Icons.person_outline,
-      label: 'Dane',
-      statusText: 'Analizujemy Twoje dane…',
-    ),
-    _MilestoneStep(
-      icon: Icons.calculate_outlined,
-      label: 'Kalkulacja',
-      statusText: 'Obliczanie kalorii…',
-    ),
-    _MilestoneStep(
-      icon: Icons.pie_chart_outline,
-      label: 'Makro',
-      statusText: 'Makroskładniki…',
-    ),
-    _MilestoneStep(
-      icon: Icons.check_circle_outline,
-      label: 'Gotowe',
-      statusText: 'Prawie gotowe…',
-    ),
-  ];
+  List<_MilestoneStep> _steps(AppLocalizations l10n) => [
+        _MilestoneStep(
+          icon: Icons.person_outline,
+          label: l10n.onbPlanStepData,
+          statusText: l10n.onbPlanStatusAnalyzing,
+        ),
+        _MilestoneStep(
+          icon: Icons.calculate_outlined,
+          label: l10n.onbPlanStepCalc,
+          statusText: l10n.onbPlanStatusCalories,
+        ),
+        _MilestoneStep(
+          icon: Icons.pie_chart_outline,
+          label: l10n.onbPlanStepMacro,
+          statusText: l10n.onbPlanStatusMacro,
+        ),
+        _MilestoneStep(
+          icon: Icons.check_circle_outline,
+          label: l10n.onbPlanStepDone,
+          statusText: l10n.onbPlanStatusAlmost,
+        ),
+      ];
 
-  String _currentText = 'Dziękujemy!';
+  String _currentText = '';
+  bool _thanksPhase = true;
+  bool _gotItPhase = false;
   int _completedStepIndex = -1; // -1 = przed krokiem 0, 0-3 = ukończone kroki
   int _activeStepIndex = 0; // aktualnie wyświetlany (0-3)
 
@@ -78,7 +84,11 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
       duration: const Duration(seconds: 2),
     );
 
-    _startAnimation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() => _currentText = context.l10n.onbPlanThanks);
+      _startAnimation();
+    });
   }
 
   @override
@@ -89,10 +99,17 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
   }
 
   Future<void> _startAnimation() async {
+    final l10n = context.l10n;
+    final steps = _steps(l10n);
+
     // 1. "Dziękujemy!"
     await Future.delayed(const Duration(milliseconds: 500));
     if (mounted) {
-      setState(() => _currentText = 'Dziękujemy!');
+      setState(() {
+        _currentText = l10n.onbPlanThanks;
+        _thanksPhase = true;
+        _gotItPhase = false;
+      });
       _bounceController.forward(from: 0);
     }
 
@@ -100,7 +117,8 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     setState(() {
-      _currentText = _steps[0].statusText;
+      _thanksPhase = false;
+      _currentText = steps[0].statusText;
       _activeStepIndex = 0;
       _completedStepIndex = -1;
     });
@@ -111,7 +129,7 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
       setState(() {
         _completedStepIndex = 0;
         _activeStepIndex = 1;
-        _currentText = _steps[1].statusText;
+        _currentText = steps[1].statusText;
       });
     }
 
@@ -121,7 +139,7 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
       setState(() {
         _completedStepIndex = 1;
         _activeStepIndex = 2;
-        _currentText = _steps[2].statusText;
+        _currentText = steps[2].statusText;
       });
     }
 
@@ -131,7 +149,7 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
       setState(() {
         _completedStepIndex = 2;
         _activeStepIndex = 3;
-        _currentText = _steps[3].statusText;
+        _currentText = steps[3].statusText;
       });
     }
 
@@ -147,7 +165,10 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
     // 3. "Mamy to!" + confetti
     await Future.delayed(const Duration(milliseconds: 400));
     if (mounted) {
-      setState(() => _currentText = 'Mamy to!');
+      setState(() {
+        _currentText = l10n.onbPlanGotIt;
+        _gotItPhase = true;
+      });
       _confettiController.play();
       _bounceController.reset();
       _bounceController.forward(from: 0);
@@ -164,82 +185,102 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
     final calories = widget.targetCalories;
     final date = widget.targetDate;
     final dateStr = date != null
-        ? DateFormat('d MMMM yyyy', 'pl_PL').format(date)
+        ? DateFormat.yMMMMd(Localizations.localeOf(context).toString()).format(date)
         : null;
 
     await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: Theme.of(ctx).colorScheme.primary),
-            const SizedBox(width: 8),
-            const Expanded(child: Text('Twój plan jest gotowy!')),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) {
+        final dialogL10n = ctx.l10n;
+        return AlertDialog(
+          title: Row(
             children: [
-              Text(
-                'Co zostało zrobione:',
-                style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '• Na podstawie wzrostu, wagi, wieku i poziomu aktywności obliczyliśmy Twoje dzienne zapotrzebowanie kaloryczne${calories != null ? ': ${calories.toStringAsFixed(0)} kcal.' : '.'}',
-                style: Theme.of(ctx).textTheme.bodyMedium,
-              ),
-              if (dateStr != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  '• Szacowany termin osiągnięcia celu: $dateStr',
-                  style: Theme.of(ctx).textTheme.bodyMedium,
-                ),
-              ],
-              const SizedBox(height: 16),
-              Text(
-                'Możesz w każdej chwili zmienić te dane w zakładce Profil (ikona osoby u góry).',
-                style: Theme.of(ctx).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Jak korzystać z aplikacji:',
-                style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              Text('• Dodawaj posiłki – śledź, co jesz i ile kalorii spożywasz',
-                  style: Theme.of(ctx).textTheme.bodyMedium),
-              const SizedBox(height: 4),
-              Text('• Pij wodę – ustaw przypomnienia w ustawieniach',
-                  style: Theme.of(ctx).textTheme.bodyMedium),
-              const SizedBox(height: 4),
-              Text('• Wpisuj wagę regularnie – widzisz postępy na wykresie',
-                  style: Theme.of(ctx).textTheme.bodyMedium),
-              const SizedBox(height: 4),
-              Text('• Sprawdzaj dashboard – tam widzisz swój dzienny cel i postępy',
-                  style: Theme.of(ctx).textTheme.bodyMedium),
+              Icon(Icons.check_circle, color: Theme.of(ctx).colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(child: Text(dialogL10n.onbPlanReadyTitle)),
             ],
           ),
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => ctx.pop(),
-            child: const Text('Rozumiem, zaczynam!'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dialogL10n.onbPlanWhatDone,
+                  style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  calories != null
+                      ? dialogL10n.onbPlanCaloriesComputedWithValue(
+                          calories: calories.toStringAsFixed(0),
+                        )
+                      : dialogL10n.onbPlanCaloriesComputed,
+                  style: Theme.of(ctx).textTheme.bodyMedium,
+                ),
+                if (widget.goal == AppConstants.goalMaintain) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    dialogL10n.onbGoalUnchangedSameWeight,
+                    style: Theme.of(ctx).textTheme.bodyMedium,
+                  ),
+                ] else if (dateStr != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    dialogL10n.onbPlanTargetDate(date: dateStr),
+                    style: Theme.of(ctx).textTheme.bodyMedium,
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Text(
+                  dialogL10n.onbPlanChangeInProfile,
+                  style: Theme.of(ctx).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  dialogL10n.onbPlanHowToUse,
+                  style: Theme.of(ctx).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(dialogL10n.onbPlanTipMeals,
+                    style: Theme.of(ctx).textTheme.bodyMedium),
+                const SizedBox(height: 4),
+                Text(dialogL10n.onbPlanTipWater,
+                    style: Theme.of(ctx).textTheme.bodyMedium),
+                const SizedBox(height: 4),
+                Text(dialogL10n.onbPlanTipWeight,
+                    style: Theme.of(ctx).textTheme.bodyMedium),
+                const SizedBox(height: 4),
+                Text(dialogL10n.onbPlanTipDashboard,
+                    style: Theme.of(ctx).textTheme.bodyMedium),
+                const SizedBox(height: 16),
+                Text(
+                  dialogL10n.onbPlanMedicalNote,
+                  style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+          actions: [
+            FilledButton(
+              onPressed: () => ctx.pop(),
+              child: Text(dialogL10n.onbPlanStartButton),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildMainText() {
-    final isBouncePhase = _currentText == 'Dziękujemy!' || _currentText == 'Mamy to!';
+    final isBouncePhase = _thanksPhase || _gotItPhase;
     final color = Theme.of(context).colorScheme;
 
     final textWidget = Text(
@@ -267,19 +308,20 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
 
   /// [stepColor] – kolor kółka i linii (np. primary), [iconOnStepColor] – kolor ikony check na kółku (np. onPrimary).
   Widget _buildMilestoneStepper(Color stepColor, Color iconOnStepColor) {
+    final steps = _steps(context.l10n);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          for (int i = 0; i < _steps.length; i++) ...[
+          for (int i = 0; i < steps.length; i++) ...[
             _buildStepIcon(
               index: i,
-              step: _steps[i],
+              step: steps[i],
               stepColor: stepColor,
               iconOnStepColor: iconOnStepColor,
             ),
-            if (i < _steps.length - 1) _buildConnectingLine(i, stepColor),
+            if (i < steps.length - 1) _buildConnectingLine(i, stepColor),
           ],
         ],
       ),
@@ -372,7 +414,7 @@ class _PlanLoadingScreenState extends State<PlanLoadingScreen>
                   ),
                   const SizedBox(height: 48),
                   // Kroczące kroki (milestone stepper) – kółka w kolorze primary, check w onPrimary
-                  if (_currentText != 'Dziękujemy!')
+                  if (!_thanksPhase)
                     _buildMilestoneStepper(color.primary, color.onPrimary),
                 ],
               ),

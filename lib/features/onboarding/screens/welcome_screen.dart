@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/auth/auth_callback_handler.dart';
@@ -15,7 +14,6 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/services/auth_link_service.dart';
 import '../../../shared/utils/pending_verification_email.dart';
-import '../widgets/privacy_consent_banner.dart';
 import 'easy_forma_onboarding.dart';
 
 /// Na webie po powrocie z Google w URL może być hash z tokenami – rozpoznajemy to
@@ -61,216 +59,72 @@ class WelcomeScreen extends StatelessWidget {
     await prefs.setBool('has_seen_welcome', true);
   }
 
-  Future<void> _onLogin(BuildContext context) async {
-    bool acceptedTerms = false;
-    await showModalBottomSheet<void>(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: StatefulBuilder(
-            builder: (ctx, setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Zaloguj lub załóż konto',
-                    style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Masz konto? Zaloguj się. Nowy użytkownik? Załóż konto – Twoje dane będą zapisane.',
-                    style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(ctx).colorScheme.onSurfaceVariant,
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  CheckboxListTile(
-                    value: acceptedTerms,
-                    onChanged: (v) => setState(() => acceptedTerms = v ?? false),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
-                    title: Text.rich(
-                      TextSpan(
-                        style: Theme.of(ctx).textTheme.bodySmall,
-                        children: [
-                          const TextSpan(text: 'Akceptuję '),
-                          TextSpan(
-                            text: 'Regulamin',
-                            style: TextStyle(
-                              color: Theme.of(ctx).colorScheme.primary,
-                              decoration: TextDecoration.underline,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => _openUrl(AppConstants.termsUrl),
-                          ),
-                          const TextSpan(text: ' i '),
-                          TextSpan(
-                            text: 'Politykę prywatności',
-                            style: TextStyle(
-                              color: Theme.of(ctx).colorScheme.primary,
-                              decoration: TextDecoration.underline,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () => _openUrl(AppConstants.privacyPolicyUrl),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: acceptedTerms
-                        ? () async {
-                            Navigator.of(ctx).pop();
-                            await _runSignIn(context, () async {
-                              try {
-                                return await AuthLinkService().signInWithGoogle().timeout(
-                                  const Duration(seconds: 90),
-                                  onTimeout: () => throw TimeoutException('OAuth'),
-                                );
-                              } on TimeoutException {
-                                return AuthLinkResult.error(
-                                  'Logowanie nie zostało dokończone (timeout). Wróć do aplikacji i spróbuj ponownie.',
-                                );
-                              }
-                            });
-                          }
-                        : null,
-                    icon: SvgPicture.asset(
-                      'assets/icons/google_g.svg',
-                      width: 20,
-                      height: 20,
-                    ),
-                    label: const Text('Zaloguj przez Google'),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  OutlinedButton.icon(
-                    onPressed: acceptedTerms
-                        ? () async {
-                            Navigator.of(ctx).pop();
-                            final result = await _showEmailDialog(ctx);
-                            if (!context.mounted) return;
-                            if (result == null) return;
-                            if (result.enterCode) {
-                              if (result.email != null && result.email!.isNotEmpty) {
-                                await savePendingVerificationEmail(result.email!);
-                              }
-                              if (!context.mounted) return;
-                              await _showEnterCodeDialog(context);
-                              return;
-                            }
-                            if (result.email != null) {
-                              await savePendingVerificationEmail(result.email!);
-                              if (!context.mounted) return;
-                              await _runSignInWithEmail(context, result.email!);
-                            }
-                          }
-                        : null,
-                    icon: const Icon(Icons.email, size: 20),
-                    label: const Text('Przez email'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
+  Future<AuthLinkResult> _signInWithGoogleTimed() async {
+    try {
+      return await AuthLinkService().signInWithGoogle().timeout(
+        const Duration(seconds: 90),
+        onTimeout: () => throw TimeoutException('OAuth'),
+      );
+    } on TimeoutException {
+      // Okno logowania już zamknięte — użytkownik jest w aplikacji.
+      return AuthLinkResult.canceled();
+    }
   }
 
-  static Future<void> _openUrl(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+  Future<void> _onApple(BuildContext context) async {
+    await _runSignIn(context, () => AuthLinkService().signInWithApple());
+  }
+
+  Future<void> _onGoogle(BuildContext context) async {
+    await _runSignIn(context, _signInWithGoogleTimed);
+  }
+
+  Future<void> _onCreateAccount(BuildContext context) async {
+    final result = await _showEmailDialog(context);
+    if (!context.mounted) return;
+    if (result == null) return;
+    if (result.enterCode) {
+      if (result.email != null && result.email!.isNotEmpty) {
+        await savePendingVerificationEmail(result.email!);
+      }
+      if (!context.mounted) return;
+      await _showEnterCodeDialog(context);
+      return;
+    }
+    if (result.email != null) {
+      await savePendingVerificationEmail(result.email!);
+      if (!context.mounted) return;
+      await _runSignInWithEmail(context, result.email!);
     }
   }
 
   /// Zwraca: (enterCode: true, email?) = mam już kod (email z pola, jeśli wpisany);
   /// (enterCode: false, email) = wyślij link i kod; null = anuluj.
-  Future<({bool enterCode, String? email})?> _showEmailDialog(BuildContext context) async {
-    final controller = TextEditingController();
-    String? errorText;
-    return showDialog<({bool enterCode, String? email})>(
+  Future<({bool enterCode, String? email})?> _showEmailDialog(BuildContext context) {
+    return showModalBottomSheet<({bool enterCode, String? email})>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => AlertDialog(
-          title: const Text('Zaloguj lub załóż konto'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.emailAddress,
-            autofillHints: const [AutofillHints.email],
-            decoration: InputDecoration(
-              labelText: 'Adres email',
-              hintText: 'np. jan@example.com',
-              helperText: 'Działa do logowania i zakładania konta',
-              errorText: errorText,
-            ),
-            onChanged: (_) {
-              if (errorText != null) {
-                setState(() => errorText = null);
-              }
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Anuluj'),
-            ),
-            TextButton(
-              onPressed: () {
-                final email = controller.text.trim();
-                Navigator.of(ctx).pop((enterCode: true, email: email.isEmpty ? null : email));
-              },
-              child: Text(
-                'Mam już kod',
-                style: TextStyle(
-                  color: Theme.of(ctx).colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-            FilledButton(
-              onPressed: () {
-                final email = controller.text.trim();
-                if (email.isEmpty) {
-                  setState(() => errorText = 'Podaj adres email');
-                  return;
-                }
-                Navigator.of(ctx).pop((enterCode: false, email: email));
-              },
-              child: const Text('Wyślij link oraz kod'),
-            ),
-          ],
-        ),
-      ),
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) => const _EmailSignupSheet(),
     );
   }
 
   Future<void> _runSignInWithEmail(BuildContext context, String email) async {
     if (!context.mounted) return;
+    final l10n = context.l10n;
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(
+      builder: (_) => Center(
         child: Card(
           child: Padding(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Wysyłanie linku i kodu...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(l10n.onbSendingLinkAndCode),
               ],
             ),
           ),
@@ -290,12 +144,12 @@ class WelcomeScreen extends StatelessWidget {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Uwaga'),
+          title: Text(ctx.l10n.commonWarning),
           content: Text(result.errorMessage!),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('OK'),
+              child: Text(ctx.l10n.commonOk),
             ),
           ],
         ),
@@ -309,12 +163,12 @@ class WelcomeScreen extends StatelessWidget {
         await showDialog<void>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('Zalogowano'),
-            content: Text(result.infoMessage ?? 'Zalogowano pomyślnie!'),
+            title: Text(ctx.l10n.onbSignedIn),
+            content: Text(result.infoMessage ?? ctx.l10n.onbSignedInSuccess),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('OK'),
+                child: Text(ctx.l10n.commonOk),
               ),
             ],
           ),
@@ -332,11 +186,12 @@ class WelcomeScreen extends StatelessWidget {
   Future<void> _showEnterCodeDialog(BuildContext context) async {
     final savedEmail = await getPendingVerificationEmail();
     if (savedEmail != null && savedEmail.isNotEmpty && context.mounted) {
+      final l10n = context.l10n;
       await _showLinkAndCodeDialog(
         context,
         savedEmail,
-        'Wpisz poniżej kod, który otrzymałeś na adres $savedEmail.',
-        dialogTitle: 'Wpisz kod z maila',
+        l10n.onbEnterCodeReceived(email: savedEmail),
+        dialogTitle: l10n.onbEnterCodeFromEmailTitle,
       );
       return;
     }
@@ -348,6 +203,7 @@ class WelcomeScreen extends StatelessWidget {
   Future<void> _onEnterCode(BuildContext context) async {
     final savedEmail = await getPendingVerificationEmail();
     if (!context.mounted) return;
+    final l10n = context.l10n;
     final String email;
     if (savedEmail != null && savedEmail.isNotEmpty) {
       email = savedEmail;
@@ -355,15 +211,16 @@ class WelcomeScreen extends StatelessWidget {
       final entered = await showDialog<String>(
         context: context,
         builder: (ctx) {
+          final dialogL10n = ctx.l10n;
           final controller = TextEditingController();
           return AlertDialog(
-            title: const Text('Podaj adres email'),
+            title: Text(dialogL10n.onbEnterEmailTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Na który adres wysłaliśmy link i kod? Podaj go, a następnie wpiszesz kod.',
+                  dialogL10n.onbEnterEmailWhichAddress,
                   style: Theme.of(ctx).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -371,10 +228,10 @@ class WelcomeScreen extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
-                  decoration: const InputDecoration(
-                    labelText: 'Adres email',
-                    hintText: 'np. jan@example.com',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: dialogL10n.onbEmailAddressLabel,
+                    hintText: dialogL10n.onbEmailAddressHint,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -382,7 +239,7 @@ class WelcomeScreen extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Anuluj'),
+                child: Text(dialogL10n.commonCancel),
               ),
               FilledButton(
                 onPressed: () {
@@ -390,7 +247,7 @@ class WelcomeScreen extends StatelessWidget {
                   if (e.isEmpty) return;
                   Navigator.of(ctx).pop(e);
                 },
-                child: const Text('Dalej'),
+                child: Text(dialogL10n.commonContinue),
               ),
             ],
           );
@@ -404,8 +261,10 @@ class WelcomeScreen extends StatelessWidget {
     await _showLinkAndCodeDialog(
       context,
       email,
-      savedEmail != null ? 'Kod wysłany na: $email' : 'Wpisz poniżej kod, który otrzymałeś na adres $email.',
-      dialogTitle: 'Wpisz kod z maila',
+      savedEmail != null
+          ? l10n.onbCodeSentTo(email: email)
+          : l10n.onbEnterCodeReceived(email: email),
+      dialogTitle: l10n.onbEnterCodeFromEmailTitle,
     );
   }
 
@@ -414,13 +273,15 @@ class WelcomeScreen extends StatelessWidget {
     BuildContext context,
     String email,
     String? infoMessage, {
-    String dialogTitle = 'Sprawdź skrzynkę',
+    String? dialogTitle,
   }) async {
+    final l10n = context.l10n;
+    final title = dialogTitle ?? l10n.onbCheckInbox;
     final codeController = TextEditingController();
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(dialogTitle),
+        title: Text(title),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -428,12 +289,12 @@ class WelcomeScreen extends StatelessWidget {
             children: [
               Text(
                 infoMessage ??
-                    'Wysłaliśmy link i kod na $email. Sprawdź skrzynkę (także folder Spam) – możesz kliknąć link w mailu lub wpisać kod poniżej.',
+                    l10n.onbSentLinkAndCode(email: email),
                 style: Theme.of(ctx).textTheme.bodyMedium,
               ),
               const SizedBox(height: 20),
               Text(
-                'Wpisz kod z maila:',
+                l10n.onbEnterCodeFromEmailLabel,
                 style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -444,10 +305,10 @@ class WelcomeScreen extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 maxLength: 12,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Kod z maila',
-                  hintText: 'np. 123456',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.onbEmailCodeLabel,
+                  hintText: l10n.onbEmailCodeHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -456,7 +317,7 @@ class WelcomeScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Zamknij'),
+            child: Text(l10n.commonClose),
           ),
           FilledButton(
             onPressed: () async {
@@ -471,12 +332,12 @@ class WelcomeScreen extends StatelessWidget {
                 await showDialog<void>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('Zalogowano'),
-                    content: const Text('Zalogowano pomyślnie!'),
+                    title: Text(ctx.l10n.onbSignedIn),
+                    content: Text(ctx.l10n.onbSignedInSuccess),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('OK'),
+                        child: Text(ctx.l10n.commonOk),
                       ),
                     ],
                   ),
@@ -488,12 +349,12 @@ class WelcomeScreen extends StatelessWidget {
                 await showDialog<void>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('Uwaga'),
+                    title: Text(ctx.l10n.commonWarning),
                     content: Text(verifyResult.errorMessage!),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('OK'),
+                        child: Text(ctx.l10n.commonOk),
                       ),
                       FilledButton(
                         onPressed: () async {
@@ -501,14 +362,14 @@ class WelcomeScreen extends StatelessWidget {
                           if (!context.mounted) return;
                           await _runSignInWithEmail(context, email);
                         },
-                        child: const Text('Wyślij ponownie'),
+                        child: Text(ctx.l10n.onbResend),
                       ),
                     ],
                   ),
                 );
               }
             },
-            child: const Text('Zaloguj'),
+            child: Text(l10n.onbSignIn),
           ),
         ],
       ),
@@ -521,19 +382,20 @@ class WelcomeScreen extends StatelessWidget {
     bool showLoading = false,
   }) async {
     if (showLoading && context.mounted) {
+      final l10n = context.l10n;
       showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (_) => const Center(
+        builder: (_) => Center(
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Wysyłanie linku i kodu...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.onbSendingLinkAndCode),
                 ],
               ),
             ),
@@ -551,26 +413,25 @@ class WelcomeScreen extends StatelessWidget {
     }
     if (!context.mounted) return;
 
-    if (result.canceled) return;
+    if (result.canceled || result.redirected) return;
     if (result.errorMessage != null) {
       if (!context.mounted) return;
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Uwaga'),
+          title: Text(ctx.l10n.commonWarning),
           content: Text(result.errorMessage!),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('OK'),
+              child: Text(ctx.l10n.commonOk),
             ),
           ],
         ),
       );
       return;
     }
-    // Nie pokazuj dialogu „Sukces” dla logowania przez Google – komunikat przekierowania
-    // (Safari / web) jest mylący; użytkownik ma się przekierować, a nie widzieć „Sukces” i zostawać na Welcome.
+    // Nie pokazuj dialogu „Sukces” dla logowania OAuth – użytkownik wraca z przeglądarki sam.
     final isOAuthRedirectMessage = result.infoMessage != null &&
         (result.infoMessage!.contains('Safari') ||
             result.infoMessage!.contains('Otwieram') ||
@@ -580,12 +441,12 @@ class WelcomeScreen extends StatelessWidget {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Sukces'),
+          title: Text(ctx.l10n.onbSuccess),
           content: Text(result.infoMessage!),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('OK'),
+              child: Text(ctx.l10n.commonOk),
             ),
           ],
         ),
@@ -612,6 +473,7 @@ class WelcomeScreen extends StatelessWidget {
       builder: (ctx) {
         final theme = Theme.of(ctx);
         final primary = theme.colorScheme.primary;
+        final l10n = ctx.l10n;
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -635,7 +497,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Powiedz nam kilka rzeczy o sobie',
+                l10n.onbIntroTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -643,7 +505,7 @@ class WelcomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Pokażemy Ci ile jeść każdego dnia,\naby osiągnąć swój cel.',
+                l10n.onbIntroBody,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   height: 1.5,
@@ -657,7 +519,7 @@ class WelcomeScreen extends StatelessWidget {
                   Icon(Icons.timer_outlined, size: 18, color: primary.withValues(alpha: 0.8)),
                   const SizedBox(width: 6),
                   Text(
-                    'Zajmie mniej niż minutę',
+                    l10n.onbIntroDuration,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: primary,
                       fontWeight: FontWeight.w500,
@@ -670,14 +532,14 @@ class WelcomeScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Anuluj'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(ctx).pop(true),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
-              child: const Text('Rozpocznij'),
+              child: Text(l10n.onbIntroStart),
             ),
           ],
         );
@@ -778,78 +640,149 @@ class WelcomeScreen extends StatelessWidget {
   void _showAnonymousErrorDialog(BuildContext context, {bool isInitialized = true, bool timeout = false, Object? error}) {
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Nie udało się rozpocząć bez konta'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!isInitialized)
-                const Text(
-                  'Aplikacja nie ma połączenia z serwerem (brak konfiguracji w buildzie).',
-                )
-              else if (timeout)
-                const Text(
-                  'Serwer nie odpowiedział w czasie. Sprawdź internet lub spróbuj później.',
-                )
-              else
-                const Text(
-                  'Połączenie z serwerem nie powiodło się. Możesz:',
-                ),
-              const SizedBox(height: 12),
-              const Text('• Upewnij się, że jesteś na adresie latwaforma.pl.'),
-              const SizedBox(height: 8),
-              const Text('• Odśwież stronę (F5) i spróbuj ponownie.'),
-              const SizedBox(height: 8),
-              const Text('• Albo zaloguj się przez Google lub email – przyciski powyżej.'),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Zamknij'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              launchUrl(Uri.parse(AppConstants.webAuthRedirectUrl), mode: LaunchMode.externalApplication);
-            },
-            child: const Text('Otwórz latwaforma.pl'),
-          ),
-          FilledButton.icon(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              _onLogin(context);
-            },
-            icon: SvgPicture.asset(
-              'assets/icons/google_g.svg',
-              width: 20,
-              height: 20,
+      builder: (ctx) {
+        final l10n = ctx.l10n;
+        return AlertDialog(
+          title: Text(l10n.onbAnonErrorTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!isInitialized)
+                  Text(l10n.onbAnonErrorNoConfig)
+                else if (timeout)
+                  Text(l10n.onbAnonErrorTimeout)
+                else
+                  Text(l10n.onbAnonErrorFailed),
+                const SizedBox(height: 12),
+                Text(l10n.onbAnonErrorTipDomain),
+                const SizedBox(height: 8),
+                Text(l10n.onbAnonErrorTipRefresh),
+                const SizedBox(height: 8),
+                Text(l10n.onbAnonErrorTipLogin),
+              ],
             ),
-            label: const Text('Zaloguj przez Google'),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.commonClose),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                launchUrl(Uri.parse(AppConstants.webAuthRedirectUrl), mode: LaunchMode.externalApplication);
+              },
+              child: Text(l10n.onbOpenLatwaForma),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                _onCreateAccount(context);
+              },
+              child: Text(l10n.onbLoginOrCreateShort),
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return _WelcomeAuthRecovery(
-      child: Stack(
+      child: EasyFormaOnboardingScreen(
+        onApple: () => _onApple(context),
+        onGoogle: () => _onGoogle(context),
+        onCreateAccount: () => _onCreateAccount(context),
+        onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
+        onEnterCode: null,
+      ),
+    );
+  }
+}
+
+class _EmailSignupSheet extends StatefulWidget {
+  const _EmailSignupSheet();
+
+  @override
+  State<_EmailSignupSheet> createState() => _EmailSignupSheetState();
+}
+
+class _EmailSignupSheetState extends State<_EmailSignupSheet> {
+  final TextEditingController _controller = TextEditingController();
+  String? _errorText;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final email = _controller.text.trim();
+    if (email.isEmpty) {
+      setState(() => _errorText = context.l10n.onbEnterEmailRequired);
+      return;
+    }
+    Navigator.of(context).pop((enterCode: false, email: email));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, 8, 24, 24 + bottomInset),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          EasyFormaOnboardingScreen(
-            onLogin: () => _onLogin(context),
-            onStartWithoutAccount: () => _showOnboardingIntroDialog(context),
-            onEnterCode: null,
+          Text(
+            l10n.onbCreateAccountEmail,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: const PrivacyConsentBanner(),
+          const SizedBox(height: 8),
+          Text(
+            l10n.onbEmailSignupBody,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _controller,
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: l10n.onbEmailAddressLabelAlt,
+              hintText: l10n.onbEmailAddressHint,
+              errorText: _errorText,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (_) {
+              if (_errorText != null) setState(() => _errorText = null);
+            },
+            onSubmitted: (_) => _submit(),
+          ),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: _submit,
+            child: Text(l10n.onbSendLinkAndCode),
+          ),
+          TextButton(
+            onPressed: () {
+              final email = _controller.text.trim();
+              Navigator.of(context).pop((
+                enterCode: true,
+                email: email.isEmpty ? null : email,
+              ));
+            },
+            child: Text(l10n.onbAlreadyHaveCode),
           ),
         ],
       ),

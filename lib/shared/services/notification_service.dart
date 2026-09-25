@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:latwa_forma/l10n/app_localizations.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+
+import '../../core/providers/locale_provider.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notifications =
@@ -62,6 +65,10 @@ class NotificationService {
       final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       await androidPlugin?.requestNotificationsPermission();
+
+      final iosPlugin = _notifications.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      await iosPlugin?.requestPermissions(alert: true, badge: true, sound: true);
     } catch (e) {
       debugPrint('⚠️ Błąd podczas żądania uprawnień: $e');
     }
@@ -83,24 +90,26 @@ class NotificationService {
     String? message,
   }) async {
     if (kIsWeb) return;
+
+    final l10n = lookupAppLocalizations(currentAppLocale());
     
     try {
       await _notifications.zonedSchedule(
         _waterReminderIdBase + id,
-        'Pamiętaj o wodzie! 💧',
-        message ?? 'Czas na szklankę wody',
+        l10n.moreNotifWaterTitle,
+        message ?? l10n.moreNotifWaterBody,
         _nextInstanceOfTime(hour, minute),
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
             'water_reminder',
-            'Przypomnienia o wodzie',
-            channelDescription: 'Przypomnienia o piciu wody',
+            l10n.moreNotifWaterChannel,
+            channelDescription: l10n.moreNotifWaterChannelDesc,
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority,
           ),
-          iOS: DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
@@ -118,24 +127,26 @@ class NotificationService {
     required int minute,
   }) async {
     if (kIsWeb) return;
+
+    final l10n = lookupAppLocalizations(currentAppLocale());
     
     try {
       await _notifications.zonedSchedule(
         _mealReminderIdBase + id,
-        'Czas na $label! 🍽️',
-        'Nie zapomnij zarejestrować posiłku',
+        l10n.moreNotifMealTitle(label: label),
+        l10n.moreNotifMealBody,
         _nextInstanceOfTime(hour, minute),
-        const NotificationDetails(
+        NotificationDetails(
           android: AndroidNotificationDetails(
             'meal_reminder',
-            'Przypomnienia o posiłkach',
-            channelDescription: 'Przypomnienia o rejestracji posiłków',
+            l10n.moreNotifMealChannel,
+            channelDescription: l10n.moreNotifMealChannelDesc,
             importance: Importance.defaultImportance,
             priority: Priority.defaultPriority,
           ),
-          iOS: DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,

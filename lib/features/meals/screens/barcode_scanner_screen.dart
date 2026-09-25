@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
-import 'dart:io' show Platform;
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/utils/platform_stub.dart'
+    if (dart.library.io) '../../../core/utils/platform_io.dart' as platform;
 import '../../../shared/services/product_service.dart';
+import 'add_catalog_product_screen.dart';
 
 class BarcodeScannerScreen extends StatefulWidget {
-  const BarcodeScannerScreen({super.key});
+  const BarcodeScannerScreen({super.key, this.date});
+
+  final DateTime? date;
 
   @override
   State<BarcodeScannerScreen> createState() => _BarcodeScannerScreenState();
@@ -20,18 +25,16 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   final TextEditingController _barcodeController = TextEditingController();
   MobileScannerController? _controller;
 
-  // Check if running on simulator - disable mobile_scanner to avoid MLKit issues
-  bool get _isSimulator {
+  /// Symulator iOS: ręczne wpisanie (ML Kit). Prawdziwy iPhone: kamera.
+  bool get _useManualEntryOnly {
     if (kIsWeb) return false;
-    if (!Platform.isIOS) return false;
-    // For now, always use manual input on iOS simulator to avoid MLKit framework issues
-    return true;
+    return platform.isIOSSimulator;
   }
 
   @override
   void initState() {
     super.initState();
-    if (!_isSimulator) {
+    if (!_useManualEntryOnly) {
       _controller = MobileScannerController();
     }
   }
@@ -59,6 +62,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   }
 
   Future<void> _processBarcode(String code) async {
+    if (_isProcessing) return;
     // Unikaj wielokrotnego skanowania tego samego kodu
     if (_lastScannedCode == code) return;
     _lastScannedCode = code;
@@ -66,30 +70,69 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     setState(() => _isProcessing = true);
 
     try {
-      // Najpierw własna baza (Supabase), potem Open Food Facts
+      // Najpierw własna baza (Turso/Supabase), potem Open Food Facts
       final product = await _productService.getProductByBarcode(code);
       
       if (!mounted) return;
 
       if (product == null) {
-        _showErrorDialog('Nie znaleziono produktu', 
-            'Produkt o kodzie $code nie został znaleziony w bazie produktów.');
+        _lastScannedCode = null;
         setState(() => _isProcessing = false);
+        final added = await _offerAddToCatalog(code);
+        if (added == true && mounted) context.pop(true);
         return;
       }
 
       // Przejdź do ekranu wpisania wagi i dodania posiłku
-      final result = await context.push<bool>(AppRoutes.barcodeProduct, extra: product);
-      if (result == true && mounted) context.pop(true);
+      final result = await context.push<bool>(
+        AppRoutes.barcodeProduct,
+        extra: mealFlowExtra(product: product, date: widget.date),
+      );
+      if (result == true && mounted) {
+        context.pop(true);
+        return;
+      }
+      _lastScannedCode = null;
     } catch (e) {
+      _lastScannedCode = null;
       if (mounted) {
-        _showErrorDialog('Błąd', 'Nie udało się pobrać danych produktu: $e');
+        _showErrorDialog(context.l10n.commonError, context.l10n.trackFetchProductFailed(error: '$e'));
       }
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
       }
     }
+  }
+
+  Future<bool?> _offerAddToCatalog(String code) {
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.trackProductNotFoundTitle),
+        content: Text(context.l10n.trackProductNotFound(code: code)),
+        actions: [
+          TextButton(
+            onPressed: () => dialogContext.pop(false),
+            child: Text(context.l10n.commonOk),
+          ),
+          FilledButton(
+            onPressed: () => dialogContext.pop(true),
+            child: Text(context.l10n.trackAddToCatalog),
+          ),
+        ],
+      ),
+    ).then((add) async {
+      if (add != true || !mounted) return false;
+      return Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => AddCatalogProductScreen(
+            barcode: code,
+            date: widget.date,
+          ),
+        ),
+      );
+    });
   }
 
   void _showErrorDialog(String title, String message) {
@@ -101,7 +144,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text('OK'),
+            child: Text(context.l10n.commonOk),
           ),
         ],
       ),
@@ -109,6 +152,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   }
 
   Widget _buildSimulatorView() {
+    final l10n = context.l10n;
     return Stack(
       children: [
         Center(
@@ -119,24 +163,24 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
               children: [
                 const Icon(Icons.qr_code_scanner, size: 64, color: Colors.grey),
                 const SizedBox(height: 24),
-                const Text(
-                  'Skaner kodów kreskowych',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.trackBarcodeScannerTitle,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Na symulatorze wprowadź kod ręcznie',
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                Text(
+                  l10n.trackSimulatorEnterCode,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 TextField(
                   controller: _barcodeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Kod kreskowy',
-                    hintText: 'Wprowadź kod produktu',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.qr_code),
+                  decoration: InputDecoration(
+                    labelText: l10n.trackBarcodeLabel,
+                    hintText: l10n.trackEnterProductCode,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.qr_code),
                   ),
                   keyboardType: TextInputType.number,
                   onSubmitted: _handleBarcodeFromInput,
@@ -145,7 +189,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                 ElevatedButton.icon(
                   onPressed: () => _handleBarcodeFromInput(_barcodeController.text),
                   icon: const Icon(Icons.search),
-                  label: const Text('Szukaj produktu'),
+                  label: Text(l10n.trackSearchProduct),
                 ),
               ],
             ),
@@ -154,15 +198,15 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         if (_isProcessing)
           Container(
             color: Colors.black.withValues(alpha: 0.7),
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.white),
-                  SizedBox(height: 16),
+                  const CircularProgressIndicator(color: Colors.white),
+                  const SizedBox(height: 16),
                   Text(
-                    'Pobieranie danych produktu...',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    l10n.trackFetchingProductData,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],
               ),
@@ -173,9 +217,10 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   }
 
   Widget _buildScannerView() {
+    final l10n = context.l10n;
     if (_controller == null) {
-      return const Center(
-        child: Text('Skaner niedostępny - użyj symulatora lub urządzenia fizycznego'),
+      return Center(
+        child: Text(l10n.trackScannerUnavailable),
       );
     }
     
@@ -188,15 +233,15 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         if (_isProcessing)
           Container(
             color: Colors.black.withValues(alpha: 0.7),
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.white),
-                  SizedBox(height: 16),
+                  const CircularProgressIndicator(color: Colors.white),
+                  const SizedBox(height: 16),
                   Text(
-                    'Pobieranie danych produktu...',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    l10n.trackFetchingProductData,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ],
               ),
@@ -216,14 +261,14 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                 children: [
                   const Icon(Icons.qr_code_scanner, color: Colors.white, size: 32),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Wskaż kod kreskowy produktu',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  Text(
+                    l10n.trackPointAtBarcode,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Dane zostaną pobrane z bazy Open Food Facts',
+                    l10n.trackBarcodePrivacy,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 12,
@@ -243,9 +288,9 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Skanuj kod kreskowy'),
+        title: Text(context.l10n.trackScanBarcode),
       ),
-      body: _isSimulator ? _buildSimulatorView() : _buildScannerView(),
+      body: _useManualEntryOnly ? _buildSimulatorView() : _buildScannerView(),
     );
   }
 }

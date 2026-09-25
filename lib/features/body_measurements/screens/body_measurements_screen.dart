@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/guest/guest_trial.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../shared/models/body_measurement.dart';
 
@@ -29,14 +31,17 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
   bool _isSaving = false;
   bool _isCustomType = false;
 
-  final List<Map<String, String>> _measurementTypes = [
-    {'value': 'waist', 'label': 'Talia'},
-    {'value': 'hips', 'label': 'Biodra'},
-    {'value': 'chest', 'label': 'Klatka piersiowa'},
-    {'value': 'arm', 'label': 'Ramię'},
-    {'value': 'thigh', 'label': 'Udo'},
-    {'value': 'custom', 'label': 'Własny'},
-  ];
+  List<Map<String, String>> _measurementTypes(BuildContext context) {
+    final l10n = context.l10n;
+    return [
+      {'value': 'waist', 'label': l10n.trackTypeWaist},
+      {'value': 'hips', 'label': l10n.trackTypeHips},
+      {'value': 'chest', 'label': l10n.trackTypeChest},
+      {'value': 'arm', 'label': l10n.trackTypeArm},
+      {'value': 'thigh', 'label': l10n.trackTypeThigh},
+      {'value': 'custom', 'label': l10n.trackTypeCustom},
+    ];
+  }
 
   @override
   void initState() {
@@ -57,7 +62,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
     if (_isCustomType && _customTypeController.text.trim().isNotEmpty) {
       return _customTypeController.text.trim();
     }
-    return _measurementTypes.firstWhere(
+    return _measurementTypes(context).firstWhere(
       (t) => t['value'] == _selectedType,
       orElse: () => {'label': _selectedType},
     )['label']!;
@@ -73,7 +78,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
   Future<void> _saveMeasurement() async {
     if (_valueController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Podaj wartość pomiaru')),
+        SnackBar(content: Text(context.l10n.trackEnterMeasurementValue)),
       );
       return;
     }
@@ -81,7 +86,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
     final value = double.tryParse(_valueController.text);
     if (value == null || value <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Podaj poprawną wartość (większą od 0)')),
+        SnackBar(content: Text(context.l10n.trackEnterValidPositiveValue)),
       );
       return;
     }
@@ -91,13 +96,13 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
       if (userId == null) {
-        throw Exception('Użytkownik nie jest zalogowany');
+        throw Exception(context.l10n.trackUserNotLoggedIn);
       }
 
       final typeToSave = _effectiveType;
       if (_isCustomType && typeToSave == 'custom') {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Wpisz nazwę własnego typu pomiaru (np. biceps)')),
+          SnackBar(content: Text(context.l10n.trackEnterCustomTypeName)),
         );
         setState(() => _isSaving = false);
         return;
@@ -121,13 +126,14 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pomiar zapisany pomyślnie!')),
+          SnackBar(content: Text(context.l10n.trackMeasurementSaved)),
         );
       }
     } catch (e) {
+      if (e is GuestTrialEndedException) return;
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
+          SnackBar(content: Text(context.l10n.trackErrorWithDetails(error: '$e'))),
         );
       }
     } finally {
@@ -143,7 +149,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pomiary ciała'),
+        title: Text(context.l10n.trackBodyMeasurementsTitle),
       ),
       body: measurementsAsync.when(
         data: (measurements) {
@@ -163,7 +169,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                     child: Column(
                       children: [
                         Text(
-                          'Śledź wymiary regularnie — każdy pomiar to dowód Twojego postępu i krok do wymarzonej sylwetki!',
+                          context.l10n.trackBodyMeasurementsMotivation,
                           style: Theme.of(context).textTheme.titleMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -171,12 +177,12 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                         // Wybór typu pomiaru
                         DropdownButtonFormField<String>(
                           initialValue: _selectedType,
-                          decoration: const InputDecoration(
-                            labelText: 'Typ pomiaru',
+                          decoration: InputDecoration(
+                            labelText: context.l10n.trackMeasurementType,
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.straighten),
                           ),
-                          items: _measurementTypes.map((type) {
+                          items: _measurementTypes(context).map((type) {
                             return DropdownMenuItem(
                               value: type['value'],
                               child: Text(type['label']!),
@@ -198,11 +204,11 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                           const SizedBox(height: 12),
                           TextField(
                             controller: _customTypeController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nazwa pomiaru',
-                              hintText: 'np. Biceps, Brzuch',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.edit),
+                            decoration: InputDecoration(
+                              labelText: context.l10n.trackMeasurementName,
+                              hintText: context.l10n.trackCustomTypeHint,
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.edit),
                             ),
                             textCapitalization: TextCapitalization.words,
                             onChanged: (_) => setState(() {}),
@@ -212,9 +218,9 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                         // Formularz dodawania pomiaru
                         TextField(
                           controller: _valueController,
-                          decoration: const InputDecoration(
-                            labelText: 'Wartość (cm)',
-                            hintText: 'np. 85.5',
+                          decoration: InputDecoration(
+                            labelText: context.l10n.trackValueCm,
+                            hintText: context.l10n.trackValueHintExample,
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.straighten),
                           ),
@@ -229,9 +235,9 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                               initialDate: _selectedDate ?? DateTime.now(),
                               firstDate: DateTime.now().subtract(const Duration(days: 365 * 2)), // 2 lata wstecz
                               lastDate: DateTime.now(), // Nie można wybrać przyszłości
-                              helpText: 'Wybierz datę pomiaru',
-                              cancelText: 'Anuluj',
-                              confirmText: 'Wybierz',
+                              helpText: context.l10n.trackPickMeasurementDate,
+                              cancelText: context.l10n.commonCancel,
+                              confirmText: context.l10n.trackChoose,
                             );
                             if (picked != null) {
                               // Jeśli wybrano datę, ustaw również godzinę (domyślnie 12:00)
@@ -248,15 +254,15 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                             }
                           },
                           child: InputDecorator(
-                            decoration: const InputDecoration(
-                              labelText: 'Data pomiaru',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.calendar_today),
+                            decoration: InputDecoration(
+                              labelText: context.l10n.trackMeasurementDate,
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.calendar_today),
                             ),
                             child: Text(
                               _selectedDate != null
                                   ? '${_selectedDate!.day}.${_selectedDate!.month}.${_selectedDate!.year}'
-                                  : 'Wybierz datę',
+                                  : context.l10n.trackSelectDate,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ),
@@ -277,7 +283,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
-                                    'Pomiar zostanie zapisany z wybraną datą',
+                                    context.l10n.trackMeasurementSavedWithDate,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                           color: Theme.of(context).colorScheme.primary,
                                         ),
@@ -296,7 +302,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                             ),
                             child: _isSaving
                                 ? const CircularProgressIndicator()
-                                : const Text('Zapisz pomiar'),
+                                : Text(context.l10n.trackSaveMeasurement),
                           ),
                         ),
                       ],
@@ -307,7 +313,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                 // Wykres
                 if (measurements.isNotEmpty) ...[
                   Text(
-                    'Historia pomiarów - $_effectiveLabel',
+                    context.l10n.trackMeasurementHistory(label: _effectiveLabel),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
@@ -323,7 +329,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                   const SizedBox(height: 24),
                   // Lista ostatnich pomiarów
                   Text(
-                    'Ostatnie pomiary',
+                    context.l10n.trackRecentMeasurements,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 16),
@@ -335,7 +341,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                           subtitle: Text(
                             measurement.createdAt != null
                                 ? _formatDate(measurement.createdAt!)
-                                : 'Brak daty',
+                                : context.l10n.trackNoDate,
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
@@ -343,21 +349,21 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                               final confirmed = await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  title: const Text('Usuń pomiar'),
+                                  title: Text(context.l10n.trackDeleteMeasurementTitle),
                                   content: Text(
-                                    'Czy na pewno chcesz usunąć pomiar ${measurement.valueCm.toStringAsFixed(1)} cm?',
+                                    context.l10n.trackDeleteBodyMeasurementConfirm(value: measurement.valueCm.toStringAsFixed(1)),
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => context.pop(false),
-                                      child: const Text('Anuluj'),
+                                      child: Text(context.l10n.commonCancel),
                                     ),
                                     TextButton(
                                       onPressed: () => context.pop(true),
                                       style: TextButton.styleFrom(
                                         foregroundColor: Colors.red,
                                       ),
-                                      child: const Text('Usuń'),
+                                      child: Text(context.l10n.commonDelete),
                                     ),
                                   ],
                                 ),
@@ -370,13 +376,13 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                                   if (context.mounted) {
                                     ref.invalidate(bodyMeasurementsProvider(_effectiveType));
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Pomiar usunięty')),
+                                      SnackBar(content: Text(context.l10n.trackMeasurementDeleted)),
                                     );
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Błąd: $e')),
+                                      SnackBar(content: Text(context.l10n.trackErrorWithDetails(error: '$e'))),
                                     );
                                   }
                                 }
@@ -398,14 +404,14 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'Brak pomiarów',
+                            context.l10n.trackNoMeasurements,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   color: Colors.grey.shade600,
                                 ),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Dodaj pierwszy pomiar, aby zobaczyć historię',
+                            context.l10n.trackAddFirstMeasurementHint,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Colors.grey.shade600,
                                 ),
@@ -427,11 +433,11 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Błąd: $error'),
+              Text(context.l10n.trackErrorWithDetails(error: '$error')),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(bodyMeasurementsProvider(_effectiveType)),
-                child: const Text('Spróbuj ponownie'),
+                child: Text(context.l10n.commonRetry),
               ),
             ],
           ),
@@ -442,7 +448,7 @@ class _BodyMeasurementsScreenState extends ConsumerState<BodyMeasurementsScreen>
 
   Widget _buildMeasurementChart(List<BodyMeasurement> measurements) {
     if (measurements.isEmpty) {
-      return const Center(child: Text('Brak danych do wyświetlenia'));
+      return Center(child: Text(context.l10n.trackNoDataToDisplay));
     }
 
     // Sortuj po dacie (od najstarszych)

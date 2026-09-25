@@ -46,6 +46,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android signing (nigdy do gita)
+android/key.properties
+android/*.jks
+android/*.keystore
+
 # Environment variables (secrets – generowane przy buildzie: netlify_env.sh, prepare)
 .env
 env.production
@@ -57,3 +62,8 @@ web/env.production
 
 # Netlify CLI (link do strony)
 .netlify/
+
+# Local scratch / screenshots
+tmp/
+
+supabase/.temp/

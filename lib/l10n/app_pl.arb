@@ -1,0 +1,2399 @@
+{
+  "@@locale": "pl",
+  "language": "Język",
+  "appTitle": "Łatwa Forma",
+  "navToday": "Dziś",
+  "navMeals": "Posiłki",
+  "navWater": "Woda",
+  "navProfile": "Ja",
+  "commonOk": "OK",
+  "commonCancel": "Anuluj",
+  "commonSave": "Zapisz",
+  "commonDelete": "Usuń",
+  "commonClose": "Zamknij",
+  "commonRetry": "Spróbuj ponownie",
+  "commonWarning": "Uwaga",
+  "commonError": "Błąd",
+  "commonBack": "Wstecz",
+  "commonYes": "Tak",
+  "commonNo": "Nie",
+  "commonContinue": "Dalej",
+  "healthDisclaimer": "Łatwa Forma nie jest urządzeniem medycznym i nie diagnozuje, nie leczy, nie zapobiega ani nie leczy żadnej choroby ani stanu zdrowia. Obliczenia kalorii, makroskładników i porady AI mają charakter orientacyjny. W sprawach zdrowia skonsultuj się z lekarzem lub dietetykiem.",
+  "onbContinueApple": "Kontynuuj z Apple",
+  "onbContinueGoogle": "Kontynuuj z Google",
+  "onbContinueWithEmail": "Kontynuuj z emailem",
+  "onbStartWithoutAccount": "Zacznij bez konta",
+  "onbCreateAccount": "Załóż konto",
+  "onbCreateAccountEmail": "Załóż konto e-mailem",
+  "onbEnterCodeLink": "Mam już kod z maila – wpisz go",
+  "onbAlreadyHaveCode": "Mam już kod z maila",
+  "onbLegalPrefix": "Korzystając z aplikacji, akceptujesz ",
+  "onbTerms": "Regulamin",
+  "onbLegalAnd": " i ",
+  "onbPrivacyPolicyAccusative": "Politykę prywatności",
+  "onbLegalPeriod": ".",
+  "onbPrivacyPolicy": "Polityka prywatności",
+  "onbContact": "Kontakt",
+  "onbFollowUs": "Śledź nas: ",
+  "onbSocialComingSoon": "{name} – wkrótce",
+  "@onbSocialComingSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCopyrightFull": "© 2026 Łatwa Forma | {company}\nNIP {nip} · {address}",
+  "@onbCopyrightFull": {
+    "placeholders": {
+      "company": {
+        "type": "String"
+      },
+      "nip": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCopyrightShort": "© 2026 Łatwa Forma | {company}\nNIP {nip}",
+  "@onbCopyrightShort": {
+    "placeholders": {
+      "company": {
+        "type": "String"
+      },
+      "nip": {
+        "type": "String"
+      }
+    }
+  },
+  "onbFeatureCaloriesTitle": "Kalorie i makro dopasowane do Ciebie",
+  "onbFeatureCaloriesDesc": "Dzienny limit i makro pod Twój cel",
+  "onbFeatureWeightTitle": "Śledzenie wagi i postępów",
+  "onbFeatureWeightDesc": "Waga i zmiany w jednym miejscu",
+  "onbFeaturePlanTitle": "Prosty plan do celu",
+  "onbFeaturePlanDesc": "Jasna droga do Twojej wagi",
+  "onbFeatureAiTitle": "Pomoc AI",
+  "onbFeatureAiDesc": "Porady i posiłek ze zdjęcia",
+  "onbFeatureProductsTitle": "Baza produktów",
+  "onbFeatureProductsDesc": "Szukaj i skanuj kod kreskowy",
+  "onbBenefitCalories": "plan kalorii dopasowany do Ciebie",
+  "onbBenefitWeight": "śledzenie wagi i postępów",
+  "onbBenefitPlan": "prosty plan do celu",
+  "onbBenefitAi": "pomoc AI",
+  "onbLoginOrRegister": "Zaloguj się lub załóż konto",
+  "onbLoginOrCreateShort": "Zaloguj lub załóż konto",
+  "onbLoginSheetBody": "Masz konto? Zaloguj się. Nowy użytkownik? Załóż konto – Twoje dane będą zapisane.",
+  "onbFaqTitle": "FAQ – najczęściej zadawane pytania",
+  "onbFaqShowLess": "Pokaż mniej",
+  "onbFaqShowMore": "Zobacz więcej pytań ({count})",
+  "@onbFaqShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbFaqFreeQ": "Czy aplikacja jest darmowa?",
+  "onbFaqFreeA": "Tak. Łatwa Forma jest darmowa do codziennego użytku: śledzenie kalorii, posiłków, wagi, wody i aktywności. Część funkcji (np. analiza AI ze zdjęcia, rozbudowane statystyki) jest dostępna w planie Premium.",
+  "onbFaqPhotoQ": "Jak działa licznik kalorii ze zdjęcia?",
+  "onbFaqPhotoA": "W ekranie dodawania posiłku wybierz „Analiza AI”. Zrób zdjęcie dania lub wybierz je z galerii. Aplikacja wysyła zdjęcie do modelu AI (wizja), który rozpoznaje potrawę i szacuje kalorie oraz makroskładniki (białko, tłuszcze, węglowodany). Możesz je potem poprawić i zapisać. Funkcja wymaga Premium.",
+  "onbFaqLimitQ": "Jak aplikacja liczy mój dzienny limit kalorii?",
+  "onbFaqLimitA": "Na podstawie profilu (wiek, płeć, waga, wzrost, poziom aktywności) obliczamy BMR (wzór Harrisa-Benedicta), a potem TDEE. W zależności od celu (schudnięcie, utrzymanie, przytycie) dostosowujemy limit kalorii i makra.",
+  "onbFaqNoAccountQ": "Co to jest „Zacznij bez konta”?",
+  "onbFaqNoAccountA": "Możesz korzystać z aplikacji bez logowania. Dane są zapisywane lokalnie. Później możesz połączyć je z kontem (Apple, Google lub e-mail), aby mieć backup i synchronizację między urządzeniami.",
+  "onbFaqStravaQ": "Czy mogę połączyć Strava lub Garmin?",
+  "onbFaqStravaA": "Tak, Strava. W ustawieniach (Profil → Integracje) możesz połączyć konto ze Strava. Importowane aktywności są uwzględniane w bilansie kalorii (spalone kcal). Garmin Connect pojawi się po uruchomieniu integracji.",
+  "onbFaqPremiumQ": "Co daje Premium?",
+  "onbFaqPremiumA": "M.in. analiza posiłku ze zdjęcia (AI), rozbudowane statystyki, eksport danych, wyższy limit porad AI. W aplikacji ze sklepu płatności idą przez Google Play / App Store; na stronie latwaforma.pl – przez Stripe.",
+  "onbFaqGoalQ": "Jak zmienić cel (schudnięcie / utrzymanie / przytycie)?",
+  "onbFaqGoalA": "W Profilu ustaw wagę docelową. Aplikacja na tej podstawie proponuje cel i dzienny limit; makra można też dostosować ręcznie w ustawieniach profilu.",
+  "onbFaqAddMealQ": "Jak dodać posiłek?",
+  "onbFaqAddMealA": "Z ekranu głównego lub zakładki „Posiłki” wybierz „Dodaj posiłek”. Możesz wpisać dane ręcznie, zeskanować kod kreskowy (Open Food Facts) lub użyć Analizy AI ze zdjęcia (Premium).",
+  "onbFaqDataQ": "Gdzie są zapisane moje dane?",
+  "onbFaqDataA": "Dane są przechowywane na serwerach w Europie (Supabase). Przy „Zacznij bez konta” dane są lokalne do momentu połączenia z kontem.",
+  "onbFaqDeleteQ": "Jak usunąć konto i dane?",
+  "onbFaqDeleteA": "W aplikacji: Profil → Usuń konto. Możesz też złożyć wniosek na latwaforma.pl/usun-konto.html. Po zatwierdzeniu konto i powiązane dane są usuwane (to nie jest zamrożenie konta). Subskrypcję w Google Play / App Store anuluj osobno w sklepie. W razie problemów: contact@latwaforma.pl.",
+  "onbFaqMedicalQ": "Czy to aplikacja medyczna?",
+  "onbFaqMedicalA": "Nie. Łatwa Forma nie jest urządzeniem medycznym i nie diagnozuje, nie leczy ani nie zapobiega chorobom. Obliczenia i porady AI są orientacyjne. W sprawach zdrowia skonsultuj się z lekarzem lub dietetykiem.",
+  "onbSendingLinkAndCode": "Wysyłanie linku i kodu...",
+  "onbSignedIn": "Zalogowano",
+  "onbSignedInSuccess": "Zalogowano pomyślnie!",
+  "onbSignedInDataSaved": "Zostałeś zalogowany. Twoje dane są zapisane.",
+  "onbAccountLinked": "Konto połączone",
+  "onbEmailLinkedSuccess": "Twój adres e-mail został połączony z kontem. Możesz się teraz logować tym emailem.",
+  "onbEnterEmailTitle": "Podaj adres email",
+  "onbEnterEmailWhichAddress": "Na który adres wysłaliśmy link i kod? Podaj go, a następnie wpiszesz kod.",
+  "onbEmailAddressLabel": "Adres email",
+  "onbEmailAddressLabelAlt": "Adres e-mail",
+  "onbEmailAddressHint": "np. jan@example.com",
+  "onbCheckInbox": "Sprawdź skrzynkę",
+  "onbEnterCodeFromEmailTitle": "Wpisz kod z maila",
+  "onbEnterCodeFromEmailLabel": "Wpisz kod z maila:",
+  "onbEmailCodeLabel": "Kod z maila",
+  "onbEmailCodeHint": "np. 123456",
+  "onbSentLinkAndCode": "Wysłaliśmy link i kod na {email}. Sprawdź skrzynkę (także folder Spam) – możesz kliknąć link w mailu lub wpisać kod poniżej.",
+  "@onbSentLinkAndCode": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbEnterCodeReceived": "Wpisz poniżej kod, który otrzymałeś na adres {email}.",
+  "@onbEnterCodeReceived": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCodeSentTo": "Kod wysłany na: {email}",
+  "@onbCodeSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCodeSentEnterBelow": "Wysłaliśmy kod na {email}. Wpisz go poniżej.",
+  "@onbCodeSentEnterBelow": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbResend": "Wyślij ponownie",
+  "onbSignIn": "Zaloguj",
+  "onbConfirmCode": "Potwierdź kod",
+  "onbSuccess": "Sukces",
+  "onbSendLinkAndCode": "Wyślij link oraz kod",
+  "onbEmailSignupBody": "Podaj adres e-mail. Wyślemy link i kod, którymi dokończysz założenie konta.",
+  "onbEnterEmailRequired": "Podaj adres e-mail",
+  "onbIntroTitle": "Powiedz nam kilka rzeczy o sobie",
+  "onbIntroBody": "Pokażemy Ci ile jeść każdego dnia,\naby osiągnąć swój cel.",
+  "onbIntroDuration": "Zajmie mniej niż minutę",
+  "onbIntroStart": "Rozpocznij",
+  "onbAnonErrorTitle": "Nie udało się rozpocząć bez konta",
+  "onbAnonErrorNoConfig": "Aplikacja nie ma połączenia z serwerem (brak konfiguracji w buildzie).",
+  "onbAnonErrorTimeout": "Serwer nie odpowiedział w czasie. Sprawdź internet lub spróbuj później.",
+  "onbAnonErrorFailed": "Połączenie z serwerem nie powiodło się. Możesz:",
+  "onbAnonErrorTipDomain": "• Upewnij się, że jesteś na adresie latwaforma.pl.",
+  "onbAnonErrorTipRefresh": "• Odśwież stronę (F5) i spróbuj ponownie.",
+  "onbAnonErrorTipLogin": "• Albo zaloguj się przez Apple, Google albo e-mail – przycisk na górze.",
+  "onbOpenLatwaForma": "Otwórz latwaforma.pl",
+  "onbSplashNoServerConfig": "Brak połączenia z serwerem. Sprawdź konfigurację (.env) i internet.",
+  "onbSplashNoConnection": "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
+  "onbSplashLoginFailed": "Nie udało się zalogować. Uzupełnij profil lub spróbuj zalogować się ponownie.",
+  "onbSplashGoogleFailed": "Logowanie Google nie powiodło się. Zaloguj się ponownie w tej samej karcie.",
+  "onbSplashAbort": "Przerwij",
+  "onbPlanThanks": "Dziękujemy!",
+  "onbPlanGotIt": "Mamy to!",
+  "onbPlanStepData": "Dane",
+  "onbPlanStepCalc": "Kalkulacja",
+  "onbPlanStepMacro": "Makro",
+  "onbPlanStepDone": "Gotowe",
+  "onbPlanStatusAnalyzing": "Analizujemy Twoje dane…",
+  "onbPlanStatusCalories": "Obliczanie kalorii…",
+  "onbPlanStatusMacro": "Makro…",
+  "onbPlanStatusAlmost": "Prawie gotowe…",
+  "onbPlanReadyTitle": "Twój plan jest gotowy!",
+  "onbPlanWhatDone": "Co zostało zrobione:",
+  "onbPlanCaloriesComputed": "• Na podstawie wzrostu, wagi, wieku i poziomu aktywności obliczyliśmy Twoje dzienne zapotrzebowanie kaloryczne.",
+  "onbPlanCaloriesComputedWithValue": "• Na podstawie wzrostu, wagi, wieku i poziomu aktywności obliczyliśmy Twoje dzienne zapotrzebowanie kaloryczne: {calories} kcal.",
+  "@onbPlanCaloriesComputedWithValue": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanTargetDate": "• Szacowany termin osiągnięcia celu: {date}",
+  "@onbPlanTargetDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanChangeInProfile": "Możesz w każdej chwili zmienić te dane w zakładce Profil (ikona osoby u góry).",
+  "onbPlanHowToUse": "Jak korzystać z aplikacji:",
+  "onbPlanTipMeals": "• Dodawaj posiłki – śledź, co jesz i ile kalorii spożywasz",
+  "onbPlanTipWater": "• Pij wodę – ustaw przypomnienia w ustawieniach",
+  "onbPlanTipWeight": "• Wpisuj wagę regularnie – widzisz postępy na wykresie",
+  "onbPlanTipDashboard": "• Sprawdzaj dashboard – tam widzisz swój dzienny cel i postępy",
+  "onbPlanMedicalNote": "Łatwa Forma nie jest urządzeniem medycznym i nie diagnozuje, nie leczy ani nie zapobiega chorobom. W sprawach zdrowia skonsultuj się z lekarzem lub dietetykiem.",
+  "onbPlanStartButton": "Rozumiem, zaczynam!",
+  "onbSaveProgressTitle": "Zapisz postępy",
+  "onbSaveProgressBodyWithMeals": "Masz już {count} posiłków! Zaloguj się, aby nie stracić danych przy reinstalacji aplikacji.",
+  "@onbSaveProgressBodyWithMeals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbSaveProgressBodyEmpty": "Załóż konto, żeby Twoje posiłki, aktywności i waga były zapisane w chmurze i dostępne na każdym urządzeniu – nic nie zginie przy reinstalacji.",
+  "onbChooseLoginMethod": "Wybierz sposób logowania:",
+  "onbLater": "Później",
+  "guestTrialDaysLeft": "Bez konta: zostało {days} dni",
+  "@guestTrialDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "guestTrialOneDay": "Bez konta: został 1 dzień",
+  "guestTrialLastDay": "Bez konta: ostatni dzień. Od jutra nowe wpisy wymagają konta.",
+  "guestTrialCardBody": "Połącz konto, żeby dane zostały przy zmianie telefonu.",
+  "guestTrialEndedTitle": "Okres bez konta minął",
+  "guestTrialEndedBody": "Możesz przeglądać zapisane posiłki, wodę i wagę. Żeby dodawać dalej, połącz konto — dane zostaną.",
+  "guestTrialViewOnly": "Tylko podgląd",
+  "onbLinkingAccount": "Łączenie konta...",
+  "onbAccountSavedSuccess": "Konto zapisane pomyślnie!",
+  "onbSaveWithEmailTitle": "Zapisz z emailem",
+  "onbEmailAlreadyRegistered": "E-mail już zarejestrowany",
+  "onbClickBelowToLogin": "Kliknij poniżej, aby przejść do logowania:",
+  "onbSignOutAndSignIn": "Wyloguj i zaloguj się",
+  "onbGoBackTitle": "Cofnąć się?",
+  "onbGoBackBody": "Dane nie zostaną zapisane. Wrócisz do ekranu początkowego.",
+  "onbGoBackConfirm": "Tak, cofnij",
+  "onbBackTooltip": "Cofnij",
+  "onbCompleteData": "Uzupełnij dane",
+  "onbGenderLabel": "Płeć *",
+  "onbGenderFemale": "Kobieta",
+  "onbGenderMale": "Mężczyzna",
+  "onbAgeLabel": "Wiek *",
+  "onbYearsUnit": "lat",
+  "onbHeightLabel": "Wzrost (cm) *",
+  "onbCurrentWeightLabel": "Aktualna waga (kg) *",
+  "onbTargetWeightLabel": "Waga docelowa (kg) *",
+  "onbWeightDiff": "Różnica: {diff} kg",
+  "@onbWeightDiff": {
+    "placeholders": {
+      "diff": {
+        "type": "String"
+      }
+    }
+  },
+  "onbWeightDiffMin": "Różnica między wagami musi wynosić co najmniej 1 kg",
+  "onbActivityLabel": "Poziom aktywności *",
+  "onbActivitySedentary": "Siedzący",
+  "onbActivitySedentaryDesc": "Brak aktywności lub minimalna aktywność",
+  "onbActivityLight": "Lekka",
+  "onbActivityLightDesc": "Ćwiczenia 1-3 razy w tygodniu",
+  "onbActivityModerate": "Umiarkowana",
+  "onbActivityModerateDesc": "Ćwiczenia 3-5 razy w tygodniu",
+  "onbActivityIntense": "Intensywna",
+  "onbActivityIntenseDesc": "Ćwiczenia 6-7 razy w tygodniu",
+  "onbActivityVeryIntense": "Bardzo intensywna",
+  "onbActivityVeryIntenseDesc": "Bardzo ciężka praca fizyczna lub treningi 2x dziennie",
+  "onbSaveAndStart": "Zapisz i rozpocznij",
+  "onbGoalLose": "Chcę schudnąć.",
+  "onbGoalGain": "Chcę przybrać na wadze.",
+  "onbGoalMaintain": "Chcę utrzymać obecną wagę.",
+  "onbGoalUnchangedSameWeight": "Cel się nie zmienił. Waga docelowa nie różni się od aktualnej, więc plan jest na utrzymanie wagi.",
+  "onbErrorCreatingAccount": "Błąd podczas tworzenia konta.",
+  "onbErrorNetworkPermission": "Błąd uprawnień sieciowych.\n\nRozwiązanie:\n1. Zatrzymaj aplikację\n2. Uruchom ponownie: flutter run\n3. Jeśli problem nadal występuje, sprawdź czy anonimowa autoryzacja jest włączona w Supabase",
+  "onbErrorAnonymousDisabled": "Anonimowa autoryzacja nie jest włączona w Supabase.\n\nPrzejdź do: Authentication → Providers → Anonymous → Enable",
+  "onbErrorInternet": "Błąd połączenia z internetem.\nSprawdź połączenie i spróbuj ponownie.",
+  "onbErrorInternetShort": "Błąd połączenia z internetem. Sprawdź połączenie i spróbuj ponownie.",
+  "onbErrorSupabaseConfig": "Błąd konfiguracji Supabase.\nSprawdź klucze API w pliku .env",
+  "onbErrorWithDetails": "Błąd: {details}",
+  "@onbErrorWithDetails": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "onbErrorSaving": "Błąd podczas zapisywania",
+  "onbErrorAuth": "Błąd autoryzacji. Sprawdź konfigurację Supabase.",
+  "moreStatisticsTitle": "Statystyki",
+  "moreStreaksTooltip": "Serie",
+  "moreWeeklySummary": "Tygodniowe podsumowanie",
+  "moreShareTooltip": "Udostępnij",
+  "moreShareWeeklyStatsFeature": "Udostępnianie tygodniowych statystyk",
+  "moreShareWeeklySummaryText": "📊 Łatwa Forma – Tygodniowe podsumowanie",
+  "moreShareError": "Błąd udostępniania: {error}",
+  "@moreShareError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAvgDailyCalories": "Średnie dzienne kalorie",
+  "moreTotalCaloriesWeek": "Całkowite kalorie (tydzień)",
+  "moreBurnedCaloriesWeek": "Spalone kalorie (tydzień)",
+  "moreWaterWeek": "Woda (tydzień)",
+  "moreCaloriesDuringWeek": "Kalorie w ciągu tygodnia",
+  "moreMacrosWeek": "Makro (tydzień)",
+  "moreProtein": "Białko",
+  "moreFat": "Tłuszcze",
+  "moreCarbs": "Węgle",
+  "moreCarbsFull": "Węglowodany",
+  "moreGoalVerification": "Weryfikacja celu",
+  "moreGoalVerificationHint": "Wprowadzaj posiłki i wagę codziennie przez tydzień. Aplikacja zweryfikuje Twój cel i zaproponuje poprawki, jeśli Twoje realne zapotrzebowanie różni się od kalkulatora.",
+  "moreProgressDaysWithData": "Postęp: {days}/7 dni z danymi",
+  "@moreProgressDaysWithData": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "moreBasedOnLast7Days": "Na podstawie ostatnich 7 dni:",
+  "moreAvgCaloriesPerDayBullet": "• Średnio: ~{calories} kcal/dzień",
+  "@moreAvgCaloriesPerDayBullet": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightStable": "stała",
+  "moreWeightIncrease": "wzrost (+{kg} kg)",
+  "@moreWeightIncrease": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightDecrease": "spadek ({kg} kg)",
+  "@moreWeightDecrease": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightBullet": "• Waga: {change}",
+  "@moreWeightBullet": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSaving": "Zapisywanie…",
+  "moreApplyCorrectedGoal": "Wprowadź poprawiony cel",
+  "moreGoalAligned": "Masz wystarczająco danych. Twój obecny cel jest zgodny z trendem – nie ma potrzeby korekty.",
+  "moreRealTdee": "Realne zapotrzebowanie: ~{calories} kcal",
+  "@moreRealTdee": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGoalUpdated": "Cel zaktualizowany do ~{calories} kcal",
+  "@moreGoalUpdated": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreErrorWithDetails": "Błąd: {error}",
+  "@moreErrorWithDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGoalHistoryReason": "Weryfikacja na podstawie danych z ostatniego tygodnia",
+  "moreDayMon": "Pon",
+  "moreDayTue": "Wt",
+  "moreDayWed": "Śr",
+  "moreDayThu": "Czw",
+  "moreDayFri": "Pt",
+  "moreDaySat": "Sob",
+  "moreDaySun": "Nie",
+  "moreSuggestionWeightLossFlat": "Waga stała przy ~{avg} kcal. Twoje realne zapotrzebowanie to ~{real} kcal. Chcesz schudnąć? Spróbuj ~{corr} kcal.",
+  "@moreSuggestionWeightLossFlat": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightLossDown": "Chudniesz przy ~{avg} kcal. Realne TDEE: ~{real} kcal. Sugerowany cel: ~{corr} kcal.",
+  "@moreSuggestionWeightLossDown": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightGainFlat": "Waga stała przy ~{avg} kcal. Twoje realne zapotrzebowanie to ~{real} kcal. Chcesz przytyć? Spróbuj ~{corr} kcal.",
+  "@moreSuggestionWeightGainFlat": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightGainUp": "Tyjesz przy ~{avg} kcal. Realne TDEE: ~{real} kcal. Sugerowany cel: ~{corr} kcal.",
+  "@moreSuggestionWeightGainUp": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionMaintain": "Realne zapotrzebowanie: ~{real} kcal (kalkulator: {calc} kcal). Cel: ~{corr} kcal.",
+  "@moreSuggestionMaintain": {
+    "placeholders": {
+      "real": {
+        "type": "String"
+      },
+      "calc": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreBmiCalculatorTitle": "Kalkulator BMI",
+  "moreYourBmi": "Twoje BMI",
+  "moreCalculatedBasedOn": "Obliczono na podstawie:",
+  "moreCurrentWeightBullet": "• Aktualna waga: {weight} kg",
+  "@moreCurrentWeightBullet": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "moreHeightBullet": "• Wzrost: {height} cm",
+  "@moreHeightBullet": {
+    "placeholders": {
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "moreNormalBmiRangeHint": "Aby być w normie (BMI 18,5–24,9), dąż do wagi w przedziale od {minKg} do {maxKg} kg.",
+  "@moreNormalBmiRangeHint": {
+    "placeholders": {
+      "minKg": {
+        "type": "String"
+      },
+      "maxKg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCompleteProfileForBmi": "Uzupełnij profil (waga i wzrost), aby zobaczyć swoje BMI",
+  "moreBmiScale": "Skala BMI",
+  "moreBmiUnderweight": "Niedowaga",
+  "moreBmiNormal": "Normalna",
+  "moreBmiOverweight": "Nadwaga",
+  "moreBmiObesity1": "Otyłość I stopnia",
+  "moreBmiObesity2": "Otyłość II stopnia",
+  "moreBmiObesity3": "Otyłość III stopnia",
+  "moreBmiFormulaTitle": "Wzór BMI",
+  "moreBmiFormula": "BMI = waga (kg) / wzrost (m)²",
+  "moreBmiExplanation": "BMI to wskaźnik masy ciała, który pomaga ocenić, czy waga jest odpowiednia do wzrostu.",
+  "moreExportTitle": "Eksport danych",
+  "moreExportDescription": "Wyeksportuj dane do pliku CSV (pełna lista) lub PDF (raport z ostatnich 30 dni). Otworzy się okno udostępniania.",
+  "moreExporting": "Eksportowanie...",
+  "moreExportToCsv": "Eksportuj do CSV",
+  "moreExportToPdfPremium": "Eksportuj do PDF (Premium)",
+  "moreExportPdfFeature": "Eksport do PDF",
+  "moreUserNotLoggedIn": "Użytkownik nie jest zalogowany",
+  "moreCsvCopiedClipboard": "Dane skopiowane do schowka. Wklej do Notatnika lub Excela i zapisz jako .csv",
+  "moreCsvFileReady": "Plik CSV gotowy. Możesz go zapisać lub udostępnić.",
+  "moreCsvClipboardFallback": "Dane wyeksportowane do schowka (CSV). Wklej je np. do Notatek i zapisz jako plik .csv",
+  "moreCsvClipboardShort": "Dane wyeksportowane do schowka (CSV).",
+  "moreExportFailed": "Nie udało się wyeksportować. Sprawdź połączenie i spróbuj ponownie.",
+  "moreExportShareText": "Eksport danych Łatwa Forma",
+  "moreExportShareSubject": "Dane Łatwa Forma - {date}",
+  "@moreExportShareSubject": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfReportShareText": "Raport Łatwa Forma",
+  "morePdfReportShareSubject": "Raport Łatwa Forma - {date}",
+  "@morePdfReportShareSubject": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfDownloaded": "PDF został pobrany. Sprawdź folder Pobrane.",
+  "morePdfShareOrDownloadFailed": "Nie udało się udostępnić ani pobrać PDF. Spróbuj w przeglądarce Chrome lub wyeksportuj do CSV.",
+  "morePdfShareFailed": "Nie udało się udostępnić PDF. Spróbuj wyeksportować do CSV.",
+  "morePdfFileReady": "Plik PDF gotowy. Możesz go zapisać lub udostępnić.",
+  "morePdfExportFailedWithHint": "Eksport PDF nie powiódł się ({hint}). Spróbuj do CSV.",
+  "@morePdfExportFailedWithHint": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfExportFailed": "Eksport PDF nie powiódł się. Spróbuj ponownie lub wyeksportuj do CSV.",
+  "moreCsvSectionProfile": "=== PROFIL ===",
+  "moreCsvHeaderTypeNameValue": "Typ,Nazwa,Wartość",
+  "moreCsvProfile": "Profil",
+  "moreCsvGender": "Płeć",
+  "moreGenderMale": "Mężczyzna",
+  "moreGenderFemale": "Kobieta",
+  "moreGenderOther": "Inna",
+  "moreCsvAge": "Wiek",
+  "moreCsvAgeYears": "{age} lat",
+  "@moreCsvAgeYears": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCsvHeight": "Wzrost",
+  "moreCsvCurrentWeight": "Aktualna waga",
+  "moreCsvTargetWeight": "Waga docelowa",
+  "moreCsvGoal": "Cel",
+  "moreGoalWeightLoss": "Utrata wagi",
+  "moreGoalWeightGain": "Przybranie wagi",
+  "moreGoalMaintain": "Utrzymanie",
+  "moreGoalMaintainWeight": "Utrzymanie wagi",
+  "moreCsvCalorieGoal": "Cel kaloryczny",
+  "moreCsvProteinG": "Białko (g)",
+  "moreCsvFatG": "Tłuszcze (g)",
+  "moreCsvCarbsG": "Węglowodany (g)",
+  "moreCsvTargetDate": "Szacowany termin osiągnięcia celu",
+  "moreCsvSectionDiary": "=== DANE DZIENNIKA ===",
+  "moreCsvGarminNote": "# Dane aktywności mogą obejmować dane z urządzeń Garmin.",
+  "moreCsvHeaderDiary": "Typ,Nazwa,Wartość,Data,Źródło danych",
+  "moreCsvMeal": "Posiłek",
+  "moreCsvActivity": "Aktywność",
+  "moreCsvWeight": "Waga",
+  "morePdfReportTitle": "Łatwa Forma – Raport",
+  "morePdfPageFooter": "Strona {page} z {pages} • Wygenerowano {date}",
+  "@morePdfPageFooter": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "pages": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfProfileSummary": "Podsumowanie profilu",
+  "morePdfProfileLine1": "Płeć: {gender} • Wiek: {age} lat • Wzrost: {height} cm",
+  "@morePdfProfileLine1": {
+    "placeholders": {
+      "gender": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfProfileLine2": "Waga: {weight} kg • Cel: {target} kg • Cel kaloryczny: {calories} kcal",
+  "@morePdfProfileLine2": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      },
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfGoalWeightLoss": "Cel: Utrata wagi",
+  "morePdfGoalWeightGain": "Cel: Przybranie wagi",
+  "morePdfGoalMaintain": "Cel: Utrzymanie wagi",
+  "morePdfNoProfile": "Brak profilu",
+  "morePdfMealsLast30": "Ostatnie 30 dni – posiłki",
+  "morePdfNoMeals": "Brak posiłków",
+  "morePdfDate": "Data",
+  "morePdfName": "Nazwa",
+  "morePdfActivitiesLast30": "Ostatnie 30 dni – aktywności",
+  "morePdfNoActivities": "Brak aktywności",
+  "morePdfGarminAttribution": "Dane aktywności pochodzą z urządzeń Garmin.",
+  "morePdfWeightHistory": "Historia wagi",
+  "morePdfNoMeasurements": "Brak pomiarów",
+  "morePdfWeightKg": "Waga (kg)",
+  "moreNotificationsTitle": "Powiadomienia",
+  "moreWaterReminders": "Przypomnienia o wodzie",
+  "moreMealReminders": "Przypomnienia o posiłkach",
+  "moreAdd": "Dodaj",
+  "moreMealBreakfast": "Śniadanie",
+  "moreMealLunch": "Obiad",
+  "moreMealDinner": "Kolacja",
+  "moreMealSnack": "Przekąska",
+  "moreMealDefault": "Posiłek",
+  "moreNewMealReminder": "Nowe przypomnienie o posiłku",
+  "moreMealNameLabel": "Nazwa posiłku",
+  "moreMealNameHint": "np. Drugie śniadanie, Podwieczorek",
+  "moreEditReminder": "Edytuj przypomnienie",
+  "moreNotifWaterTitle": "Pamiętaj o wodzie! 💧",
+  "moreNotifWaterBody": "Czas na szklankę wody",
+  "moreNotifWaterChannel": "Przypomnienia o wodzie",
+  "moreNotifWaterChannelDesc": "Przypomnienia o piciu wody",
+  "moreNotifMealTitle": "Czas na {label}! 🍽️",
+  "@moreNotifMealTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "moreNotifMealBody": "Nie zapomnij zarejestrować posiłku",
+  "moreNotifMealChannel": "Przypomnienia o posiłkach",
+  "moreNotifMealChannelDesc": "Przypomnienia o rejestracji posiłków",
+  "moreIntegrationsTitle": "Integracje",
+  "moreLoginToFinishStrava": "Zaloguj się, aby dokończyć połączenie ze Strava",
+  "moreLoginToFinishGarmin": "Zaloguj się, aby dokończyć połączenie z Garmin",
+  "moreStravaConnectedImported": "Strava połączona. Zaimportowano {count} aktywności.",
+  "@moreStravaConnectedImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreStravaConnectedNoNew": "Strava połączona. Brak nowych aktywności do importu.",
+  "moreStravaConnectedSuccess": "Strava połączona pomyślnie",
+  "moreStravaSyncFailedLater": "Synchronizacja nie powiodła się. Kliknij „Synchronizuj aktywności” później.",
+  "moreGarminSessionExpiredRetry": "Sesja wygasła. Spróbuj ponownie połączyć Garmin.",
+  "moreGarminSessionRejected": "Sesja odrzucona: {message}. Wyloguj się, zaloguj ponownie i spróbuj połączyć Garmin.",
+  "@moreGarminSessionRejected": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminSessionExpiredRelogin": "Sesja wygasła. Wyloguj się i zaloguj ponownie do Łatwej Formy, potem kliknij „Połącz z Garmin Connect”.",
+  "moreConnectedSuccessfully": "Połączono pomyślnie!",
+  "moreGarminSessionExpiredShort": "Sesja wygasła. Wyloguj się i zaloguj ponownie, potem połącz Garmin.",
+  "moreGarminError": "Błąd Garmin: {error}",
+  "@moreGarminError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStravaEnvMissing": "Dodaj STRAVA_CLIENT_ID i STRAVA_CLIENT_SECRET do pliku .env",
+  "moreGarminEnvMissing": "Dodaj GARMIN_CLIENT_ID do env (po zatwierdzeniu programu).",
+  "moreLoginAgainForGarmin": "Zaloguj się ponownie, aby uzupełnić dane Garmin.",
+  "moreCouldNotComplete": "Nie udało się: {message}",
+  "@moreCouldNotComplete": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminNoUserId": "Garmin nie zwrócił User ID. Spróbuj odłączyć i połączyć ponownie.",
+  "moreGarminReceiveDataSaved": "Dane do odbierania aktywności zapisane. Nowe treningi z Garmin Connect będą się pojawiać w aplikacji.",
+  "moreGarminDisconnectFailed": "Nie udało się wywołać odłączenia u Garmin: {error}",
+  "@moreGarminDisconnectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminDisconnectedTitle": "Garmin Connect odłączony",
+  "moreGarminDisconnectedBody": "Połączenie z Garmin Connect zostało usunięte. Nowe aktywności nie będą już dodawane automatycznie. Możesz połączyć ponownie w dowolnym momencie.",
+  "moreStravaDisconnected": "Strava odłączona",
+  "moreConnectStravaFirst": "Najpierw połącz konto Strava",
+  "moreImportedFromStrava": "Zaimportowano {count} aktywności ze Strava",
+  "@moreImportedFromStrava": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreNoNewActivities": "Brak nowych aktywności do importu",
+  "moreSyncError": "Błąd synchronizacji: {error}",
+  "@moreSyncError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStravaImportDesc": "Importuj wszystkie aktywności i spalone kalorie",
+  "moreConnected": "Połączona",
+  "moreSyncing": "Synchronizuję...",
+  "moreSyncActivities": "Synchronizuj aktywności",
+  "moreDisconnectStrava": "Odłącz Strava",
+  "moreConnecting": "Łączę...",
+  "moreConnectStrava": "Połącz ze Strava",
+  "moreGarminImportDesc": "Aktywności z Garmin dodawane automatycznie po synchronizacji z Garmin Connect",
+  "moreGarminAutoImportInfo": "Wszystkie nowe aktywności z Garmin Connect są importowane do aplikacji. To Ty decydujesz, którą wliczyć do bilansu.",
+  "moreGarminNeedUserId": "Żeby aktywności z Garmin pojawiały się w aplikacji, zapisz dane połączenia (ID Garmin).",
+  "moreSavingShort": "Zapisuję...",
+  "moreCompleteActivityReceiveData": "Uzupełnij dane do odbierania aktywności",
+  "moreDisconnectGarmin": "Odłącz Garmin",
+  "moreConnectGarmin": "Połącz z Garmin Connect",
+  "moreGarminDisconnectErrorStatus": "Błąd odłączania: {status}",
+  "@moreGarminDisconnectErrorStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "moreErrorStatusCode": "Błąd {code}",
+  "@moreErrorStatusCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "moreChallengesTitle": "Cele i wyzwania",
+  "moreNoChallenges": "Brak celów i wyzwań",
+  "moreNoChallengesHint": "Dodaj cel lub wyzwanie, aby śledzić swoje postępy",
+  "moreProgressPercent": "Postęp: {percent}%",
+  "@moreProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStartDate": "Start: {date}",
+  "@moreStartDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreEndDate": "Koniec: {date}",
+  "@moreEndDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreDeleteChallengeTitle": "Usuń wyzwanie",
+  "moreDeleteChallengeConfirm": "Czy na pewno chcesz usunąć \"{title}\"?",
+  "@moreDeleteChallengeConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "moreChallengeDeleted": "Wyzwanie usunięte",
+  "morePickStartDate": "Wybierz datę rozpoczęcia",
+  "morePickEndDate": "Wybierz datę zakończenia",
+  "morePick": "Wybierz",
+  "moreChallengeAdded": "Wyzwanie dodane pomyślnie!",
+  "moreTargetWeightKg": "Cel wagi (kg)",
+  "moreCalorieDeficitKcal": "Deficyt kaloryczny (kcal)",
+  "moreWaterAmountMl": "Ilość wody (ml)",
+  "moreWorkoutCount": "Liczba treningów",
+  "moreStreakLengthDays": "Długość serii (dni)",
+  "moreTargetValue": "Wartość docelowa",
+  "moreAddChallenge": "Dodaj wyzwanie",
+  "moreChallengeType": "Typ wyzwania",
+  "moreCalorieDeficit": "Deficyt kaloryczny",
+  "moreWater": "Woda",
+  "moreExercise": "Ćwiczenia",
+  "moreStreak": "Seria",
+  "moreChallengeTitleLabel": "Tytuł wyzwania",
+  "moreChallengeTitleHint": "np. Schudnij 5 kg",
+  "moreChallengeTitleRequired": "Podaj tytuł wyzwania",
+  "moreDescriptionOptional": "Opis (opcjonalnie)",
+  "moreChallengeDescHint": "Dodatkowe informacje o wyzwaniu",
+  "moreOptional": "Opcjonalnie",
+  "moreStartDateLabel": "Data rozpoczęcia",
+  "moreSetEndDate": "Ustaw datę zakończenia",
+  "moreEndDateLabel": "Data zakończenia",
+  "morePickDate": "Wybierz datę",
+  "moreStreaksTitle": "Serie",
+  "moreNoStreaks": "Brak serii",
+  "moreNoStreaksHint": "Zacznij śledzić swoje nawyki, aby zobaczyć serie",
+  "moreLastTime": "Ostatni raz: {date}",
+  "@moreLastTime": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCurrentStreak": "Aktualna seria",
+  "moreLongestStreak": "Najdłuższa seria",
+  "moreStreakMeals": "Posiłki",
+  "moreStreakActivities": "Aktywności",
+  "moreStreakWeight": "Waga",
+  "moreAiAdviceTitle": "Porada AI",
+  "moreAiLimitReachedPremium": "Wykorzystałeś dzisiejszy limit ({limit} zapytań). Spróbuj jutro.",
+  "@moreAiLimitReachedPremium": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiLimitReachedFree": "Wykorzystałeś dzisiejszy limit ({limit} zapytań). Spróbuj jutro lub przejdź na Premium.",
+  "@moreAiLimitReachedFree": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiNeedsConnection": "Porada AI wymaga połączenia z aplikacją (Supabase) lub klucza OpenAI w konfiguracji.",
+  "moreAiNoResponse": "Nie udało się uzyskać odpowiedzi. Spróbuj ponownie.",
+  "moreAiRemainingToday": "Pozostało zapytań dziś: {remaining} / {limit}",
+  "@moreAiRemainingToday": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiRemainingTodayPremium": "Pozostało zapytań dziś: {remaining} / {limit} (Premium)",
+  "@moreAiRemainingTodayPremium": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiIntro": "Zapytaj o poradę w zakresie diety, odżywiania lub aktywności fizycznej. Odpowiedź generuje AI i nie zastępuje konsultacji z lekarzem.",
+  "moreAiHint": "np. Ile białka potrzebuję przy treningu siłowym?",
+  "moreAiAnswer": "Odpowiedź",
+  "profErrNetwork": "Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.",
+  "profErrCors": "Błąd połączenia z usługą. Odśwież stronę i spróbuj ponownie.",
+  "profErrTimeout": "Przekroczono limit czasu. Spróbuj ponownie.",
+  "profErrAuth": "Błąd autoryzacji. Zaloguj się ponownie.",
+  "profErrNotFound": "Nie znaleziono zasobu.",
+  "profErrServer": "Błąd serwera. Spróbuj później.",
+  "profErrGeneric": "Wystąpił błąd. Spróbuj ponownie.",
+  "profOfflineBanner": "Brak połączenia z internetem.",
+  "premFeatureTitle": "Funkcja Premium",
+  "premFeatureDialog": "{feature} jest dostępna w planie Premium. Czy chcesz dowiedzieć się więcej?",
+  "@premFeatureDialog": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premFeatureThis": "Ta funkcja",
+  "premSeePremium": "Zobacz Premium",
+  "premLockedTitle": "{feature} jest w Premium",
+  "@premLockedTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premLockedBody": "Odblokuj nieograniczoną poradę AI, eksport PDF i więcej.",
+  "premCheckPremium": "Sprawdź Premium",
+  "premThanks": "Dziękujemy!",
+  "premActivatedBody": "Premium zostało aktywowane.\nCiesz się pełnym dostępem do Łatwa Forma – eksport PDF, porady AI, integracje i więcej.",
+  "premBackToApp": "Wróć do aplikacji",
+  "premCloseTabHint": "Możesz też zamknąć tę kartę, jeśli płatność była w osobnym oknie.",
+  "premPaymentCancelled": "Płatność anulowana",
+  "premCancelBody": "Nic nie zostało pobrane. Możesz wrócić i wybrać plan, kiedy będziesz gotowy.",
+  "premBackToPlans": "Wróć do planów Premium",
+  "premGoToApp": "Przejdź do aplikacji",
+  "premTitle": "Łatwa Forma Premium",
+  "premHavePremium": "Masz Premium!",
+  "premUnlockPotential": "Odblokuj pełny potencjał",
+  "premAllFeaturesAvailable": "Wszystkie funkcje premium są dla Ciebie dostępne.",
+  "premValidUntil": "Ważne do: {date}",
+  "@premValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premTrialTitle": "Okres próbny (24 h)",
+  "premTrialLeft": "Pozostało: {hours}h {minutes}min. ",
+  "@premTrialLeft": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "premTrialBody": "Wszystkie funkcje premium są teraz dostępne. {remaining}Po tym czasie funkcje Premium się wyłączą, dopóki nie wykupisz planu. Okres próbny nie pobiera opłaty i nie zapisuje Cię automatycznie na subskrypcję.",
+  "@premTrialBody": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "premFeatHistoryOtherDays": "Przeglądanie historii innych dni niż dziś",
+  "premFeatMacrosDash": "Podgląd makroskładników na dashboardzie",
+  "premFeatAiAdvice": "Porada AI (limit 100 dziennie)",
+  "premFeatAiPhoto": "Analiza AI posiłku ze zdjęcia",
+  "premFeatIngredients": "Dodawanie posiłku ze składników",
+  "premFeatEatingOut": "Dodawanie posiłku „na mieście”",
+  "premFeatQuickActivity": "Szybkie dodawanie w aktywnościach",
+  "premFeatShare": "Udostępnianie podsumowania i tygodniowych statystyk",
+  "premFeatPdf": "Eksport raportów do PDF",
+  "premFeatCustomCalories": "Własny cel kaloryczny w edycji profilu",
+  "premFeatCustomMacros": "Własne makroskładniki w edycji profilu",
+  "premFeatStrava": "Integracje Strava bez limitów",
+  "premFeatGoals": "Zaawansowane cele i wyzwania",
+  "premChoosePlan": "Wybierz plan",
+  "premPlanMonthly": "Łatwa Forma Premium – miesięcznie",
+  "premPlanMonthlyPeriod": "1 miesiąc, auto-odnawiane",
+  "premPlanYearly": "Łatwa Forma Premium – rocznie",
+  "premPlanYearlyPeriod": "12 miesięcy, auto-odnawiane",
+  "premBadgeSave": "Oszczędzasz ~17%",
+  "premPlanYearlyOnce": "Rocznie (jednorazowo)",
+  "premPlanYearlyOncePeriod": "za rok",
+  "premBadgeBlik": "Tylko BLIK",
+  "premYearlyOnceSubtitle": "płatność raz na rok, bez subskrypcji",
+  "premHaveCode": "Mam kod",
+  "premCodeLabel": "Kod",
+  "premRedeemTooltip": "Zrealizuj",
+  "premOpeningPayment": "Otwieram płatność…",
+  "premProcessingPurchase": "Przetwarzam zakup…",
+  "premBuy": "Wykup Premium",
+  "premRestoring": "Przywracam…",
+  "premRestorePurchases": "Przywróć zakupy",
+  "premPaymentNoteWeb": "Rocznie (jednorazowo) – tylko BLIK. Subskrypcja – karta, Apple Pay, Google Pay. Subskrypcja odnawia się automatycznie, dopóki jej nie anulujesz.",
+  "premPaymentNoteMobile": "Płatność przez App Store / Google Play. „Łatwa Forma Premium – miesięcznie” (1 miesiąc) i „Łatwa Forma Premium – rocznie” (12 miesięcy) odnawiają się automatycznie za cenę pokazaną powyżej, aż anulujesz w ustawieniach sklepu. BLIK jest na latwaforma.pl. Podstawowe funkcje działają bez subskrypcji.",
+  "premAutoActivate": "Po opłaceniu konto Premium aktywuje się automatycznie.",
+  "premPrivacy": "Polityka prywatności",
+  "premTerms": "Regulamin",
+  "premEula": "Terms of Use (EULA)",
+  "premActivating": "Aktywuję…",
+  "premActivateTest": "Aktywuj Premium (test)",
+  "premAvailableFeatures": "Dostępne funkcje:",
+  "premFeatActiveHistory": "Historia innych dni",
+  "premFeatActiveMacros": "Makro na dashboardzie",
+  "premFeatActiveAiPhoto": "Analiza AI posiłku",
+  "premFeatActiveIngredients": "Posiłek ze składników",
+  "premFeatActiveEatingOut": "Posiłek „na mieście”",
+  "premFeatActiveQuickActivity": "Szybkie dodawanie aktywności",
+  "premFeatActiveShare": "Udostępnianie podsumowania i statystyk",
+  "premFeatActivePdf": "Eksport do PDF",
+  "premFeatActiveCalories": "Własny cel kaloryczny",
+  "premFeatActiveMacrosCustom": "Własne makroskładniki",
+  "premFeatActiveStrava": "Integracje Strava",
+  "premFeatActiveGoals": "Zaawansowane cele",
+  "premOpening": "Otwieram…",
+  "premCancelSub": "Anuluj subskrypcję",
+  "premManageSub": "Zarządzaj subskrypcją",
+  "premCancelNoteWeb": "Możesz anulować subskrypcję. Dostęp do Premium pozostanie do końca opłaconego okresu.",
+  "premCancelNoteMobile": "Anulowanie w ustawieniach App Store / Google Play. Dostęp Premium do końca opłaconego okresu.",
+  "premEnterEmail": "Podaj adres e-mail.",
+  "premCodeSent": "Kod wysłany",
+  "premCodeSentBody": "Wysłaliśmy link i kod na {email}. Sprawdź skrzynkę (także folder Spam) – kliknij link w mailu albo wpisz kod poniżej.",
+  "@premCodeSentBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "premSignedIn": "Zalogowano",
+  "premSignedInBuy": "Możesz teraz wykupić Premium.",
+  "premAccountExistsTitle": "Konto z tym adresem e-mail istnieje.",
+  "premAccountExistsBody": "Próbujesz się zalogować na konto powiązane z tym adresem e-mail. Na tym urządzeniu masz inne dane (profil, posiłki itd.).\n\nCo chcesz zrobić?\n\n• Zaktualizować tamto konto – obecnymi danymi z tego urządzenia (profil, posiłki zostaną przeniesione).\n\n• Przywrócić dane konta – zobaczysz dane przypisane do konta z tym e-mailem (obecne dane z urządzenia nie będą użyte).\n\nW obu przypadkach musisz potwierdzić tożsamość – kliknij link w mailu lub wpisz kod weryfikacyjny.",
+  "premRestoreAccountData": "Przywróć dane konta",
+  "premUpdateWithCurrent": "Zaktualizuj konto tymi danymi",
+  "premConfirmIdentity": "Potwierdź tożsamość",
+  "premVerifyEmailSent": "Wysłaliśmy wiadomość na {email}. Możesz kliknąć link weryfikacyjny w mailu albo wpisać kod poniżej (sprawdź też folder Spam).",
+  "@premVerifyEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "premVerificationCode": "Kod weryfikacyjny",
+  "premCodeHint": "np. 123456",
+  "premEnterFullCode": "Wpisz pełny kod z maila (min. 6 znaków).",
+  "premLoggedInMergeError": "Zalogowano. Błąd przenoszenia danych: {error}",
+  "@premLoggedInMergeError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premVerifyErrorTitle": "Błąd weryfikacji",
+  "premVerifyErrorBody": "Kod wygasł lub jest nieprawidłowy. Wyślij ponownie.",
+  "premConfirm": "Zatwierdź",
+  "premConnErrorTitle": "Błąd połączenia",
+  "premConnErrorBody": "Nie udało się połączyć z płatnościami. Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl",
+  "premLoginToBuy": "Aby wykupić Premium, zaloguj się (Apple, Google albo e-mail z kodem powyżej).",
+  "premCodeNotForOnce": "Ten kod nie działa przy płatności jednorazowej.",
+  "premTryLaterContact": "Spróbuj za chwilę ponownie lub napisz do nas: contact@latwaforma.pl",
+  "premOpenPaymentFailed": "Nie udało się otworzyć płatności",
+  "premCannotOpenPaymentPage": "Nie można otworzyć strony płatności.",
+  "premCheckoutSessionError": "Błąd tworzenia sesji płatności.",
+  "premTryLaterContactShort": "Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl",
+  "premLoginToUseCode": "Aby użyć kodu, zaloguj się (Apple, Google albo e-mail).",
+  "premCodeSheetFailed": "Nie udało się otworzyć wpisywania kodu. Spróbuj ponownie.",
+  "premEnterCode": "Wpisz kod.",
+  "premPlayStoreFailed": "Nie udało się otworzyć Sklepu Play.",
+  "premLoginToBuyMobile": "Aby wykupić Premium, zaloguj się (Google, Apple lub e-mail z kodem powyżej).",
+  "premThanksActive": "Dziękujemy! Premium powinno być już aktywne. Jeśli funkcje są jeszcze zablokowane, odczekaj chwilę lub wróć do aplikacji.",
+  "premPurchasePending": "Zakup zakończony. Status Premium odświeży się za chwilę. Jeśli nie – użyj „Przywróć zakupy”.",
+  "premInfo": "Informacja",
+  "premPurchaseErrorTitle": "Błąd zakupu",
+  "premPurchaseErrorBody": "Nie udało się dokończyć zakupu. Sprawdź połączenie i konfigurację sklepu, albo napisz: contact@latwaforma.pl\n\n{error}",
+  "@premPurchaseErrorBody": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premLoginToRestore": "Zaloguj się, aby przywrócić zakupy.",
+  "premRestoredTitle": "Zakupy przywrócone",
+  "premNoPurchasesTitle": "Brak aktywnych zakupów",
+  "premRestoredBody": "Twoje Premium zostało przywrócone. Jeśli nie widzisz odblokowania, odczekaj chwilę.",
+  "premNoPurchasesBody": "Nie znaleziono aktywnej subskrypcji powiązanej z tym kontem sklepu.",
+  "premRestoreFailed": "Nie udało się przywrócić zakupów: {error}",
+  "@premRestoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premSubscription": "Subskrypcja",
+  "premManageHint": "Otwórz ustawienia subskrypcji w sklepie Apple / Google, aby anulować lub zarządzać Premium.",
+  "premSessionExpired": "Sesja wygasła",
+  "premLoginAgain": "Zaloguj się ponownie.",
+  "premPortalHintWeb": "Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.",
+  "premPortalHintMobile": "Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.",
+  "premCannotOpenPortal": "Nie można otworzyć portalu.",
+  "premPortalOpenError": "Błąd otwierania portalu.",
+  "premSessionExpiredCancel": "Sesja wygasła. Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.",
+  "premErrorWithDetail": "Błąd: {error}",
+  "@premErrorWithDetail": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premActivatedEnjoy": "Premium aktywowane. Ciesz się pełnym dostępem!",
+  "premLoginToBuyCard": "Aby wykupić Premium, potrzebne jest konto. Zaloguj się przez Google, Apple albo podaj adres e-mail – wyślemy wiadomość z linkiem weryfikacyjnym i kodem.",
+  "premSigningIn": "Logowanie…",
+  "premContinueGoogle": "Kontynuuj z Google",
+  "premContinueApple": "Kontynuuj z Apple",
+  "premOrEmail": "lub e-mail:",
+  "premEmailLabel": "Adres e-mail",
+  "premEmailHint": "np. jan@example.com",
+  "premSending": "Wysyłam…",
+  "premSendCode": "Wyślij kod",
+  "premConfirmIdentityHint": "Potwierdź tożsamość: wpisz poniżej kod z maila albo kliknij link weryfikacyjny w wiadomości (sprawdź też folder Spam).",
+  "premChecking": "Sprawdzam…",
+  "premConfirmAndSignIn": "Zatwierdź i zaloguj",
+  "premResendOtherEmail": "Wyślij kod ponownie na inny adres",
+  "profTitle": "Profil",
+  "profNotifications": "Powiadomienia",
+  "profNoProfile": "Brak profilu",
+  "profErrorWithDetail": "Błąd: {error}",
+  "@profErrorWithDetail": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profAccountGoogle": "Konto Google",
+  "profAccountEmail": "Konto e-mail",
+  "profAccountSignedIn": "Konto zalogowane",
+  "profSignOutTitle": "Wyloguj się",
+  "profSignOutBody": "Czy na pewno chcesz się wylogować? Możesz ponownie zalogować się później.",
+  "profSignOutConfirm": "Wyloguj",
+  "profDeleteAccountTitle": "Usuń konto",
+  "profDeleteAccountBody": "Twoje dane zostaną całkowicie usunięte i nie będzie można ich przywrócić. Gdy wrócisz do aplikacji, trzeba będzie uzupełnić profil od nowa.\n\nJeśli masz subskrypcję Premium w Google Play lub App Store, anuluj ją osobno w sklepie – usunięcie konta jej nie kończy.\n\nCzy na pewno chcesz usunąć konto?",
+  "profAccountDeleted": "Konto zostało usunięte",
+  "profDeleteUnavailable": "Usługa usuwania konta jest niedostępna. Skontaktuj się z nami: {email}",
+  "@profDeleteUnavailable": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "profSessionExpiredRetry": "Sesja wygasła. Zaloguj się ponownie i spróbuj jeszcze raz.",
+  "profNoPermission": "Brak uprawnień do wykonania tej operacji.",
+  "profDeleteFailed": "Nie udało się usunąć konta. Spróbuj ponownie później.",
+  "profInviteTitle": "Zaproś znajomego",
+  "profInviteBody": "Podaj adres e-mail osoby, której chcesz wysłać zaproszenie do Łatwa Forma.",
+  "profEmailLabel": "Adres e-mail",
+  "profEmailHintFriend": "np. znajomy@example.com",
+  "profSessionExpiredWebInvite": "Sesja wygasła. Odśwież stronę (F5) i zaloguj się ponownie, potem wyślij zaproszenie.",
+  "profLoginAgainRetry": "Zaloguj się ponownie i spróbuj jeszcze raz.",
+  "profInviteSent": "Zaproszenie wysłane",
+  "profSessionExpiredWebRetry": "Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.",
+  "profSessionExpiredInviteMobile": "Sesja wygasła. Wyloguj się i zaloguj ponownie, potem wyślij zaproszenie.",
+  "profInviteAlreadySent": "Na ten adres wysłano już zaproszenie. Sprawdź skrzynkę (w tym spam) lub podaj inny adres.",
+  "profEmailAlreadyRegistered": "Ten adres e-mail jest już zarejestrowany w Łatwa Forma. Zaproś kogoś innego.",
+  "profInviteRateLimit": "Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie.",
+  "profEnterValidEmail": "Podaj prawidłowy adres e-mail.",
+  "profInviteSendFailed": "Nie udało się wysłać zaproszenia. Spróbuj ponownie.",
+  "profSessionExpiredWebShort": "Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie.",
+  "profSessionExpiredSignOutIn": "Sesja wygasła. Wyloguj się i zaloguj ponownie.",
+  "profSendInvite": "Wyślij zaproszenie",
+  "profInviteSentExclaim": "Zaproszenie wysłane!",
+  "profSaveProgress": "Zapisz postępy",
+  "profSaveProgressHint": "Zaloguj się przez Apple, Google albo e-mail, aby nie stracić danych",
+  "profBasicData": "Dane podstawowe",
+  "profGender": "Płeć",
+  "profAge": "Wiek",
+  "profAgeYears": "{age} lat",
+  "@profAgeYears": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "profHeight": "Wzrost",
+  "profCurrentWeight": "Aktualna waga",
+  "profTargetWeight": "Waga docelowa",
+  "profActivityLevel": "Poziom aktywności",
+  "profGoal": "Cel",
+  "profCalculations": "Obliczenia",
+  "profBmrExplain": "Zapotrzebowanie kaloryczne w spoczynku – ile kalorii spalasz bez aktywności.",
+  "profTdeeExplain": "Całkowite dzienne zapotrzebowanie – ile kalorii spalasz w ciągu dnia z uwzględnieniem aktywności.",
+  "profCalorieGoalExplain": "Zalecane dzienne spożycie kalorii do osiągnięcia celu wagowego.",
+  "profWaterGoal": "Cel picia wody",
+  "profWaterGoalExplanation": "Obliczone z Twojej wagi: {mlPerKg} ml na każdy kg ({weightKg} kg → ok. {rawMl} ml, zaokrąglone do {goalMl} ml). Możesz zmienić cel ręcznie.",
+  "@profWaterGoalExplanation": {
+    "placeholders": {
+      "mlPerKg": {
+        "type": "int"
+      },
+      "weightKg": {
+        "type": "String"
+      },
+      "rawMl": {
+        "type": "int"
+      },
+      "goalMl": {
+        "type": "int"
+      }
+    }
+  },
+  "profMacros": "Makro",
+  "profProtein": "Białko",
+  "profFat": "Tłuszcze",
+  "profCarbs": "Węglowodany",
+  "profCarbsShort": "Węgle",
+  "profTargetDateTitle": "Termin osiągnięcia celu:",
+  "profTargetDateHint": "Działaj zgodnie z planem, a ten dzień się nie opóźni.",
+  "profSpeedUpHint": "Chcesz przyspieszyć cel? Edytuj tempo zmiany wagi w trybie edycji profilu (ikona ołówka u góry).",
+  "profMaintainNoDateTitle": "Cel: utrzymanie wagi",
+  "profMaintainNoDateBody": "Przy utrzymaniu wagi nie ma osobnego terminu „osiągnięcia”. Zmień cel na schudnięcie lub przytycie (oraz wagę docelową) — wtedy powiem Ci, kiedy mniej więcej go osiągniesz.",
+  "profMaintainNoDateCta": "Edytuj cel w profilu",
+  "profAiAdvice": "Porada AI",
+  "profAiAdviceHint": "Zapytaj o dietę, odżywianie i aktywność",
+  "profBmiTitle": "Kalkulator BMI",
+  "profBmiHint": "Sprawdź swój wskaźnik masy ciała",
+  "profTrialLeft": "Pozostało: {hours}h {minutes}min",
+  "@profTrialLeft": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "profPremiumTitleActive": "Łatwa Forma Premium",
+  "profPremiumTitle": "Subskrypcja Premium",
+  "profActive": "Aktywna",
+  "profPremiumHintActive": "Nieograniczona AI, eksport PDF, integracje",
+  "profPremiumHint": "Odblokuj pełny potencjał – AI, PDF, integracje",
+  "profIntegrations": "Integracje",
+  "profIntegrationsHint": "Strava – importuj aktywności i spalone kalorie",
+  "profExport": "Eksport danych",
+  "profExportHint": "Wyeksportuj swoje dane do CSV",
+  "profInviteHint": "Wyślij zaproszenie e-mailem do aplikacji Łatwa Forma",
+  "profPrivacy": "Polityka prywatności",
+  "profTerms": "Regulamin",
+  "profEula": "Terms of Use (EULA)",
+  "profDeleteAccountPage": "Usuń konto (strona)",
+  "profYourAccount": "Twoje konto",
+  "profDeviceData": "Dane na tym urządzeniu",
+  "profDeviceDataHint": "Korzystasz bez konta. Możesz usunąć zapisany profil i posiłki z tego urządzenia.",
+  "profDeleteData": "Usuń dane",
+  "profDeleteDataBody": "Profil, posiłki i inne dane z tego urządzenia zostaną trwale usunięte. Nie da się ich przywrócić.\n\nCzy na pewno chcesz usunąć dane?",
+  "profDataDeleted": "Dane z urządzenia zostały usunięte.",
+  "profGenderMale": "Mężczyzna",
+  "profGenderFemale": "Kobieta",
+  "profGenderOther": "Inna",
+  "profActSedentary": "Siedzący",
+  "profActLight": "Lekka",
+  "profActModerate": "Umiarkowana",
+  "profActIntense": "Intensywna",
+  "profActVeryIntense": "Bardzo intensywna",
+  "profGoalLoss": "Utrata wagi",
+  "profGoalGain": "Przybranie wagi",
+  "profGoalMaintain": "Utrzymanie wagi",
+  "profGenderRequired": "Płeć *",
+  "profAgeRequired": "Wiek *",
+  "profYearsSuffix": "lat",
+  "profHeightRequired": "Wzrost (cm) *",
+  "profCurrentWeightRequired": "Aktualna waga (kg) *",
+  "profTargetWeightRequired": "Waga docelowa (kg) *",
+  "profWeightDiffError": "Różnica między wagami musi wynosić co najmniej 1 kg",
+  "profActivityRequired": "Poziom aktywności *",
+  "profActSedentaryDesc": "Brak aktywności lub minimalna",
+  "profActLightDesc": "1-3 treningi / tydzień",
+  "profActModerateDesc": "3-5 treningów / tydzień",
+  "profActIntenseDesc": "6-7 treningów / tydzień",
+  "profActVeryIntenseDesc": "2x dziennie / ciężka praca",
+  "profWaterGoalMl": "Cel wody (ml)",
+  "profWaterGoalHelper": "Możesz zmienić ręcznie. Poniżej wyjaśnienie, skąd bierze się propozycja.",
+  "profSaveChanges": "Zapisz zmiany",
+  "profWantLose": "Chcę schudnąć.",
+  "profWantGain": "Chcę przybrać na wadze.",
+  "profWantMaintain": "Chcę utrzymać obecną wagę.",
+  "profAdjustPlan": "Dostosuj plan",
+  "profPlanPremiumOnly": "Własny cel kaloryczny i makroskładniki są dostępne w Premium.",
+  "profSeePremium": "Zobacz Premium",
+  "profWeightRate": "Tempo zmiany wagi",
+  "profRateKgWeek": "{rate} kg/tydz.",
+  "@profRateKgWeek": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "profRateZero": "0 kg/tydz.",
+  "profMaintainRateZero": "Dla utrzymania wagi tempo = 0",
+  "profRecommendedRate": "Zalecane tempo: 0,5 kg/tydz. – bezpieczne i zdrowe. Szybsze chudnięcie może być niezdrowe (utrata mięśni, niedobory, zmęczenie).",
+  "profEstTargetDate": "Szacunkowy termin osiągnięcia celu: {date}",
+  "@profEstTargetDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profMoveSlider": "Przesuń suwak, aby zobaczyć plan",
+  "profCustomCalorieGoal": "Własny cel kaloryczny",
+  "profGoalKcal": "Cel (kcal)",
+  "profLeaveEmptyFromRate": "Zostaw puste, aby obliczyć z tempa.",
+  "profCustomMacros": "Własne makroskładniki",
+  "profMacrosAutoRecalc": "Kalorie i termin przeliczą się automatycznie.",
+  "profMacroSum": "Suma: {kcal} kcal",
+  "@profMacroSum": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroPerGram": "1g = {kcal} kcal",
+  "@profMacroPerGram": {
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "profValuesNotNegative": "Wartości nie mogą być ujemne.",
+  "profMacroMaxProtein": "białko max {g} g",
+  "@profMacroMaxProtein": {
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroMaxFat": "tłuszcze max {g} g",
+  "@profMacroMaxFat": {
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroMaxCarbs": "węglowodany max {g} g",
+  "@profMacroMaxCarbs": {
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroOverLimit": "⚠️ Wartości przekraczają zalecane limity dzienne: {parts}. Wprowadź realistyczne wartości dla zdrowej diety.",
+  "@profMacroOverLimit": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroCaloriesUnreal": "⚠️ Łączna liczba kalorii ({calories} kcal) jest nierealistyczna dla dziennego zapotrzebowania. Zalecane maksimum to ok. {max} kcal/dzień.",
+  "@profMacroCaloriesUnreal": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroLossSurplus": "Twój cel to chudnięcie (waga docelowa niższa niż obecna), ale wprowadzone makroskładniki dają {surplus} kcal powyżej zapotrzebowania (TDEE: {tdee} kcal). Zmniejsz kalorie/makroskładniki, aby osiągnąć deficyt.",
+  "@profMacroLossSurplus": {
+    "placeholders": {
+      "surplus": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroGainDeficit": "Twój cel to przybieranie na wadze (waga docelowa wyższa niż obecna), ale wprowadzone makroskładniki dają deficyt (TDEE: {tdee} kcal). Zwiększ kalorie/makroskładniki, aby osiągnąć nadwyżkę.",
+  "@profMacroGainDeficit": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnCalAboveTdeeLoss": "⚠️ Cel kaloryczny jest wyższy niż TDEE ({tdee} kcal). Aby schudnąć, musisz mieć deficyt kaloryczny. Maksymalny bezpieczny deficyt to ~1100 kcal/dzień (ok. 1 kg/tydzień).",
+  "@profWarnCalAboveTdeeLoss": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnDeficitHuge": "⚠️ Deficyt kaloryczny jest bardzo duży ({deficit} kcal/dzień). Zalecany maksymalny deficyt to 1000-1500 kcal/dzień dla bezpiecznej utraty wagi.",
+  "@profWarnDeficitHuge": {
+    "placeholders": {
+      "deficit": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnDeficitTiny": "⚠️ Deficyt kaloryczny jest bardzo mały. Dla skutecznej utraty wagi zalecany jest deficyt 500-1000 kcal/dzień.",
+  "profWarnCalBelowTdeeGain": "⚠️ Cel kaloryczny jest niższy niż TDEE ({tdee} kcal). Aby przybrać na wadze, musisz mieć nadwyżkę kaloryczną. Zalecana nadwyżka to 250-500 kcal/dzień (ok. 0.25-0.5 kg/tydzień).",
+  "@profWarnCalBelowTdeeGain": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnSurplusHuge": "⚠️ Nadwyżka kaloryczna jest bardzo duża ({surplus} kcal/dzień). Zalecana nadwyżka to 250-500 kcal/dzień dla zdrowego przybierania na wadze.",
+  "@profWarnSurplusHuge": {
+    "placeholders": {
+      "surplus": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnSurplusTiny": "⚠️ Nadwyżka kaloryczna jest bardzo mała. Dla skutecznego przybierania na wadze zalecana jest nadwyżka 250-500 kcal/dzień.",
+  "profWarnMaintainFar": "⚠️ Cel kaloryczny różni się znacznie od TDEE ({tdee} kcal). Dla utrzymania wagi cel powinien być zbliżony do TDEE (±100-200 kcal).",
+  "@profWarnMaintainFar": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profCannotSaveLoss": "Nie można zapisać: Cel kaloryczny ({calories} kcal) jest wyższy niż TDEE ({tdee} kcal). Aby schudnąć, musisz mieć deficyt kaloryczny.",
+  "@profCannotSaveLoss": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profCannotSaveGain": "Nie można zapisać: Cel kaloryczny ({calories} kcal) jest niższy niż TDEE ({tdee} kcal). Aby przybrać na wadze, musisz mieć nadwyżkę kaloryczną.",
+  "@profCannotSaveGain": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profUserNotLoggedIn": "Użytkownik nie jest zalogowany",
+  "profGoalHistoryEdit": "Edycja profilu",
+  "profUpdatedSuccess": "Profil zaktualizowany pomyślnie! Cel został przeliczony.",
+  "profSaveError": "Błąd podczas zapisywania: {error}",
+  "@profSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profCalorieGoal": "Cel kaloryczny",
+  "trackPremium": "Premium",
+  "trackStatistics": "Statystyki",
+  "trackGoalsAndChallenges": "Cele i wyzwania",
+  "trackProfile": "Profil",
+  "trackSessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
+  "trackLoadDataFailed": "Nie udało się załadować danych. Sprawdź połączenie internetowe i naciśnij „Spróbuj ponownie”.",
+  "trackErrorWithDetails": "Błąd: {error}",
+  "@trackErrorWithDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSignIn": "Zaloguj się",
+  "trackFeatureEatingOut": "Posiłek „na mieście”",
+  "trackShareCaloriesText": "📊 Łatwa Forma – Kalorie {date}",
+  "@trackShareCaloriesText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackShareError": "Błąd udostępniania: {error}",
+  "@trackShareError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesOverview": "Przegląd kalorii",
+  "trackSelectDate": "Wybierz datę",
+  "trackShare": "Udostępnij",
+  "trackFeatureShareSummary": "Udostępnianie podsumowania",
+  "trackEarlierWeek": "Wcześniejszy tydzień",
+  "trackFeatureBrowseHistory": "Przeglądanie historii innych dni",
+  "trackLaterWeek": "Późniejszy tydzień",
+  "trackShowingDataFrom": "Wyświetlane dane z {date}",
+  "@trackShowingDataFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackConsumed": "Spożyte",
+  "trackTodayTarget": "Cel na dziś",
+  "trackSurplusKcal": "Nadwyżka: {kcal} kcal",
+  "@trackSurplusKcal": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackProtein": "Białko",
+  "trackFat": "Tłuszcze",
+  "trackCarbs": "Węglowodany",
+  "trackCarbsShort": "Węgle",
+  "trackIncludingSaturated": "w tym nasycone",
+  "trackIncludingSugars": "w tym cukry",
+  "trackFiber": "błonnik",
+  "trackFiberLabel": "Błonnik",
+  "trackSalt": "Sól",
+  "trackFeatureAiMealAnalysis": "Analiza AI posiłku",
+  "trackAiPhotoAnalysisTooltip": "Analiza AI ze zdjęcia",
+  "trackNoResults": "Brak wyników",
+  "trackWater": "Woda",
+  "trackWaterMotivation": "Człowiek nie wielbłąd, pić musi! 💧",
+  "trackActivitiesToday": "Aktywności dzisiaj",
+  "trackActivitiesOnDate": "Aktywności – {date}",
+  "@trackActivitiesOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoActivities": "Brak aktywności",
+  "trackAndMoreCount": "... i {count} więcej",
+  "@trackAndMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealsToday": "Posiłki dzisiaj",
+  "trackMealsOnDate": "Posiłki – {date}",
+  "@trackMealsOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoMeals": "Brak posiłków",
+  "trackDayMon": "Pon",
+  "trackDayTue": "Wt",
+  "trackDayWed": "Śr",
+  "trackDayThu": "Czw",
+  "trackDayFri": "Pt",
+  "trackDaySat": "Sob",
+  "trackDaySun": "Nie",
+  "trackAdd": "Dodaj",
+  "trackMeal": "Posiłek",
+  "trackEatingOut": "Jedzenie na mieście",
+  "trackActivity": "Aktywność",
+  "trackWeight": "Waga",
+  "trackMeasurements": "Pomiary",
+  "trackFavorites": "Ulubione",
+  "trackUserNotLoggedIn": "Użytkownik nie jest zalogowany",
+  "trackMealSavedAndFavorited": "Posiłek zapisany i dodany do ulubionych!",
+  "trackMealAddedSuccess": "Posiłek dodany pomyślnie!",
+  "trackFeatureIngredientsMeal": "Posiłek ze składników",
+  "trackOptionEatingOut": "Na mieście",
+  "trackOptionAiAnalysis": "Analiza AI",
+  "trackOptionIngredients": "Składniki",
+  "trackOptionBarcode": "Kod kreskowy",
+  "trackOptionSearchProduct": "Wyszukaj produkt",
+  "trackOptionFavorites": "Ulubione",
+  "trackEditMeal": "Edytuj posiłek",
+  "trackAddMeal": "Dodaj posiłek",
+  "trackMealNameOptional": "Nazwa posiłku (opcjonalnie)",
+  "trackHintEmptyDefaultName": "Puste = \"Bez nazwy\"",
+  "trackDefaultMealName": "Bez nazwy",
+  "trackHintCaloriesFromMacros": "Puste = policzy z makroskładników",
+  "trackEnterCaloriesOrMacros": "Podaj liczbę kalorii lub uzupełnij makroskładniki",
+  "trackProteinG": "Białko (g)",
+  "trackFatG": "Tłuszcze (g)",
+  "trackCarbsG": "Węglowodany (g)",
+  "trackFiberG": "Błonnik (g)",
+  "trackSaltG": "Sól (g)",
+  "trackMealTypeOptional": "Typ posiłku - opcjonalnie",
+  "trackBreakfast": "Śniadanie",
+  "trackLunch": "Obiad",
+  "trackDinner": "Kolacja",
+  "trackSnack": "Przekąska",
+  "trackAddToFavorites": "Dodaj do ulubionych",
+  "trackAddToFavoritesMealSubtitle": "Będziesz mógł szybko dodać ten posiłek później",
+  "trackUpdateMeal": "Zaktualizuj posiłek",
+  "trackSaveMeal": "Zapisz posiłek",
+  "trackCalories": "Kalorie",
+  "trackCameraUnavailableTitle": "Kamera niedostępna",
+  "trackCameraUnavailableBody": "Kamera nie jest dostępna na tym urządzeniu (np. na symulatorze).\n\nUżyj przycisku „Z galerii”, aby wybrać zdjęcie z galerii.",
+  "trackFromGallery": "Z galerii",
+  "trackPickImageError": "Błąd wyboru zdjęcia: {error}",
+  "@trackPickImageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAnalysisFailedOpenAi": "Nie udało się przeanalizować zdjęcia. Sprawdź czy klucz OpenAI API jest ustawiony.",
+  "trackAnalysisError": "Błąd analizy: {error}",
+  "@trackAnalysisError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAiPhotoTitle": "Analiza zdjęcia AI",
+  "trackTakeMealPhoto": "Zrób zdjęcie posiłku",
+  "trackAiPhotoDescription": "AI przeanalizuje zdjęcie i oszacuje wartości odżywcze. Zdjęcie jest wysyłane do dostawcy AI (OpenAI) wyłącznie w tym celu – nie zapisujemy galerii zdjęć. Szacunki są orientacyjne i nie stanowią porady medycznej.",
+  "trackSimulatorCameraHint": "Na symulatorze kamera nie działa – wybierz zdjęcie z galerii.",
+  "trackTakePhoto": "Zrób zdjęcie",
+  "trackAnalyzingPhoto": "Analizowanie zdjęcia...",
+  "trackMayTakeAMoment": "To może chwilę potrwać",
+  "trackProductNotFound": "Produkt o kodzie {code} nie został znaleziony w bazie produktów.",
+  "@trackProductNotFound": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "trackFetchProductFailed": "Nie udało się pobrać danych produktu: {error}",
+  "@trackFetchProductFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackBarcodeScannerTitle": "Skaner kodów kreskowych",
+  "trackSimulatorEnterCode": "Na symulatorze wprowadź kod ręcznie",
+  "trackEnterProductCode": "Wprowadź kod produktu",
+  "trackSearchProduct": "Szukaj produktu",
+  "trackScannerUnavailable": "Skaner niedostępny - użyj symulatora lub urządzenia fizycznego",
+  "trackPointAtBarcode": "Wskaż kod kreskowy produktu",
+  "trackBarcodePrivacy": "Dane zostaną pobrane z bazy produktów. Kamera służy wyłącznie do odczytu kodu – zdjęcia nie zapisujemy ani nie wysyłamy.",
+  "trackScanBarcode": "Skanuj kod kreskowy",
+  "trackAddProduct": "Dodaj produkt",
+  "trackEnterProductWeight": "Podaj wagę produktu",
+  "trackNutritionPer100g": "Wartości odżywcze (na 100g):",
+  "trackWeightHintExample": "np. 75.5",
+  "trackWeightHelper": "Ile gramów produktu zjadasz?",
+  "trackEditBeforeSave": "Edytuj przed zapisem",
+  "trackPer100g": "{label}/100g",
+  "@trackPer100g": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWeightG": "Waga (g)",
+  "trackSearchProductTitle": "Wyszukaj produkt",
+  "trackSearchProductHint": "Nazwa produktu, np. mleko, nutella…",
+  "trackEnterProductName": "Wpisz nazwę produktu",
+  "trackSearchProductSubtitle": "Korzystamy z bazy Open Food Facts. Wyniki pojawią się po wpisaniu min. kilku liter.",
+  "trackNoResultsTryBarcode": "Spróbuj innej nazwy lub zeskanuj kod kreskowy produktu.",
+  "trackBackToDashboard": "Wróć do dashboardu",
+  "trackMealsDateTitle": "Posiłki - {date}",
+  "@trackMealsDateTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackFavoriteMealsTooltip": "Ulubione posiłki",
+  "trackNoMealsForDay": "Brak posiłków na ten dzień",
+  "trackUsePlusToAddMeal": "Użyj przycisku + aby dodać posiłek",
+  "trackDeleteMealTitle": "Usuń posiłek",
+  "trackDeleteMealConfirm": "Czy na pewno chcesz usunąć \"{name}\"?",
+  "@trackDeleteMealConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealDeleted": "Posiłek usunięty",
+  "trackAddAtLeastOneIngredient": "Dodaj przynajmniej jeden składnik",
+  "trackMealFromIngredientsTitle": "Posiłek ze składników",
+  "trackTotalWeightG": "Całkowita waga: {weight} g",
+  "@trackTotalWeightG": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "trackIngredientsCount": "Składniki ({count})",
+  "@trackIngredientsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddIngredient": "Dodaj składnik",
+  "trackNoIngredients": "Brak składników",
+  "trackAddIngredientsHint": "Dodaj składniki, aby zbudować posiłek",
+  "trackEditIngredient": "Edytuj składnik",
+  "trackIngredientNameOptional": "Nazwa składnika (opcjonalnie)",
+  "trackAmountG": "Ilość (g)",
+  "trackEnterAmount": "Podaj ilość",
+  "trackEnterValidAmount": "Podaj poprawną ilość",
+  "trackEnterCaloriesOrFillMacros": "Podaj kalorie lub uzupełnij makroskładniki",
+  "trackProteinPer100g": "Białko (g/100g)",
+  "trackFatPer100g": "Tłuszcze (g/100g)",
+  "trackCarbsPer100g": "Węglowodany (g/100g)",
+  "trackEatingOutTitle": "🍽️ Jem na mieście",
+  "trackEatingOutSubtitle": "Wybierz co jadłeś (szacunki kalorii):",
+  "trackPortionLabel": "Porcja: {label}",
+  "@trackPortionLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesCount": "Ilość kawałków: {count}",
+  "@trackSlicesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesUnit": "{count} szt.",
+  "@trackSlicesUnit": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalPerSlice": "kcal na kawałek:",
+  "trackKcalPerPieceLabel": "{kcal} kcal/szt.",
+  "@trackKcalPerPieceLabel": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalLabel": "{kcal} kcal",
+  "@trackKcalLabel": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalTimesSlices": "{kcal} × {slices} = {total} kcal",
+  "@trackKcalTimesSlices": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "slices": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSaving": "Zapisywanie…",
+  "trackAddToDiary": "Dodaj do dziennika",
+  "trackSelectMealAbove": "Wybierz posiłek powyżej",
+  "trackEatingOutTip": "Jeśli reszta dnia była lekka – to OK. Nie stresuj się.",
+  "trackMealNameEatingOutSlices": "{name} ({slices} szt.) (na mieście)",
+  "@trackMealNameEatingOutSlices": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "slices": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealNameEatingOut": "{name} (na mieście)",
+  "@trackMealNameEatingOut": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddedEatingOut": "Dodano: {name}{slicesPart} (~{kcal} kcal)",
+  "@trackAddedEatingOut": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "slicesPart": {
+        "type": "String"
+      },
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesPart": " ({slices} szt.)",
+  "@trackSlicesPart": {
+    "placeholders": {
+      "slices": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEatingOutPizza": "Pizza",
+  "trackEatingOutPizzaLabel": "~250–450 kcal / kawałek",
+  "trackEatingOutKebab": "Kebab",
+  "trackEatingOutKebabLabel": "~600–900 kcal",
+  "trackEatingOutBurger": "Burger (ogólnie)",
+  "trackEatingOutBurgerLabel": "~500–800 kcal",
+  "trackEatingOutChinese": "Chińczyk",
+  "trackEatingOutChineseLabel": "~500–900 kcal",
+  "trackEatingOutMcdCheeseburger": "McDonald's – Cheeseburger",
+  "trackEatingOutMcdCheeseburgerLabel": "~300 kcal",
+  "trackEatingOutMcd2ForYou": "McDonald's – 2forYou (Cheeseburger + frytki)",
+  "trackEatingOutMcd2ForYouLabel": "~530 kcal",
+  "trackEatingOutMcdBigMac": "McDonald's – Big Mac",
+  "trackEatingOutMcdBigMacLabel": "~590 kcal",
+  "trackEatingOutMcdMcDouble": "McDonald's – McDouble",
+  "trackEatingOutMcdMcDoubleLabel": "~400 kcal",
+  "trackEatingOutMcdSmallFries": "McDonald's – małe frytki",
+  "trackEatingOutMcdSmallFriesLabel": "~230 kcal",
+  "trackEatingOutMcdMediumFries": "McDonald's – średnie frytki",
+  "trackEatingOutMcdMediumFriesLabel": "~340 kcal",
+  "trackEatingOutKfcDrumstick": "KFC – udko/nóżka",
+  "trackEatingOutKfcDrumstickLabel": "~200 kcal / szt.",
+  "trackEatingOutKfcTenders": "KFC – Strips / Tenders",
+  "trackEatingOutKfcTendersLabel": "~400–600 kcal",
+  "trackEatingOutSubway6": "Subway – 6'' sub",
+  "trackEatingOutSubway6Label": "~300–500 kcal",
+  "trackEatingOutSubwayFootlong": "Subway – Footlong",
+  "trackEatingOutSubwayFootlongLabel": "~600–900 kcal",
+  "trackActivitiesDateTitle": "Aktywności - {date}",
+  "@trackActivitiesDateTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoActivitiesForDay": "Brak aktywności na ten dzień",
+  "trackAddFirstActivity": "Dodaj pierwszą aktywność",
+  "trackDaySummary": "Podsumowanie dnia",
+  "trackBurned": "Spalone",
+  "trackTime": "Czas",
+  "trackGarminActivitiesNote": "Dane aktywności pochodzą z urządzeń Garmin.",
+  "trackDeleteActivityTitle": "Usuń aktywność",
+  "trackDeleteActivityConfirm": "Czy na pewno chcesz usunąć \"{name}\"?",
+  "@trackDeleteActivityConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityDeleted": "Aktywność usunięta",
+  "trackExcludeFromBalance": "Nie licz w bilansie (spalone)",
+  "trackActivityExcludedFromBalance": "Aktywność wyłączona z bilansu",
+  "trackActivityIncludedInBalance": "Aktywność wliczana do bilansu",
+  "trackOtherActivities": "Pozostałe aktywności.",
+  "trackActivityTypeOther": "Inna",
+  "trackActivityTypeLow": "Niska",
+  "trackActivityTypeModerate": "Umiarkowana",
+  "trackActivityTypeHigh": "Wysoka",
+  "trackActivityTypeVeryHigh": "Bardzo wysoka",
+  "trackActivityTypeRun": "Bieg",
+  "trackActivityTypeCycling": "Kolarstwo",
+  "trackActivityTypeSwim": "Pływanie",
+  "trackActivityTypeWalk": "Chodzenie",
+  "trackActivityTypeHike": "Wędrówka",
+  "trackActivityTypeRow": "Wioślarstwo",
+  "trackActivityTypeTennis": "Tenis",
+  "trackActivityTypeYoga": "Joga",
+  "trackActivityTypeTraining": "Trening",
+  "trackFeatureQuickAddActivities": "Szybkie dodawanie w aktywnościach",
+  "trackActivitySavedAndFavorited": "Aktywność zapisana i dodana do ulubionych!",
+  "trackActivityAddedSuccess": "Aktywność dodana pomyślnie!",
+  "trackEditActivity": "Edytuj aktywność",
+  "trackAddActivity": "Dodaj aktywność",
+  "trackQuickAdd": "Szybkie dodawanie",
+  "trackActivityNameOptional": "Nazwa aktywności (opcjonalnie)",
+  "trackHintEmptyDefaultActivityName": "Puste = \"Aktywność bez nazwy\"",
+  "trackDefaultActivityName": "Aktywność bez nazwy",
+  "trackEnterBurnedCalories": "Podaj liczbę spalonych kalorii",
+  "trackEnterValidCalories": "Podaj poprawną liczbę kalorii",
+  "trackActivityTypeOptional": "Typ aktywności - opcjonalnie",
+  "trackAddToFavoritesActivitySubtitle": "Będziesz mógł szybko dodać tę aktywność później",
+  "trackUpdateActivity": "Zaktualizuj aktywność",
+  "trackSaveActivity": "Zapisz aktywność",
+  "trackDurationMinutes": "Czas (min)",
+  "trackBurnedCalories": "Spalone kalorie",
+  "trackAddedWaterMl": "Dodano {amount} ml wody",
+  "@trackAddedWaterMl": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddWaterError": "Błąd podczas dodawania wody: {error}",
+  "@trackAddWaterError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackUpdatedAmountMl": "Zaktualizowano: {amount} ml",
+  "@trackUpdatedAmountMl": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackUpdateError": "Błąd podczas aktualizacji: {error}",
+  "@trackUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDeleteEntryTitle": "Usuń wpis",
+  "trackDeleteWaterConfirm": "Czy na pewno chcesz usunąć wpis {amount} ml?",
+  "@trackDeleteWaterConfirm": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEntryDeleted": "Wpis usunięty",
+  "trackDeleteError": "Błąd podczas usuwania: {error}",
+  "@trackDeleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEditAmount": "Edytuj ilość",
+  "trackAmountMl": "Ilość (ml)",
+  "trackAmountMlHintRange": "1–5000 ml",
+  "trackAmountMustBeRange": "Ilość musi być od 1 do 5000 ml",
+  "trackAddWater": "Dodaj wodę",
+  "trackAmountMlHintExample": "np. 250",
+  "trackMaxAmountPerEntry": "Maksymalna ilość to 5000 ml na wpis",
+  "trackEnterAmountRange": "Podaj ilość od 1 do 5000 ml",
+  "trackDailyWaterGoal": "Cel dzienny picia wody",
+  "trackGoalHintExample": "np. 2000",
+  "trackGoalMustBeRange": "Podaj wartość od 500 do 10000 ml",
+  "trackWaterGoalUpdated": "Cel wody zaktualizowany",
+  "trackChangeDailyWaterGoal": "Zmień cel dzienny picia wody",
+  "trackEveryDropCounts": "Każda kropla się liczy!",
+  "trackCustomAmount": "Własna",
+  "trackWaterHistoryHint": "Przegląd – edycja i usuwanie możliwe. Dodawanie tylko na dzisiaj.",
+  "trackNoEntries": "Brak wpisów",
+  "trackEdit": "Edytuj",
+  "trackAmountMlLabel": "{amount} ml",
+  "@trackAmountMlLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDailyGoal": "Cel dzienny",
+  "trackEnterWeight": "Podaj wagę",
+  "trackEnterValidWeight": "Podaj poprawną wagę (30-300 kg)",
+  "trackWeightSaved": "Waga zapisana pomyślnie!",
+  "trackWeightMotivation": "Regularne pomiary pomagają trzymać cel. Każdy wpis przybliża Cię do wymarzonej formy!",
+  "trackPickMeasurementDate": "Wybierz datę pomiaru",
+  "trackMeasurementSavedWithDate": "Pomiar zostanie zapisany z wybraną datą",
+  "trackSaveWeight": "Zapisz wagę",
+  "trackDeleteMeasurementTitle": "Usuń pomiar",
+  "trackDeleteWeightConfirm": "Czy na pewno chcesz usunąć pomiar {weight} kg?",
+  "@trackDeleteWeightConfirm": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasurementDeleted": "Pomiar usunięty",
+  "trackNoWeightMeasurements": "Brak pomiarów wagi",
+  "trackAddFirstMeasurementHint": "Dodaj pierwszy pomiar, aby zobaczyć historię",
+  "trackNoDataToDisplay": "Brak danych do wyświetlenia",
+  "trackWeightKg": "Waga (kg)",
+  "trackHistory": "Historia",
+  "trackEnterMeasurementValue": "Podaj wartość pomiaru",
+  "trackEnterValidPositiveValue": "Podaj poprawną wartość (większą od 0)",
+  "trackEnterCustomTypeName": "Wpisz nazwę własnego typu pomiaru (np. biceps)",
+  "trackMeasurementSaved": "Pomiar zapisany pomyślnie!",
+  "trackBodyMeasurementsTitle": "Pomiary ciała",
+  "trackBodyMeasurementsMotivation": "Śledź wymiary regularnie — każdy pomiar to dowód Twojego postępu i krok do wymarzonej sylwetki!",
+  "trackMeasurementType": "Typ pomiaru",
+  "trackCustomTypeHint": "np. Biceps, Brzuch",
+  "trackCustomTypeName": "Nazwa własnego typu",
+  "trackValueCm": "Wartość (cm)",
+  "trackValueHintExample": "np. 85.5",
+  "trackSaveMeasurement": "Zapisz pomiar",
+  "trackMeasurementHistory": "Historia pomiarów - {label}",
+  "@trackMeasurementHistory": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDeleteBodyMeasurementConfirm": "Czy na pewno chcesz usunąć pomiar {value} cm?",
+  "@trackDeleteBodyMeasurementConfirm": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoMeasurements": "Brak pomiarów",
+  "trackTypeWaist": "Talia",
+  "trackTypeHips": "Biodra",
+  "trackTypeChest": "Klatka piersiowa",
+  "trackTypeArm": "Ramię",
+  "trackTypeThigh": "Udo",
+  "trackTypeCustom": "Własny",
+  "trackNoFavorites": "Brak ulubionych",
+  "trackNoFavoritesSubtitle": "Dodaj posiłki lub aktywności do ulubionych przy ich zapisywaniu",
+  "trackFavoriteMeals": "Ulubione posiłki",
+  "trackNoFavoriteMeals": "Brak ulubionych posiłków",
+  "trackFavoriteActivities": "Ulubione aktywności",
+  "trackNoFavoriteActivities": "Brak ulubionych aktywności",
+  "trackAddToMealsOnDate": "Dodaj do posiłków {date}",
+  "@trackAddToMealsOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddToTodaysMeals": "Dodaj do dzisiejszych posiłków",
+  "trackRemoveFromFavorites": "Usuń z ulubionych",
+  "trackAddToActivitiesOnDate": "Dodaj do aktywności {date}",
+  "@trackAddToActivitiesOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddToTodaysActivities": "Dodaj do dzisiejszych aktywności",
+  "trackMealAddedToMealsOnDate": "{name} dodany do posiłków {date}",
+  "@trackMealAddedToMealsOnDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealAddedToTodaysMeals": "{name} dodany do dzisiejszych posiłków",
+  "@trackMealAddedToTodaysMeals": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityAddedToActivitiesOnDate": "{name} dodana do aktywności {date}",
+  "@trackActivityAddedToActivitiesOnDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityAddedToTodaysActivities": "{name} dodana do dzisiejszych aktywności",
+  "@trackActivityAddedToTodaysActivities": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackRemoveFromFavoritesConfirm": "Czy na pewno chcesz usunąć \"{name}\" z ulubionych?",
+  "@trackRemoveFromFavoritesConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackRemovedFromFavorites": "Usunięto z ulubionych",
+  "trackEditFavoriteMeal": "Edytuj ulubiony posiłek",
+  "trackFavoriteMealUpdated": "Zaktualizowano ulubiony posiłek",
+  "trackRecalculateFromIngredients": "Przelicz z składników",
+  "trackMinutesLabel": "{minutes} min",
+  "@trackMinutesLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesKcal": "Kalorie (kcal)",
+  "trackIncludingSaturatedG": "w tym nasycone (g)",
+  "trackIncludingSugarsG": "w tym cukry (g)",
+  "trackWeightGOptional": "Waga (g) - opcjonalnie",
+  "trackGoalMl": "Cel (ml)",
+  "trackWaterTitle": "Woda",
+  "trackOfGoal": "{current} / {goal} ml",
+  "@trackOfGoal": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSearchShort": "Wyszukaj",
+  "trackWaterToday": "Woda – Dzisiaj",
+  "trackWaterOnDate": "Woda – {date}",
+  "@trackWaterOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackHydrationBasics": "Nawodnienie to podstawa formy.",
+  "trackSugar": "Cukry",
+  "trackSaturatedFat": "Nasycone",
+  "trackProduct": "Produkt",
+  "trackMealMacrosLine": "{kcal} kcal • B: {protein}g • T: {fat}g • W: {carbs}g",
+  "@trackMealMacrosLine": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "protein": {
+        "type": "String"
+      },
+      "fat": {
+        "type": "String"
+      },
+      "carbs": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAnalysisResults": "Wyniki analizy",
+  "trackName": "Nazwa",
+  "trackProductNotFoundTitle": "Nie znaleziono produktu",
+  "trackBarcodeLabel": "Kod kreskowy",
+  "trackFetchingProductData": "Pobieranie danych produktu...",
+  "trackBrand": "Marka: {brand}",
+  "@trackBrand": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWeightGRequired": "Waga (g) *",
+  "trackYourPortion": "Twoja porcja:",
+  "trackMacroAbbrevProtein": "B",
+  "trackMacroAbbrevFat": "T",
+  "trackMacroAbbrevCarbs": "W",
+  "trackAddedKcal": "Dodano: {kcal} kcal",
+  "@trackAddedKcal": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesPer100g": "Kalorie (kcal/100g)",
+  "trackDashToday": "Dzisiaj",
+  "trackNoDate": "Brak daty",
+  "trackEntries": "Wpisy",
+  "trackWeightHistory": "Historia wagi",
+  "trackMeasurementName": "Nazwa pomiaru",
+  "trackChoose": "Wybierz",
+  "trackDurationMinutesOptional": "Czas trwania (minuty) - opcjonalnie",
+  "trackMax5000Helper": "Maksymalnie 5000 ml na jeden wpis",
+  "trackRecommendedMin2l": "Zalecane jest min. 2l",
+  "trackSummary": "Podsumowanie",
+  "trackBurnedKcalName": "Spalone {kcal} kcal",
+  "@trackBurnedKcalName": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasurementDate": "Data pomiaru",
+  "trackKcalBurned": "{kcal} kcal spalone",
+  "@trackKcalBurned": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMacrosInPremium": "Makro – w Premium",
+  "trackSearchProductEllipsis": "Szukaj produktu…",
+  "trackMacros": "Makro",
+  "trackRecentMeasurements": "Ostatnie pomiary",
+  "authEnterFullCode": "Wpisz pełny kod z maila.",
+  "authSignedIn": "Zalogowano pomyślnie!",
+  "authCodeExpired": "Kod wygasł lub jest nieprawidłowy. Wyślij ponownie.",
+  "authEnterEmail": "Podaj adres email",
+  "authInvalidEmail": "Nieprawidłowy format email",
+  "authLinkAndCodeSent": "Wysłaliśmy link i kod na {email}. Sprawdź skrzynkę (także folder Spam) – kliknij link lub wpisz kod w aplikacji.",
+  "@authLinkAndCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authCouldNotStart": "Nie udało się rozpocząć logowania.",
+  "authEmailTaken": "Ten adres e-mail jest już zarejestrowany. Zaloguj się linkiem z maila (sprawdź spam).",
+  "authAlreadyLinked": "To konto jest już połączone z innym użytkownikiem.",
+  "authManualLinking": "Łączenie kont wymaga włączenia w Supabase. Włącz \"Manual linking\" w Authentication → Providers.",
+  "authConnection": "Błąd połączenia. Sprawdź internet.",
+  "authTooManyAttempts": "Zbyt dużo prób logowania. Spróbuj za godzinę.",
+  "authTooManyEmails": "Zbyt wiele wiadomości na ten adres. Sprawdź skrzynkę lub spróbuj za chwilę.",
+  "authInvalidEmailAddress": "Nieprawidłowy adres email.",
+  "authGenericError": "Błąd: {detail}",
+  "@authGenericError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "premAboutPerMonth": "ok. {amount} {unit} / miesięcznie",
+  "@premAboutPerMonth": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "premYearlyPerMonthFallback": "w przeliczeniu ok. 16,25 zł / mies. (płatność raz na rok)",
+  "moreStreakWater": "Woda",
+  "premStoreNotReady": "Zakupy w sklepie nie są jeszcze gotowe. Spróbuj ponownie za chwilę.",
+  "trackAddToCatalog": "Dodaj do bazy",
+  "trackAddToCatalogHint": "Zrób zdjęcie tabeli wartości odżywczych albo wpisz dane z etykiety. Produkt trafi do wspólnej bazy.",
+  "trackLabelPhoto": "Zdjęcie etykiety",
+  "trackReadingLabel": "Czytam etykietę…",
+  "trackLabelNotRead": "Nie udało się odczytać tabeli. Wpisz wartości ręcznie.",
+  "trackEnterNameAndCalories": "Podaj nazwę i kalorie na 100 g.",
+  "trackProductSavedCatalog": "Produkt zapisany. Następnym razem skan go znajdzie.",
+  "trackCatalogNotSaved": "Posiłek możesz dodać, ale wspólna baza nie zapisała produktu.",
+  "trackBrandOptional": "Marka (opcjonalnie)",
+  "trackCopyYesterday": "Skopiuj wczoraj",
+  "trackCopiedMealsCount": "Skopiowano posiłki: {count}",
+  "@trackCopiedMealsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackNoMealsYesterday": "Wczoraj nie było posiłków do skopiowania.",
+  "trackCopyConfirmTitle": "Posiłki już są",
+  "trackCopyConfirmBody": "Tego dnia masz już {count} posiłków. Skopiować wczorajsze jeszcze raz? (powstaną duplikaty)",
+  "@trackCopyConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackCopyAgain": "Kopiuj ponownie",
+  "trackCopying": "Kopiowanie…",
+  "trackRecentFoods": "Ostatnio jedzone",
+  "trackMealIdeasTitle": "Pasuje na dziś",
+  "trackMealIdeasLeft": "Zostało ok. {kcal} kcal",
+  "@trackMealIdeasLeft": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWaterTipSerious": "Regularne nawodnienie wspiera koncentrację i metabolizm — warto pić przez cały dzień.",
+  "trackAddFirstMealTitle": "Dodaj pierwszy posiłek",
+  "trackAddFirstMealSubtitle": "Zacznij od wpisania tego, co jesz — reszta policzy się sama.",
+  "trackAddFirstMealCta": "Dodaj posiłek",
+  "trackShortcutRecent": "Ostatnie",
+  "trackRemainingKcal": "Zostało do celu",
+  "trackOverGoalLabel": "Powyżej celu",
+  "trackGoalVerificationDays": "{days}/7 dni z danymi",
+  "@trackGoalVerificationDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trackCalorieGoalSuccess": "Dobra robota — dziś jesteś w okolicach celu kalorycznego.",
+  "trackD1ChecklistTitle": "Pierwszy dzień — checklista",
+  "trackD1ChecklistMeal": "Dodaj posiłek",
+  "trackD1ChecklistWater": "Zapisz wodę",
+  "trackD1ChecklistWeight": "Zapisz wagę",
+  "trackD1ChecklistDismiss": "Rozumiem",
+  "trackPremiumLabel": "Premium",
+  "trackPercentOfGoal": "{percent}% celu",
+  "@trackPercentOfGoal": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
+}

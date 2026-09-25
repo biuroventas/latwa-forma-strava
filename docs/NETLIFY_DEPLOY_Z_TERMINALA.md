@@ -57,6 +57,22 @@ npx netlify deploy --dir=dist_latwaforma_pl --prod
 
 ---
 
+## Deploy aplikacji Flutter (główna strona latwaforma.pl)
+
+Aplikacja (Flutter web) jest budowana przez Netlify przy pushu do repozytorium (zgodnie z `netlify.toml`). Możesz też wgrać build z terminala:
+
+```bash
+bash scripts/prepare_latwaforma_pl.sh
+npx netlify deploy --dir=build/web --prod --no-build
+```
+
+- `prepare_latwaforma_pl.sh` tworzy `env.production` z `.env` (w tym TURSO_*, Supabase, Garmin) i buduje Flutter web.
+- `--no-build` pomija ponowny build po stronie Netlify (używasz lokalnego `build/web`).
+
+**Ważne:** Nie anuluj deployu w panelu Netlify. Anulowany lub nieudany deploy oznacza, że na produkcji zostaje poprzednia wersja – bez nowego env (np. Turso) ani nowego kodu. Jeśli deploy się nie udał lub został anulowany, uruchom deploy jeszcze raz i poczekaj na zakończenie („Production Published”).
+
+---
+
 ## Uwagi
 
 - **netlify login** i **netlify link** robisz tylko raz (albo po zmianie komputera / usunięciu `.netlify`).

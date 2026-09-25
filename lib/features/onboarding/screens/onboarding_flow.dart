@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/utils/calculations.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/trial_constants.dart';
 import '../../../core/auth/sign_out_guard.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/guest/guest_trial.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/services/supabase_service.dart';
@@ -68,22 +70,23 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Future<void> _handleBack(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cofnąć się?'),
-        content: const Text(
-          'Dane nie zostaną zapisane. Wrócisz do ekranu początkowego.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Nie'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Tak, cofnij'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final l10n = ctx.l10n;
+        return AlertDialog(
+          title: Text(l10n.onbGoBackTitle),
+          content: Text(l10n.onbGoBackBody),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l10n.commonNo),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l10n.onbGoBackConfirm),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true) return;
     if (!context.mounted) return;
@@ -97,6 +100,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: kIsWeb
           ? null
@@ -104,9 +108,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => _handleBack(context),
-                tooltip: 'Cofnij',
+                tooltip: l10n.onbBackTooltip,
               ),
-              title: const Text('Uzupełnij dane'),
+              title: Text(l10n.onbCompleteData),
             ),
       body: Form(
         key: _formKey,
@@ -127,7 +131,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Text(
-                          'Uzupełnij dane',
+                          l10n.onbCompleteData,
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -135,7 +139,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                       ),
                     // Płeć
               Text(
-                'Płeć *',
+                l10n.onbGenderLabel,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -144,11 +148,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildGenderOption('Kobieta', AppConstants.genderFemale),
+                    child: _buildGenderOption(l10n.onbGenderFemale, AppConstants.genderFemale),
                   ),
                   const SizedBox(width: 4),
                   Expanded(
-                    child: _buildGenderOption('Mężczyzna', AppConstants.genderMale),
+                    child: _buildGenderOption(l10n.onbGenderMale, AppConstants.genderMale),
                   ),
                 ],
               ),
@@ -156,7 +160,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               
               // Wiek
               Text(
-                'Wiek *',
+                l10n.onbAgeLabel,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -186,11 +190,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     child: TextField(
                       controller: _ageController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        suffixText: 'lat',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        suffixText: l10n.onbYearsUnit,
+                        border: const OutlineInputBorder(),
                         isDense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
                       ),
                       onSubmitted: (s) {
                         final v = int.tryParse(s.trim());
@@ -209,7 +213,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               
               // Wzrost
               Text(
-                'Wzrost (cm) *',
+                l10n.onbHeightLabel,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -262,7 +266,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               
               // Aktualna waga
               Text(
-                'Aktualna waga (kg) *',
+                l10n.onbCurrentWeightLabel,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -319,7 +323,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               
               // Waga docelowa
               Text(
-                'Waga docelowa (kg) *',
+                l10n.onbTargetWeightLabel,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -327,7 +331,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               const SizedBox(height: 2),
               if (_currentWeightKg != null && _targetWeightKg != null)
                 Text(
-                  'Różnica: ${(_targetWeightKg! - _currentWeightKg!).abs().toStringAsFixed(1)} kg',
+                  l10n.onbWeightDiff(
+                    diff: (_targetWeightKg! - _currentWeightKg!).abs().toStringAsFixed(1),
+                  ),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               Row(
@@ -379,7 +385,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
                   child: Text(
-                    _getGoalDescriptionText(),
+                    (_targetWeightKg! - _currentWeightKg!).abs() < 0.5
+                        ? l10n.onbGoalUnchangedSameWeight
+                        : _getGoalDescriptionText(l10n),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: Theme.of(context).colorScheme.primary,
@@ -394,7 +402,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(
-                    'Różnica między wagami musi wynosić co najmniej 1 kg',
+                    l10n.onbWeightDiffMin,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.error,
                         ),
@@ -404,21 +412,21 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               
               // Poziom aktywności
               Text(
-                'Poziom aktywności *',
+                l10n.onbActivityLabel,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 3),
-              _buildActivityLevelOption('Siedzący', 'Brak aktywności lub minimalna aktywność', AppConstants.activitySedentary),
+              _buildActivityLevelOption(l10n.onbActivitySedentary, l10n.onbActivitySedentaryDesc, AppConstants.activitySedentary),
               const SizedBox(height: 3),
-              _buildActivityLevelOption('Lekka', 'Ćwiczenia 1-3 razy w tygodniu', AppConstants.activityLight),
+              _buildActivityLevelOption(l10n.onbActivityLight, l10n.onbActivityLightDesc, AppConstants.activityLight),
               const SizedBox(height: 3),
-              _buildActivityLevelOption('Umiarkowana', 'Ćwiczenia 3-5 razy w tygodniu', AppConstants.activityModerate),
+              _buildActivityLevelOption(l10n.onbActivityModerate, l10n.onbActivityModerateDesc, AppConstants.activityModerate),
               const SizedBox(height: 3),
-              _buildActivityLevelOption('Intensywna', 'Ćwiczenia 6-7 razy w tygodniu', AppConstants.activityIntense),
+              _buildActivityLevelOption(l10n.onbActivityIntense, l10n.onbActivityIntenseDesc, AppConstants.activityIntense),
               const SizedBox(height: 3),
-              _buildActivityLevelOption('Bardzo intensywna', 'Bardzo ciężka praca fizyczna lub treningi 2x dziennie', AppConstants.activityVeryIntense),
+              _buildActivityLevelOption(l10n.onbActivityVeryIntense, l10n.onbActivityVeryIntenseDesc, AppConstants.activityVeryIntense),
               const SizedBox(height: 10),
               
               // Przycisk zapisz
@@ -436,9 +444,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Zapisz i rozpocznij',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      : Text(
+                          l10n.onbSaveAndStart,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                 ),
                   ],
@@ -546,12 +554,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     }
   }
 
-  String _getGoalDescriptionText() {
+  String _getGoalDescriptionText(AppLocalizations l10n) {
     if (_currentWeightKg == null || _targetWeightKg == null) return '';
     final diff = _targetWeightKg! - _currentWeightKg!;
-    if (diff < -0.5) return 'Chcę schudnąć.';
-    if (diff > 0.5) return 'Chcę przybrać na wadze.';
-    return 'Chcę utrzymać obecną wagę.';
+    if (diff < -0.5) return l10n.onbGoalLose;
+    if (diff > 0.5) return l10n.onbGoalGain;
+    return l10n.onbGoalMaintain;
   }
 
   bool _canProceed() {
@@ -659,26 +667,27 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               _isSaving = false;
             });
             
-            String errorMsg = 'Błąd podczas tworzenia konta.';
+            final l10n = context.l10n;
+            String errorMsg = l10n.onbErrorCreatingAccount;
             String errorDetails = authError.toString();
             
             if (errorDetails.contains('Operation not permitted') ||
                 errorDetails.contains('errno = 1') ||
                 errorDetails.contains('SocketException')) {
-              errorMsg = 'Błąd uprawnień sieciowych.\n\nRozwiązanie:\n1. Zatrzymaj aplikację\n2. Uruchom ponownie: flutter run\n3. Jeśli problem nadal występuje, sprawdź czy anonimowa autoryzacja jest włączona w Supabase';
+              errorMsg = l10n.onbErrorNetworkPermission;
             } else if (errorDetails.contains('anonymous') || 
                 errorDetails.contains('disabled') ||
                 errorDetails.contains('not enabled')) {
-              errorMsg = 'Anonimowa autoryzacja nie jest włączona w Supabase.\n\nPrzejdź do: Authentication → Providers → Anonymous → Enable';
+              errorMsg = l10n.onbErrorAnonymousDisabled;
             } else if (errorDetails.contains('network') || 
                        errorDetails.contains('connection') ||
                        errorDetails.contains('timeout')) {
-              errorMsg = 'Błąd połączenia z internetem.\nSprawdź połączenie i spróbuj ponownie.';
+              errorMsg = l10n.onbErrorInternet;
             } else if (errorDetails.contains('invalid') || 
                        errorDetails.contains('unauthorized')) {
-              errorMsg = 'Błąd konfiguracji Supabase.\nSprawdź klucze API w pliku .env';
+              errorMsg = l10n.onbErrorSupabaseConfig;
             } else {
-              errorMsg = 'Błąd: $errorDetails';
+              errorMsg = l10n.onbErrorWithDetails(details: errorDetails);
             }
             
             ScaffoldMessenger.of(context).showSnackBar(
@@ -686,7 +695,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 content: Text(errorMsg),
                 duration: const Duration(seconds: 4),
                 action: SnackBarAction(
-                  label: 'Spróbuj ponownie',
+                  label: l10n.commonRetry,
                   onPressed: () => _saveProfile(),
                 ),
               ),
@@ -725,11 +734,16 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       final service = SupabaseService();
       await service.createProfile(profile);
       debugPrint('✅ Profil zapisany pomyślnie!');
+      final savedUser = SupabaseConfig.auth.currentUser;
+      if (savedUser != null && savedUser.isAnonymous) {
+        await GuestTrial.startIfNeeded();
+      }
 
       if (mounted) {
         context.go(AppRoutes.planLoading, extra: {
           'targetCalories': _macros?['calories'],
           'targetDate': _targetDate,
+          'goal': _goal,
         });
       }
     } catch (e, stackTrace) {
@@ -741,13 +755,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           _isSaving = false;
         });
         
-        String errorMessage = 'Błąd podczas zapisywania';
+        final l10n = context.l10n;
+        String errorMessage = l10n.onbErrorSaving;
         if (e.toString().contains('network') || e.toString().contains('connection')) {
-          errorMessage = 'Błąd połączenia z internetem. Sprawdź połączenie i spróbuj ponownie.';
+          errorMessage = l10n.onbErrorInternetShort;
         } else if (e.toString().contains('auth') || e.toString().contains('permission')) {
-          errorMessage = 'Błąd autoryzacji. Sprawdź konfigurację Supabase.';
+          errorMessage = l10n.onbErrorAuth;
         } else {
-          errorMessage = 'Błąd: $e';
+          errorMessage = l10n.onbErrorWithDetails(details: '$e');
         }
         
         ScaffoldMessenger.of(context).showSnackBar(
@@ -755,7 +770,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             content: Text(errorMessage),
             duration: const Duration(seconds: 3),
             action: SnackBarAction(
-              label: 'Spróbuj ponownie',
+              label: l10n.commonRetry,
               onPressed: () => _saveProfile(),
             ),
           ),

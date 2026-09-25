@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/providers/profile_provider.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -14,6 +15,7 @@ class PremiumSuccessScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -36,7 +38,7 @@ class PremiumSuccessScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                'Dziękujemy!',
+                l10n.premThanks,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
@@ -45,7 +47,7 @@ class PremiumSuccessScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Premium zostało aktywowane.\nCiesz się pełnym dostępem do Łatwa Forma – eksport PDF, porady AI, integracje i więcej.',
+                l10n.premActivatedBody,
                 style: theme.textTheme.bodyLarge?.copyWith(
                   color: AppTheme.textSecondary,
                   height: 1.4,
@@ -59,7 +61,7 @@ class PremiumSuccessScreen extends ConsumerWidget {
                   context.go(AppRoutes.dashboard);
                 },
                 icon: const Icon(Icons.home_rounded),
-                label: const Text('Wróć do aplikacji'),
+                label: Text(l10n.premBackToApp),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppTheme.primaryColor,
                   foregroundColor: Colors.white,
@@ -70,7 +72,7 @@ class PremiumSuccessScreen extends ConsumerWidget {
               if (kIsWeb) ...[
                 const SizedBox(height: 16),
                 Text(
-                  'Możesz też zamknąć tę kartę, jeśli płatność była w osobnym oknie.',
+                  l10n.premCloseTabHint,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
                   ),

@@ -1,15 +1,22 @@
-import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../../core/config/supabase_config.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/utils/platform_stub.dart' if (dart.library.io) '../../../core/utils/platform_io.dart' as platform;
 import '../../../shared/models/meal.dart';
 import '../../../shared/services/openai_service.dart';
+import '../../../shared/widgets/health_disclaimer.dart';
 
 class AIPhotoScreen extends StatefulWidget {
-  const AIPhotoScreen({super.key});
+  const AIPhotoScreen({super.key, this.date});
+
+  final DateTime? date;
 
   @override
   State<AIPhotoScreen> createState() => _AIPhotoScreenState();
@@ -18,11 +25,18 @@ class AIPhotoScreen extends StatefulWidget {
 class _AIPhotoScreenState extends State<AIPhotoScreen> {
   final OpenAIService _aiService = OpenAIService();
   final ImagePicker _picker = ImagePicker();
-  File? _selectedImage;
+  Uint8List? _imageBytes;
   bool _isAnalyzing = false;
   Map<String, dynamic>? _analysisResult;
 
   Future<void> _pickImage() async {
+    if (platform.isIOSSimulator) {
+      final useGallery = await _showCameraUnavailable();
+      if (useGallery == true && mounted) {
+        await _pickImageFromGallery();
+      }
+      return;
+    }
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
@@ -30,11 +44,14 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _selectedImage = File(image.path);
-          _analysisResult = null;
-        });
-        _analyzeImage();
+        final bytes = await image.readAsBytes();
+        if (mounted) {
+          setState(() {
+            _imageBytes = bytes;
+            _analysisResult = null;
+          });
+          _analyzeImage();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -44,36 +61,38 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
             err.contains('no camera') ||
             err.contains('kamera niedostępna');
         if (isCameraUnavailable) {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Kamera niedostępna'),
-              content: const Text(
-                'Kamera nie jest dostępna na tym urządzeniu (np. na symulatorze).\n\n'
-                'Użyj przycisku „Z galerii”, aby wybrać zdjęcie z galerii.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => ctx.pop(),
-                  child: const Text('OK'),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    ctx.pop();
-                    _pickImageFromGallery();
-                  },
-                  child: const Text('Z galerii'),
-                ),
-              ],
-            ),
-          );
+          final useGallery = await _showCameraUnavailable();
+          if (useGallery == true && mounted) {
+            await _pickImageFromGallery();
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Błąd wyboru zdjęcia: $e')),
+            SnackBar(content: Text(context.l10n.trackPickImageError(error: '$e'))),
           );
         }
       }
     }
+  }
+
+  Future<bool?> _showCameraUnavailable() {
+    final l10n = context.l10n;
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.trackCameraUnavailableTitle),
+        content: Text(l10n.trackCameraUnavailableBody),
+        actions: [
+          TextButton(
+            onPressed: () => ctx.pop(false),
+            child: Text(l10n.commonOk),
+          ),
+          FilledButton(
+            onPressed: () => ctx.pop(true),
+            child: Text(l10n.trackFromGallery),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _pickImageFromGallery() async {
@@ -84,28 +103,34 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
       );
 
       if (image != null) {
-        setState(() {
-          _selectedImage = File(image.path);
-          _analysisResult = null;
-        });
-        _analyzeImage();
+        final bytes = await image.readAsBytes();
+        if (mounted) {
+          setState(() {
+            _imageBytes = bytes;
+            _analysisResult = null;
+          });
+          _analyzeImage();
+        }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd wyboru zdjęcia: $e')),
+          SnackBar(content: Text(context.l10n.trackPickImageError(error: '$e'))),
         );
       }
     }
   }
 
   Future<void> _analyzeImage() async {
-    if (_selectedImage == null) return;
+    if (_imageBytes == null) return;
 
     setState(() => _isAnalyzing = true);
 
     try {
-      final result = await _aiService.analyzeMealPhoto(_selectedImage!);
+      final result = await _aiService.analyzeMealPhoto(
+        _imageBytes!,
+        languageCode: Localizations.localeOf(context).languageCode,
+      );
       
       if (mounted) {
         setState(() {
@@ -115,8 +140,8 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
 
         if (result == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Nie udało się przeanalizować zdjęcia. Sprawdź czy klucz OpenAI API jest ustawiony.'),
+            SnackBar(
+              content: Text(context.l10n.trackAnalysisFailedOpenAi),
             ),
           );
         }
@@ -125,7 +150,7 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
       if (mounted) {
         setState(() => _isAnalyzing = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd analizy: $e')),
+          SnackBar(content: Text(context.l10n.trackAnalysisError(error: '$e'))),
         );
       }
     }
@@ -134,8 +159,19 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
   Future<void> _addMeal() async {
     if (_analysisResult == null) return;
 
+    final userId = SupabaseConfig.auth.currentUser?.id;
+    if (userId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.trackUserNotLoggedIn)),
+        );
+      }
+      return;
+    }
+
+    final d = widget.date ?? DateTime.now();
     final meal = Meal(
-      userId: SupabaseConfig.auth.currentUser!.id,
+      userId: userId,
       name: _analysisResult!['name'] as String,
       calories: _analysisResult!['calories'] as double,
       proteinG: _analysisResult!['proteinG'] as double,
@@ -147,6 +183,7 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
       saltG: (_analysisResult!['saltG'] as num?)?.toDouble() ?? 0,
       weightG: _analysisResult!['weightG'] as double?,
       source: AppConstants.mealSourceAiPhoto,
+      createdAt: DateTime(d.year, d.month, d.day, 12, 0),
     );
     final result = await context.push<bool>(AppRoutes.mealsAdd, extra: meal);
     if (result == true && mounted) context.pop(true);
@@ -154,9 +191,10 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analiza zdjęcia AI'),
+        title: Text(l10n.trackAiPhotoTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -173,18 +211,18 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                     const Icon(Icons.camera_alt, size: 48),
                     const SizedBox(height: 8),
                     Text(
-                      'Zrób zdjęcie posiłku',
+                      l10n.trackTakeMealPhoto,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'AI przeanalizuje zdjęcie i oszacuje wartości odżywcze',
+                      l10n.trackAiPhotoDescription,
                       style: Theme.of(context).textTheme.bodySmall,
                       textAlign: TextAlign.center,
                     ),
-                    if (Platform.isIOS) ...[
+                    if (platform.isIOS) ...[
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.all(10),
@@ -198,7 +236,7 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Na symulatorze kamera nie działa – wybierz zdjęcie z galerii.',
+                                l10n.trackSimulatorCameraHint,
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: Colors.amber.shade900,
                                     ),
@@ -220,7 +258,7 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _isAnalyzing ? null : _pickImage,
                     icon: const Icon(Icons.camera),
-                    label: const Text('Zrób zdjęcie'),
+                    label: Text(l10n.trackTakePhoto),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -231,7 +269,7 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                   child: OutlinedButton.icon(
                     onPressed: _isAnalyzing ? null : _pickImageFromGallery,
                     icon: const Icon(Icons.photo_library),
-                    label: const Text('Z galerii'),
+                    label: Text(l10n.trackFromGallery),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
@@ -241,11 +279,11 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
             ),
             const SizedBox(height: 24),
             // Podgląd zdjęcia
-            if (_selectedImage != null) ...[
+            if (_imageBytes != null) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(
-                  _selectedImage!,
+                child: Image.memory(
+                  _imageBytes!,
                   height: 300,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -263,12 +301,12 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                       const CircularProgressIndicator(),
                       const SizedBox(height: 16),
                       Text(
-                        'Analizowanie zdjęcia...',
+                        l10n.trackAnalyzingPhoto,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'To może chwilę potrwać',
+                        l10n.trackMayTakeAMoment,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Colors.grey.shade600,
                             ),
@@ -287,20 +325,22 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Wyniki analizy',
+                        l10n.trackAnalysisResults,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       const SizedBox(height: 16),
-                      _buildResultRow('Nazwa', _analysisResult!['name'] as String),
+                      _buildResultRow(l10n.trackName, _analysisResult!['name'] as String),
                       const Divider(),
-                      _buildResultRow('Kalorie', '${(_analysisResult!['calories'] as double).toStringAsFixed(0)} kcal'),
-                      _buildResultRow('Białko', '${(_analysisResult!['proteinG'] as double).toStringAsFixed(1)} g'),
-                      _buildResultRow('Tłuszcze', '${(_analysisResult!['fatG'] as double).toStringAsFixed(1)} g'),
-                      _buildResultRow('Węglowodany', '${(_analysisResult!['carbsG'] as double).toStringAsFixed(1)} g'),
+                      _buildResultRow(l10n.trackCalories, '${(_analysisResult!['calories'] as double).toStringAsFixed(0)} kcal'),
+                      _buildResultRow(l10n.trackProtein, '${(_analysisResult!['proteinG'] as double).toStringAsFixed(1)} g'),
+                      _buildResultRow(l10n.trackFat, '${(_analysisResult!['fatG'] as double).toStringAsFixed(1)} g'),
+                      _buildResultRow(l10n.trackCarbs, '${(_analysisResult!['carbsG'] as double).toStringAsFixed(1)} g'),
                       if (_analysisResult!['weightG'] != null)
-                        _buildResultRow('Waga', '${(_analysisResult!['weightG'] as double).toStringAsFixed(0)} g'),
+                        _buildResultRow(l10n.trackWeight, '${(_analysisResult!['weightG'] as double).toStringAsFixed(0)} g'),
+                      const SizedBox(height: 8),
+                      const HealthDisclaimer(compact: true),
                       const SizedBox(height: 16),
                       SizedBox(
                         width: double.infinity,
@@ -309,7 +349,7 @@ class _AIPhotoScreenState extends State<AIPhotoScreen> {
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: const Text('Dodaj posiłek'),
+                          child: Text(l10n.trackAddMeal),
                         ),
                       ),
                     ],

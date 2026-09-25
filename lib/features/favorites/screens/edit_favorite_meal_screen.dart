@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/utils/success_message.dart';
 import '../../../core/utils/error_handler.dart';
 import 'package:uuid/uuid.dart';
@@ -8,7 +9,6 @@ import '../../../shared/models/favorite_meal.dart';
 import '../../../shared/models/ingredient.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../core/config/supabase_config.dart';
-import '../../../core/constants/app_constants.dart';
 
 class EditFavoriteMealScreen extends StatefulWidget {
   final FavoriteMeal favoriteMeal;
@@ -122,7 +122,7 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
       final updatedMeal = FavoriteMeal(
         id: widget.favoriteMeal.id,
         userId: userId,
-        name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
+        name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultMealName : _nameController.text.trim(),
         calories: double.parse(_caloriesController.text),
         proteinG: double.parse(_proteinController.text),
         fatG: double.parse(_fatController.text),
@@ -135,10 +135,10 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
 
       if (mounted) {
         context.pop(true);
-        SuccessMessage.show(context, 'Zaktualizowano ulubiony posiłek');
+        SuccessMessage.show(context, context.l10n.trackFavoriteMealUpdated, l10n: context.l10n);
       }
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -148,9 +148,10 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edytuj ulubiony posiłek'),
+        title: Text(l10n.trackEditFavoriteMeal),
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
@@ -165,9 +166,9 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nazwa posiłku (opcjonalnie)',
-                hintText: 'Puste = "Bez nazwy"',
+              decoration: InputDecoration(
+                labelText: l10n.trackMealNameOptional,
+                hintText: l10n.trackHintEmptyDefaultName,
                 border: OutlineInputBorder(),
               ),
             ),
@@ -177,9 +178,9 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
                 Expanded(
                   child: TextField(
                     controller: _caloriesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Kalorie (kcal)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.trackCaloriesKcal,
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -188,9 +189,9 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
                 Expanded(
                   child: TextField(
                     controller: _proteinController,
-                    decoration: const InputDecoration(
-                      labelText: 'Białko (g)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.trackProteinG,
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -203,9 +204,9 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
                 Expanded(
                   child: TextField(
                     controller: _fatController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tłuszcze (g)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.trackFatG,
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -214,9 +215,9 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
                 Expanded(
                   child: TextField(
                     controller: _carbsController,
-                    decoration: const InputDecoration(
-                      labelText: 'Węglowodany (g)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.trackCarbsG,
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -228,7 +229,7 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Składniki (${_ingredients.length})',
+                  l10n.trackIngredientsCount(count: '${_ingredients.length}'),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -236,7 +237,7 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
                 TextButton.icon(
                   onPressed: _addIngredient,
                   icon: const Icon(Icons.add),
-                  label: const Text('Dodaj składnik'),
+                  label: Text(l10n.trackAddIngredient),
                 ),
               ],
             ),
@@ -264,7 +265,7 @@ class _EditFavoriteMealScreenState extends State<EditFavoriteMealScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _recalculateFromIngredients,
-                child: const Text('Przelicz z składników'),
+                child: Text(l10n.trackRecalculateFromIngredients),
               ),
             ],
           ],
@@ -341,7 +342,7 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Dodaj składnik'),
+      title: Text(context.l10n.trackAddIngredient),
       contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       content: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: 320, maxWidth: 400),
@@ -353,36 +354,36 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nazwa składnika (opcjonalnie)',
-                  hintText: 'Puste = "Bez nazwy"',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackIngredientNameOptional,
+                  hintText: context.l10n.trackHintEmptyDefaultName,
                 ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Ilość (g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackAmountG,
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Podaj ilość';
+                    return context.l10n.trackEnterAmount;
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               Text(
-                'Wartości odżywcze (na 100g):',
+                context.l10n.trackNutritionPer100g,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _caloriesController,
-                decoration: const InputDecoration(
-                  labelText: 'Kalorie (kcal/100g)',
-                  hintText: 'Puste = policzy z makroskładników',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackCaloriesPer100g,
+                  hintText: context.l10n.trackHintCaloriesFromMacros,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -394,7 +395,7 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
                       ? double.tryParse(value)
                       : _calculateCaloriesFromMacros();
                   if (calories == null || calories < 0) {
-                    return 'Podaj kalorie lub uzupełnij makroskładniki';
+                    return context.l10n.trackEnterCaloriesOrFillMacros;
                   }
                   return null;
                 },
@@ -402,8 +403,8 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _proteinController,
-                decoration: const InputDecoration(
-                  labelText: 'Białko (g/100g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackProteinPer100g,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -412,8 +413,8 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _fatController,
-                decoration: const InputDecoration(
-                  labelText: 'Tłuszcze (g/100g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackFatPer100g,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -422,8 +423,8 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _carbsController,
-                decoration: const InputDecoration(
-                  labelText: 'Węglowodany (g/100g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackCarbsPer100g,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -437,14 +438,14 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
       actions: [
         TextButton(
           onPressed: () => context.pop(),
-          child: const Text('Anuluj'),
+          child: Text(context.l10n.commonCancel),
         ),
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final ingredient = Ingredient(
                 id: const Uuid().v4(),
-                name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
+                name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultMealName : _nameController.text.trim(),
                 amountG: double.parse(_amountController.text),
                 caloriesPer100G: _getCalories(),
                 proteinPer100G: double.tryParse(_proteinController.text) ?? 0,
@@ -454,7 +455,7 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               context.pop(ingredient);
             }
           },
-          child: const Text('Dodaj'),
+          child: Text(context.l10n.trackAdd),
         ),
       ],
     );

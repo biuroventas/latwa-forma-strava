@@ -23,9 +23,9 @@ Płatność za Premium odbywa się **na stronie Stripe** (link z aplikacji). Po 
 
 - Załóż konto: [stripe.com](https://stripe.com).
 - **Produkty** → utwórz produkt „Łatwa Forma Premium” z **trzema cennikami**:
-  - **69,98 PLN / miesiąc** (Recurring) → Price ID → `STRIPE_PREMIUM_PRICE_MONTHLY`.
-  - **194,95 PLN / rok** (Recurring) → Price ID → `STRIPE_PREMIUM_PRICE_YEARLY`.
-  - **194,95 PLN jednorazowo** (One time) → Price ID → `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` (używane przy płatności „Rocznie jednorazowo” – **BLIK + karta**).
+  - **69,99 PLN / miesiąc** (Recurring) → Price ID → `STRIPE_PREMIUM_PRICE_MONTHLY`.
+  - **194,99 PLN / rok** (Recurring) → Price ID → `STRIPE_PREMIUM_PRICE_YEARLY`.
+  - **194,99 PLN jednorazowo** (One time) → Price ID → `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` (używane przy płatności „Rocznie jednorazowo” – **BLIK + karta**).
 - **Settings → Payment methods:** włącz Cards, **BLIK** (dla płatności jednorazowej za rok), Apple Pay, Google Pay.
 
 ### 2. Klucze API
@@ -49,11 +49,11 @@ Płatność za Premium odbywa się **na stronie Stripe** (link z aplikacji). Po 
 W Supabase: **Project Settings → Edge Functions → Secrets** (lub przez CLI) ustaw:
 
 | Secret | Opis |
-|--------|------|
+| --- | --- |
 | `STRIPE_SECRET_KEY` | Secret key z Stripe (sk_test_... / sk_live_...) |
-| `STRIPE_PREMIUM_PRICE_MONTHLY` | Price ID ceny miesięcznej 69,98 PLN recurring (price_...) |
-| `STRIPE_PREMIUM_PRICE_YEARLY` | Price ID ceny rocznej 194,95 PLN recurring (price_...) |
-| `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | Price ID ceny **jednorazowej** 194,95 PLN (za rok) – płatność BLIK + karta (price_...) |
+| `STRIPE_PREMIUM_PRICE_MONTHLY` | Price ID ceny miesięcznej 69,99 PLN recurring (price_...) |
+| `STRIPE_PREMIUM_PRICE_YEARLY` | Price ID ceny rocznej 194,99 PLN recurring (price_...) |
+| `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | Price ID ceny **jednorazowej** 194,99 PLN (za rok) – płatność BLIK + karta (price_...) |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret z webhooka Stripe (whsec_...) |
 | `STRIPE_SUCCESS_URL` | URL po udanej płatności – **użyj latwaforma.pl**: `https://latwaforma.pl/#/premium-success` (nie app.latwaforma.pl) |
 | `STRIPE_CANCEL_URL` | URL po anulowaniu – **użyj latwaforma.pl**: `https://latwaforma.pl/#/premium-cancel` |
@@ -71,6 +71,7 @@ supabase functions deploy create-checkout-session --no-verify-jwt
 supabase functions deploy create-portal-session --no-verify-jwt
 supabase functions deploy stripe-webhook --no-verify-jwt
 ```
+
 **stripe-webhook** też musi być z `--no-verify-jwt` – Stripe nie wysyła tokenu JWT, tylko nagłówek `Stripe-Signature`. Bez tego w logach Stripe (Event deliveries) zobaczysz **401 ERR** przy `checkout.session.completed`.
 
 Albo uruchom skrypt: `./scripts/deploy_stripe_functions.sh`

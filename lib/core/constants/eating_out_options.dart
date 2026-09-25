@@ -1,8 +1,8 @@
+import 'package:latwa_forma/l10n/app_localizations.dart';
+
 /// Opcje „Jem na mieście” – szybkie dodawanie posiłków z restauracji.
 class EatingOutOption {
   final String id;
-  final String name;
-  final String label; // np. "~600-900 kcal"
   final int minKcal;
   final int maxKcal;
   final int defaultKcal; // wartość domyślna (średnia)
@@ -12,14 +12,82 @@ class EatingOutOption {
 
   const EatingOutOption({
     required this.id,
-    required this.name,
-    required this.label,
     required this.minKcal,
     required this.maxKcal,
     required this.defaultKcal,
     required this.icon,
     this.supportsSlices = false,
   });
+
+  String localizedName(AppLocalizations l10n) {
+    switch (id) {
+      case 'pizza':
+        return l10n.trackEatingOutPizza;
+      case 'kebab':
+        return l10n.trackEatingOutKebab;
+      case 'burger':
+        return l10n.trackEatingOutBurger;
+      case 'chinese':
+        return l10n.trackEatingOutChinese;
+      case 'mcd_cheeseburger':
+        return l10n.trackEatingOutMcdCheeseburger;
+      case 'mcd_2foryou':
+        return l10n.trackEatingOutMcd2ForYou;
+      case 'mcd_bigmac':
+        return l10n.trackEatingOutMcdBigMac;
+      case 'mcd_mcdouble':
+        return l10n.trackEatingOutMcdMcDouble;
+      case 'mcd_fries':
+        return l10n.trackEatingOutMcdSmallFries;
+      case 'mcd_medium_fries':
+        return l10n.trackEatingOutMcdMediumFries;
+      case 'kfc_drumstick':
+        return l10n.trackEatingOutKfcDrumstick;
+      case 'kfc_tenders':
+        return l10n.trackEatingOutKfcTenders;
+      case 'subway_6in':
+        return l10n.trackEatingOutSubway6;
+      case 'subway_footlong':
+        return l10n.trackEatingOutSubwayFootlong;
+      default:
+        return id;
+    }
+  }
+
+  String localizedLabel(AppLocalizations l10n) {
+    switch (id) {
+      case 'pizza':
+        return l10n.trackEatingOutPizzaLabel;
+      case 'kebab':
+        return l10n.trackEatingOutKebabLabel;
+      case 'burger':
+        return l10n.trackEatingOutBurgerLabel;
+      case 'chinese':
+        return l10n.trackEatingOutChineseLabel;
+      case 'mcd_cheeseburger':
+        return l10n.trackEatingOutMcdCheeseburgerLabel;
+      case 'mcd_2foryou':
+        return l10n.trackEatingOutMcd2ForYouLabel;
+      case 'mcd_bigmac':
+        return l10n.trackEatingOutMcdBigMacLabel;
+      case 'mcd_mcdouble':
+        return l10n.trackEatingOutMcdMcDoubleLabel;
+      case 'mcd_fries':
+        return l10n.trackEatingOutMcdSmallFriesLabel;
+      case 'mcd_medium_fries':
+        return l10n.trackEatingOutMcdMediumFriesLabel;
+      case 'kfc_drumstick':
+        return l10n.trackEatingOutKfcDrumstickLabel;
+      case 'kfc_tenders':
+        return l10n.trackEatingOutKfcTendersLabel;
+      case 'subway_6in':
+        return l10n.trackEatingOutSubway6Label;
+      case 'subway_footlong':
+        return l10n.trackEatingOutSubwayFootlongLabel;
+      default:
+        return '';
+    }
+  }
 
   /// Szacowane makroskładniki (przybliżenie dla typowej porcji).
   Map<String, double> getEstimatedMacros({int slices = 1}) {
@@ -59,8 +127,6 @@ const List<EatingOutOption> eatingOutOptions = [
   // Pizza – z kawałkami
   EatingOutOption(
     id: 'pizza',
-    name: 'Pizza',
-    label: '~250–450 kcal / kawałek',
     minKcal: 250,
     maxKcal: 450,
     defaultKcal: 350,
@@ -70,8 +136,6 @@ const List<EatingOutOption> eatingOutOptions = [
   // Ogólne
   EatingOutOption(
     id: 'kebab',
-    name: 'Kebab',
-    label: '~600–900 kcal',
     minKcal: 600,
     maxKcal: 900,
     defaultKcal: 750,
@@ -79,8 +143,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'burger',
-    name: 'Burger (ogólnie)',
-    label: '~500–800 kcal',
     minKcal: 500,
     maxKcal: 800,
     defaultKcal: 650,
@@ -88,8 +150,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'chinese',
-    name: 'Chińczyk',
-    label: '~500–900 kcal',
     minKcal: 500,
     maxKcal: 900,
     defaultKcal: 700,
@@ -98,8 +158,6 @@ const List<EatingOutOption> eatingOutOptions = [
   // McDonald's
   EatingOutOption(
     id: 'mcd_cheeseburger',
-    name: "McDonald's – Cheeseburger",
-    label: '~300 kcal',
     minKcal: 270,
     maxKcal: 330,
     defaultKcal: 303,
@@ -107,8 +165,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'mcd_2foryou',
-    name: "McDonald's – 2forYou (Cheeseburger + frytki)",
-    label: '~530 kcal',
     minKcal: 480,
     maxKcal: 580,
     defaultKcal: 530,
@@ -116,8 +172,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'mcd_bigmac',
-    name: "McDonald's – Big Mac",
-    label: '~590 kcal',
     minKcal: 550,
     maxKcal: 630,
     defaultKcal: 590,
@@ -125,8 +179,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'mcd_mcdouble',
-    name: "McDonald's – McDouble",
-    label: '~400 kcal',
     minKcal: 370,
     maxKcal: 430,
     defaultKcal: 400,
@@ -134,8 +186,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'mcd_fries',
-    name: "McDonald's – małe frytki",
-    label: '~230 kcal',
     minKcal: 200,
     maxKcal: 260,
     defaultKcal: 230,
@@ -143,8 +193,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'mcd_medium_fries',
-    name: "McDonald's – średnie frytki",
-    label: '~340 kcal',
     minKcal: 300,
     maxKcal: 380,
     defaultKcal: 340,
@@ -153,8 +201,6 @@ const List<EatingOutOption> eatingOutOptions = [
   // KFC
   EatingOutOption(
     id: 'kfc_drumstick',
-    name: 'KFC – udko/nóżka',
-    label: '~200 kcal / szt.',
     minKcal: 150,
     maxKcal: 250,
     defaultKcal: 200,
@@ -163,8 +209,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'kfc_tenders',
-    name: 'KFC – Strips / Tenders',
-    label: '~400–600 kcal',
     minKcal: 350,
     maxKcal: 650,
     defaultKcal: 500,
@@ -173,8 +217,6 @@ const List<EatingOutOption> eatingOutOptions = [
   // Subway
   EatingOutOption(
     id: 'subway_6in',
-    name: "Subway – 6'' sub",
-    label: '~300–500 kcal',
     minKcal: 280,
     maxKcal: 550,
     defaultKcal: 400,
@@ -182,8 +224,6 @@ const List<EatingOutOption> eatingOutOptions = [
   ),
   EatingOutOption(
     id: 'subway_footlong',
-    name: "Subway – Footlong",
-    label: '~600–900 kcal',
     minKcal: 550,
     maxKcal: 950,
     defaultKcal: 750,

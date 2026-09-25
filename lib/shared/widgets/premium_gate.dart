@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../core/providers/subscription_provider.dart';
 import '../../core/router/app_router.dart';
 
@@ -27,7 +28,7 @@ class PremiumGate extends ConsumerWidget {
     if (lockedChild != null) return lockedChild!;
 
     return _PremiumLockedPlaceholder(
-      featureName: featureName ?? 'Ta funkcja',
+      featureName: featureName ?? context.l10n.premFeatureThis,
       onUpgrade: () => context.push(AppRoutes.premium),
     );
   }
@@ -43,22 +44,21 @@ Future<bool> checkPremiumOrNavigate(
   if (hasAccess) return true;
 
   if (!context.mounted) return false;
+  final l10n = context.l10n;
+  final name = featureName ?? l10n.premFeatureThis;
   final go = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: const Text('Funkcja Premium'),
-      content: Text(
-        '${featureName ?? "Ta funkcja"} jest dostępna w planie Premium. '
-        'Czy chcesz dowiedzieć się więcej?',
-      ),
+      title: Text(l10n.premFeatureTitle),
+      content: Text(l10n.premFeatureDialog(feature: name)),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),
-          child: const Text('Anuluj'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(ctx).pop(true),
-          child: const Text('Zobacz Premium'),
+          child: Text(l10n.premSeePremium),
         ),
       ],
     ),
@@ -81,6 +81,7 @@ class _PremiumLockedPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -94,13 +95,13 @@ class _PremiumLockedPlaceholder extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '$featureName jest w Premium',
+              l10n.premLockedTitle(feature: featureName),
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Odblokuj nieograniczoną poradę AI, eksport PDF i więcej.',
+              l10n.premLockedBody,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -110,7 +111,7 @@ class _PremiumLockedPlaceholder extends StatelessWidget {
             FilledButton.icon(
               onPressed: onUpgrade,
               icon: const Icon(Icons.star),
-              label: const Text('Sprawdź Premium'),
+              label: Text(l10n.premCheckPremium),
             ),
           ],
         ),

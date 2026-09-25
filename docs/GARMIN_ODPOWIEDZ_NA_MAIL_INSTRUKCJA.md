@@ -31,7 +31,7 @@ Poniżej: **co zrobić**, **gotowy mail do skopiowania**, **numerowana lista scr
 Garmin prosi o **screenshots of your evaluation app, per API requested** – czyli dla każdego API, z którego korzystasz (u Ciebie: **Health API** i **Activity API**), trzeba pokazać, jak dane z tego API wyświetlają się w aplikacji. Poniższe ujęcia to robią (Integracje + lista aktywności = Activity/Health w UI). Zrób dokładnie te ujęcia (pełny ekran albo wyraźny fragment). W mailu będziesz pisał np. „See screenshot 1”, „Screenshot 2 shows…”.
 
 | Nr | Co zrobić | Opis dla Garmin (możesz skopiować do maila) |
-|----|-----------|---------------------------------------------|
+| --- | --- | --- |
 | **1** | Partner Verification – cały ekran z **wszystkimi testami zielonymi** (Endpoint Setup, Endpoint Coverage, Active User). | „Screenshot 1: Partner Verification – all tests green (Endpoint Setup, Endpoint Coverage, Active User).” |
 | **2** | Aplikacja Łatwa Forma – ekran **Integracje** (Profil → Integracje): widać sekcję **Garmin Connect**, przycisk „Połącz z Garmin Connect” lub „Odłącz Garmin”, krótki opis o aktywnościach z Garmin. | „Screenshot 2: Integrations screen – Garmin Connect section, connect/disconnect and description.” |
 | **3** | Aplikacja – **lista aktywności** (Aktywności), gdzie widać **co najmniej jedną aktywność z Garmin** (nazwa z „(Garmin)” lub ikona). | „Screenshot 3: Activities list showing Garmin-sourced activity with attribution (Garmin).” |
@@ -137,7 +137,7 @@ Po wklejeniu maila **załącz pliki** Screenshot_1.png … Screenshot_5.png (i e
 ## Zweryfikowane punkty z maila Marca Lussiego (27.02.2026)
 
 | Punkt w mailu | W instrukcji / w szablonie odpowiedzi |
-|---------------|--------------------------------------|
+| --- | --- |
 | 1. Technical: APIs tested/in use | ✓ Health API, Activity API; Training/Courses – nie używane |
 | 1. Technical: ≥2 Garmin Connect users | ✓ Screenshot 1 (Partner Verification) |
 | 1. Technical: User Deregistration & User Permission endpoints | ✓ Callback /api/garmin, Screenshot 5 |

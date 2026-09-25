@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/utils/success_message.dart';
 import '../../../core/utils/error_handler.dart';
 import 'package:uuid/uuid.dart';
@@ -9,9 +10,12 @@ import '../../../shared/models/meal.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/streak_updater.dart';
 
 class IngredientsMealScreen extends StatefulWidget {
-  const IngredientsMealScreen({super.key});
+  const IngredientsMealScreen({super.key, this.date});
+
+  final DateTime? date;
 
   @override
   State<IngredientsMealScreen> createState() => _IngredientsMealScreenState();
@@ -86,25 +90,36 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_ingredients.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dodaj przynajmniej jeden składnik')),
+        SnackBar(content: Text(context.l10n.trackAddAtLeastOneIngredient)),
       );
       return;
     }
 
     setState(() => _isSaving = true);
+    final l10n = context.l10n;
+    final defaultMealName = l10n.trackDefaultMealName;
 
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
       if (userId == null) {
-        throw Exception('Użytkownik nie jest zalogowany');
+        throw Exception(l10n.trackUserNotLoggedIn);
       }
 
       final totals = _calculateTotals();
       final service = SupabaseService();
+      final effectiveDate = widget.date ?? DateTime.now();
+      final createdAt = DateTime(
+        effectiveDate.year,
+        effectiveDate.month,
+        effectiveDate.day,
+        12,
+        0,
+      );
+      await StreakUpdater.updateStreak(userId, AppConstants.streakMeals, effectiveDate);
 
       final meal = Meal(
         userId: userId,
-        name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
+        name: _nameController.text.trim().isEmpty ? defaultMealName : _nameController.text.trim(),
         calories: totals['calories']!,
         proteinG: totals['protein']!,
         fatG: totals['fat']!,
@@ -116,16 +131,17 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
         weightG: totals['weight']!,
         mealType: _mealType,
         source: AppConstants.mealSourceIngredients,
+        createdAt: createdAt,
       );
 
       await service.createMeal(meal);
 
-      if (mounted) {
-        context.pop(true);
-        SuccessMessage.show(context, 'Posiłek dodany pomyślnie!', duration: const Duration(seconds: 2));
-      }
+      if (!mounted) return;
+      context.pop(true);
+      SuccessMessage.show(context, l10n.trackMealAddedSuccess, l10n: l10n, duration: const Duration(seconds: 2));
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (!mounted) return;
+      ErrorHandler.showSnackBar(context, l10n: l10n, error: e);
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -135,11 +151,12 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final totals = _calculateTotals();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Posiłek ze składników'),
+        title: Text(context.l10n.trackMealFromIngredientsTitle),
       ),
       body: Form(
         key: _formKey,
@@ -152,23 +169,23 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                   // Nazwa posiłku
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nazwa posiłku (opcjonalnie)',
-                      hintText: 'Puste = "Bez nazwy"',
+                    decoration: InputDecoration(
+                      labelText: l10n.trackMealNameOptional,
+                      hintText: l10n.trackHintEmptyDefaultName,
                     ),
                   ),
                   const SizedBox(height: 16),
                   // Typ posiłku
                   DropdownButtonFormField<String>(
                     initialValue: _mealType,
-                    decoration: const InputDecoration(
-                      labelText: 'Typ posiłku - opcjonalnie',
+                    decoration: InputDecoration(
+                      labelText: l10n.trackMealTypeOptional,
                     ),
-                    items: const [
-                      DropdownMenuItem(value: AppConstants.mealBreakfast, child: Text('Śniadanie')),
-                      DropdownMenuItem(value: AppConstants.mealLunch, child: Text('Obiad')),
-                      DropdownMenuItem(value: AppConstants.mealDinner, child: Text('Kolacja')),
-                      DropdownMenuItem(value: AppConstants.mealSnack, child: Text('Przekąska')),
+                    items: [
+                      DropdownMenuItem(value: AppConstants.mealBreakfast, child: Text(l10n.trackBreakfast)),
+                      DropdownMenuItem(value: AppConstants.mealLunch, child: Text(l10n.trackLunch)),
+                      DropdownMenuItem(value: AppConstants.mealDinner, child: Text(l10n.trackDinner)),
+                      DropdownMenuItem(value: AppConstants.mealSnack, child: Text(l10n.trackSnack)),
                     ],
                     onChanged: (value) {
                       setState(() => _mealType = value);
@@ -184,7 +201,7 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Podsumowanie',
+                            l10n.trackSummary,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -193,17 +210,17 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildSummaryItem('Kalorie', totals['calories']!.toStringAsFixed(0), 'kcal'),
-                              _buildSummaryItem('Białko', totals['protein']!.toStringAsFixed(1), 'g'),
-                              _buildSummaryItem('Tłuszcze', totals['fat']!.toStringAsFixed(1), 'g'),
-                              _buildSummaryItem('Węgle', totals['carbs']!.toStringAsFixed(1), 'g'),
+                              _buildSummaryItem(l10n.trackCalories, totals['calories']!.toStringAsFixed(0), 'kcal'),
+                              _buildSummaryItem(l10n.trackProtein, totals['protein']!.toStringAsFixed(1), 'g'),
+                              _buildSummaryItem(l10n.trackFat, totals['fat']!.toStringAsFixed(1), 'g'),
+                              _buildSummaryItem(l10n.trackCarbsShort, totals['carbs']!.toStringAsFixed(1), 'g'),
                             ],
                           ),
                           if (totals['weight']! > 0)
                             Padding(
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(
-                                'Całkowita waga: ${totals['weight']!.toStringAsFixed(0)} g',
+                                l10n.trackTotalWeightG(weight: totals['weight']!.toStringAsFixed(0)),
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
@@ -217,7 +234,7 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Składniki (${_ingredients.length})',
+                        l10n.trackIngredientsCount(count: '${_ingredients.length}'),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -225,7 +242,7 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                       TextButton.icon(
                         onPressed: _addIngredient,
                         icon: const Icon(Icons.add),
-                        label: const Text('Dodaj składnik'),
+                        label: Text(l10n.trackAddIngredient),
                       ),
                     ],
                   ),
@@ -242,12 +259,12 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Brak składników',
+                              l10n.trackNoIngredients,
                               style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Dodaj składniki, aby zbudować posiłek',
+                              l10n.trackAddIngredientsHint,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: Colors.grey.shade600,
                                   ),
@@ -313,9 +330,9 @@ class _IngredientsMealScreenState extends State<IngredientsMealScreen> {
                   ),
                   child: _isSaving
                       ? const CircularProgressIndicator()
-                      : const Text(
-                          'Zapisz posiłek',
-                          style: TextStyle(fontSize: 16),
+                      : Text(
+                          l10n.trackSaveMeal,
+                          style: const TextStyle(fontSize: 16),
                         ),
                 ),
               ),
@@ -415,7 +432,7 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.ingredient != null ? 'Edytuj składnik' : 'Dodaj składnik'),
+      title: Text(widget.ingredient != null ? context.l10n.trackEditIngredient : context.l10n.trackAddIngredient),
       contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       content: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: 320, maxWidth: 400),
@@ -427,41 +444,41 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nazwa składnika (opcjonalnie)',
-                  hintText: 'Puste = "Bez nazwy"',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackIngredientNameOptional,
+                  hintText: context.l10n.trackHintEmptyDefaultName,
                 ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Ilość (g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackAmountG,
                   hintText: '100',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Podaj ilość';
+                    return context.l10n.trackEnterAmount;
                   }
                   final amount = double.tryParse(value);
                   if (amount == null || amount <= 0) {
-                    return 'Podaj poprawną ilość';
+                    return context.l10n.trackEnterValidAmount;
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               Text(
-                'Wartości odżywcze (na 100g):',
+                context.l10n.trackNutritionPer100g,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _caloriesController,
-                decoration: const InputDecoration(
-                  labelText: 'Kalorie (kcal/100g)',
-                  hintText: 'Puste = policzy z makroskładników',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackCaloriesPer100g,
+                  hintText: context.l10n.trackHintCaloriesFromMacros,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -473,7 +490,7 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
                       ? double.tryParse(value)
                       : _calculateCaloriesFromMacros();
                   if (calories == null || calories < 0) {
-                    return 'Podaj kalorie lub uzupełnij makroskładniki';
+                    return context.l10n.trackEnterCaloriesOrFillMacros;
                   }
                   return null;
                 },
@@ -481,8 +498,8 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _proteinController,
-                decoration: const InputDecoration(
-                  labelText: 'Białko (g/100g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackProteinPer100g,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -491,8 +508,8 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _fatController,
-                decoration: const InputDecoration(
-                  labelText: 'Tłuszcze (g/100g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackFatPer100g,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -501,8 +518,8 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _carbsController,
-                decoration: const InputDecoration(
-                  labelText: 'Węglowodany (g/100g)',
+                decoration: InputDecoration(
+                  labelText: context.l10n.trackCarbsPer100g,
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -516,14 +533,14 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
       actions: [
         TextButton(
           onPressed: () => context.pop(),
-          child: const Text('Anuluj'),
+          child: Text(context.l10n.commonCancel),
         ),
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
               final ingredient = Ingredient(
                 id: widget.ingredient?.id ?? const Uuid().v4(),
-                name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
+                name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultMealName : _nameController.text.trim(),
                 amountG: double.parse(_amountController.text),
                 caloriesPer100G: _getCalories(),
                 proteinPer100G: double.tryParse(_proteinController.text) ?? 0,
@@ -533,7 +550,7 @@ class _AddIngredientDialogState extends State<_AddIngredientDialog> {
               context.pop(ingredient);
             }
           },
-          child: Text(widget.ingredient != null ? 'Zapisz' : 'Dodaj'),
+          child: Text(widget.ingredient != null ? context.l10n.commonSave : context.l10n.trackAdd),
         ),
       ],
     );

@@ -1,3 +1,13 @@
 /api/garmin  /.netlify/functions/garmin  200
+/api/garmin/  /.netlify/functions/garmin  200
+/api/garmin/*  /.netlify/functions/garmin  200
 /api/garmin-disconnect  /.netlify/functions/garmin-disconnect  200
+/env.production  /env.production  200
+/firma.html  /regulamin.html  301
+/polityka-prywatnosci.html  /polityka-prywatnosci.html  200
+/regulamin.html  /regulamin.html  200
+/privacy.html  /privacy.html  200
+/terms.html  /terms.html  200
+/usun-konto.html  /usun-konto.html  200
+/delete-account.html  /delete-account.html  200
 /*    /index.html   200

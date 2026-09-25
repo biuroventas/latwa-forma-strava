@@ -13,8 +13,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    const authHeader = req.headers.get("authorization") ?? req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(
         JSON.stringify({ error: "Brak autoryzacji" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -37,14 +37,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey);
     const {
       data: { user },
       error: userError,
-    } = await supabaseAuth.auth.getUser();
+    } = await supabaseAuth.auth.getUser(jwt);
     if (userError || !user) {
       return new Response(
         JSON.stringify({ error: "Nieprawidłowa sesja" }),

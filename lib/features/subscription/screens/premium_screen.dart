@@ -8,11 +8,19 @@ import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/constants/store_product_ids.dart';
 import '../../../core/constants/trial_constants.dart';
 import '../../../core/providers/profile_provider.dart';
 import '../../../core/providers/subscription_provider.dart';
+import '../../../core/router/app_router.dart';
 import '../../../shared/services/auth_link_service.dart';
+import '../../../shared/services/revenuecat_service.dart';
 import '../../../shared/services/supabase_service.dart';
+import '../../../shared/widgets/health_disclaimer.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
+import '../../legal/legal_document_screen.dart';
+
 
 class PremiumScreen extends ConsumerStatefulWidget {
   const PremiumScreen({super.key});
@@ -21,29 +29,69 @@ class PremiumScreen extends ConsumerStatefulWidget {
   ConsumerState<PremiumScreen> createState() => _PremiumScreenState();
 }
 
-/// Plan subskrypcji: miesięczny, roczny (subskrypcja) lub roczny jednorazowo (BLIK + karta).
+/// Plan subskrypcji: miesięczny, roczny (subskrypcja) lub roczny jednorazowo (web: tylko BLIK).
 enum _PremiumPlan { monthly, yearly, yearlyOnce }
 
 class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindingObserver {
   bool _isActivating = false;
   bool _isLoadingStripe = false;
   bool _isLoadingPortal = false;
-  _PremiumPlan _selectedPlan = _PremiumPlan.yearlyOnce;
+  bool _isLoadingIap = false;
+  bool _isRestoring = false;
+  _PremiumPlan _selectedPlan = kIsWeb ? _PremiumPlan.yearlyOnce : _PremiumPlan.yearly;
+  String _monthlyPriceLabel = StoreProductIds.monthlyPriceLabel;
+  String _yearlyPriceLabel = StoreProductIds.yearlyPriceLabel;
+  String _yearlyOncePriceLabel = StoreProductIds.yearlyPriceLabel;
+  String _yearlyPerMonthLabel = StoreProductIds.yearlyPerMonthLabel;
   final _loginEmailController = TextEditingController();
   final _loginCodeController = TextEditingController();
+  final _promoController = TextEditingController();
+  bool _showPromoField = false;
   String? _loginEmail;
   bool _loginCodeSent = false;
   bool _isSendingCode = false;
   bool _isVerifying = false;
   bool _isSigningInWithGoogle = false;
+  bool _isSigningInWithApple = false;
   /// 'update_with_current' = zaktualizuj konto danymi z urządzenia; 'restore_account' = przywróć dane konta
   String? _mergeChoice;
   String? _anonymousUserIdForMerge;
+
+  String? _priceLocale;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _loadStorePrices();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final code = Localizations.localeOf(context).languageCode;
+    if (_priceLocale == code) return;
+    final first = _priceLocale == null;
+    _priceLocale = code;
+    _yearlyPerMonthLabel = context.l10n.premYearlyPerMonthFallback;
+    if (!first) setState(() {});
+    _loadStorePrices();
+  }
+
+  Future<void> _loadStorePrices() async {
+    if (kIsWeb) return;
+    final prices = await RevenueCatService.instance.loadPlanPrices();
+    if (!mounted || prices == null) return;
+    setState(() {
+      _monthlyPriceLabel = prices.monthlyLabel;
+      _yearlyPriceLabel = prices.yearlyLabel;
+      if (prices.yearlyOnceLabel != null) {
+        _yearlyOncePriceLabel = prices.yearlyOnceLabel!;
+      }
+      if (prices.yearlyPerMonthLabel != null) {
+        _yearlyPerMonthLabel = prices.yearlyPerMonthLabel!;
+      }
+    });
   }
 
   @override
@@ -51,6 +99,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
     WidgetsBinding.instance.removeObserver(this);
     _loginEmailController.dispose();
     _loginCodeController.dispose();
+    _promoController.dispose();
     super.dispose();
   }
 
@@ -58,6 +107,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.invalidate(profileProvider);
+      if (mounted) setState(() {});
     }
   }
 
@@ -72,7 +122,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('OK'),
+            child: Text(context.l10n.commonOk),
           ),
         ],
       ),
@@ -82,7 +132,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
   Future<void> _sendLoginCode() async {
     final email = _loginEmailController.text.trim();
     if (email.isEmpty) {
-      await _showMessageDialog('Uwaga', 'Podaj adres e-mail.');
+      await _showMessageDialog(context.l10n.commonWarning, context.l10n.premEnterEmail);
       return;
     }
     final user = SupabaseConfig.auth.currentUser;
@@ -102,14 +152,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           await showDialog<void>(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Text('Kod wysłany'),
+              title: Text(context.l10n.premCodeSent),
               content: SingleChildScrollView(
-                child: Text(linkResult.infoMessage ?? 'Wysłaliśmy link i kod na $email. Sprawdź skrzynkę (także folder Spam) – kliknij link w mailu albo wpisz kod poniżej.'),
+                child: Text(linkResult.infoMessage ?? context.l10n.premCodeSentBody(email: email)),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('OK'),
+                  child: Text(context.l10n.commonOk),
                 ),
               ],
             ),
@@ -147,15 +197,15 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
             });
             ref.invalidate(profileProvider);
             if (mounted) {
-              await _showMessageDialog('Zalogowano', 'Możesz teraz wykupić Premium.');
+              await _showMessageDialog(context.l10n.premSignedIn, context.l10n.premSignedInBuy);
             }
           }
         } else {
-          if (mounted) await _showMessageDialog('Błąd', signInResult.errorMessage ?? 'Błąd');
+          if (mounted) await _showMessageDialog(context.l10n.commonError, signInResult.errorMessage ?? context.l10n.commonError);
         }
         return;
       }
-      if (mounted) await _showMessageDialog('Błąd', linkResult.errorMessage ?? 'Błąd');
+      if (mounted) await _showMessageDialog(context.l10n.commonError, linkResult.errorMessage ?? context.l10n.commonError);
       return;
     }
     final result = await AuthLinkService().signInWithEmail(email);
@@ -170,21 +220,21 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         await showDialog<void>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('Kod wysłany'),
+            title: Text(context.l10n.premCodeSent),
             content: SingleChildScrollView(
-              child: Text(result.infoMessage ?? 'Wysłaliśmy link i kod na $email. Sprawdź skrzynkę (także folder Spam) – kliknij link w mailu albo wpisz kod poniżej.'),
+              child: Text(result.infoMessage ?? context.l10n.premCodeSentBody(email: email)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('OK'),
+                child: Text(context.l10n.commonOk),
               ),
             ],
           ),
         );
       }
     } else {
-      if (mounted) await _showMessageDialog('Błąd', result.errorMessage ?? 'Błąd');
+      if (mounted) await _showMessageDialog(context.l10n.commonError, result.errorMessage ?? context.l10n.commonError);
     }
   }
 
@@ -193,29 +243,22 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('Konto z tym adresem e-mail istnieje.'),
-        content: const SingleChildScrollView(
-          child: Text(
-            'Próbujesz się zalogować na konto powiązane z tym adresem e-mail. '
-            'Na tym urządzeniu masz inne dane (profil, posiłki itd.).\n\n'
-            'Co chcesz zrobić?\n\n'
-            '• Zaktualizować tamto konto – obecnymi danymi z tego urządzenia (profil, posiłki zostaną przeniesione).\n\n'
-            '• Przywrócić dane konta – zobaczysz dane przypisane do konta z tym e-mailem (obecne dane z urządzenia nie będą użyte).\n\n'
-            'W obu przypadkach musisz potwierdzić tożsamość – kliknij link w mailu lub wpisz kod weryfikacyjny.',
-          ),
+        title: Text(context.l10n.premAccountExistsTitle),
+        content: SingleChildScrollView(
+          child: Text(context.l10n.premAccountExistsBody),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop('restore_account'),
-            child: const Text('Przywróć dane konta'),
+            child: Text(context.l10n.premRestoreAccountData),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop('update_with_current'),
-            child: const Text('Zaktualizuj konto tymi danymi'),
+            child: Text(context.l10n.premUpdateWithCurrent),
           ),
         ],
       ),
@@ -237,15 +280,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) {
           return AlertDialog(
-            title: const Text('Potwierdź tożsamość'),
+            title: Text(context.l10n.premConfirmIdentity),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Wysłaliśmy wiadomość na $email. '
-                    'Możesz kliknąć link weryfikacyjny w mailu albo wpisać kod poniżej (sprawdź też folder Spam).',
+                    context.l10n.premVerifyEmailSent(email: email),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 20),
@@ -254,10 +296,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                     keyboardType: TextInputType.number,
                     maxLength: 12,
                     autofocus: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Kod weryfikacyjny',
-                      hintText: 'np. 123456',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: context.l10n.premVerificationCode,
+                      hintText: context.l10n.premCodeHint,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ],
@@ -266,7 +308,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
             actions: [
               TextButton(
                 onPressed: verifying ? null : () => Navigator.of(ctx).pop(false),
-                child: const Text('Zamknij'),
+                child: Text(context.l10n.commonClose),
               ),
               FilledButton(
                 onPressed: verifying
@@ -278,12 +320,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                             await showDialog<void>(
                               context: context,
                               builder: (dctx) => AlertDialog(
-                                title: const Text('Uwaga'),
-                                content: const Text('Wpisz pełny kod z maila (min. 6 znaków).'),
+                                title: Text(context.l10n.commonWarning),
+                                content: Text(context.l10n.premEnterFullCode),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.of(dctx).pop(),
-                                    child: const Text('OK'),
+                                    child: Text(context.l10n.commonOk),
                                   ),
                                 ],
                               ),
@@ -311,14 +353,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                                   await showDialog<void>(
                                     context: context,
                                     builder: (dctx) => AlertDialog(
-                                      title: const Text('Uwaga'),
+                                      title: Text(context.l10n.commonWarning),
                                       content: SingleChildScrollView(
-                                        child: Text('Zalogowano. Błąd przenoszenia danych: $err'),
+                                        child: Text(context.l10n.premLoggedInMergeError(error: '$err')),
                                       ),
                                       actions: [
                                         TextButton(
                                           onPressed: () => Navigator.of(dctx).pop(),
-                                          child: const Text('OK'),
+                                          child: Text(context.l10n.commonOk),
                                         ),
                                       ],
                                     ),
@@ -330,14 +372,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                                 await showDialog<void>(
                                   context: context,
                                   builder: (dctx) => AlertDialog(
-                                    title: const Text('Uwaga'),
+                                    title: Text(context.l10n.commonWarning),
                                     content: SingleChildScrollView(
-                                      child: Text('Zalogowano. Błąd przenoszenia danych: $e'),
+                                      child: Text(context.l10n.premLoggedInMergeError(error: '$e')),
                                     ),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.of(dctx).pop(),
-                                        child: const Text('OK'),
+                                        child: Text(context.l10n.commonOk),
                                       ),
                                     ],
                                   ),
@@ -352,14 +394,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                             await showDialog<void>(
                               context: context,
                               builder: (dctx) => AlertDialog(
-                                title: const Text('Błąd weryfikacji'),
+                                title: Text(context.l10n.premVerifyErrorTitle),
                                 content: SingleChildScrollView(
-                                  child: Text(result.errorMessage ?? 'Kod wygasł lub jest nieprawidłowy. Wyślij ponownie.'),
+                                  child: Text(result.errorMessage ?? context.l10n.premVerifyErrorBody),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.of(dctx).pop(),
-                                    child: const Text('OK'),
+                                    child: Text(context.l10n.commonOk),
                                   ),
                                 ],
                               ),
@@ -373,7 +415,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                         height: 24,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Zatwierdź'),
+                    : Text(context.l10n.premConfirm),
               ),
             ],
           );
@@ -389,7 +431,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
     final email = _loginEmail ?? _loginEmailController.text.trim();
     final code = _loginCodeController.text.trim().replaceAll(RegExp(r'\s'), '');
     if (email.isEmpty || code.length < 6) {
-      await _showMessageDialog('Uwaga', 'Wpisz pełny kod z maila (min. 6 znaków).');
+      await _showMessageDialog(context.l10n.commonWarning, context.l10n.premEnterFullCode);
       return;
     }
     final anonymousIdToMerge = _anonymousUserIdForMerge;
@@ -409,10 +451,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           );
           if (mounted && mergeResponse.status != 200) {
             final err = mergeResponse.data is Map ? (mergeResponse.data as Map)['error'] : mergeResponse.status;
-            if (mounted) await _showMessageDialog('Uwaga', 'Zalogowano. Błąd przenoszenia danych: $err');
+            if (mounted) await _showMessageDialog(context.l10n.commonWarning, context.l10n.premLoggedInMergeError(error: '$err'));
           }
         } catch (e) {
-          if (mounted) await _showMessageDialog('Uwaga', 'Zalogowano. Błąd przenoszenia danych: $e');
+          if (mounted) await _showMessageDialog(context.l10n.commonWarning, context.l10n.premLoggedInMergeError(error: '$e'));
         }
         if (mounted) setState(() => _isVerifying = false);
       }
@@ -426,21 +468,21 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       });
       ref.invalidate(profileProvider);
       if (mounted) {
-        await _showMessageDialog('Zalogowano', 'Możesz teraz wykupić Premium.');
+        await _showMessageDialog(context.l10n.premSignedIn, context.l10n.premSignedInBuy);
       }
     } else {
       if (mounted) {
         await showDialog<void>(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('Błąd weryfikacji'),
+            title: Text(context.l10n.premVerifyErrorTitle),
             content: SingleChildScrollView(
-              child: Text(result.errorMessage ?? 'Kod wygasł lub jest nieprawidłowy. Wyślij ponownie.'),
+              child: Text(result.errorMessage ?? context.l10n.premVerifyErrorBody),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('OK'),
+                child: Text(context.l10n.commonOk),
               ),
             ],
           ),
@@ -450,7 +492,11 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
   }
 
   /// Wywołuje Edge Function create-checkout-session przez HTTP z tokenem (bez bramki JWT – płatność działa od razu).
-  Future<({int status, Map<String, dynamic>? data})> _invokeCreateCheckoutSession(String token, String plan) async {
+  Future<({int status, Map<String, dynamic>? data})> _invokeCreateCheckoutSession(
+    String token,
+    String plan, {
+    String? promoCode,
+  }) async {
     final url = Uri.parse('${SupabaseConfig.functionsBaseUrl}/create-checkout-session');
     final res = await http.post(
       url,
@@ -458,7 +504,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({'plan': plan}),
+      body: jsonEncode({
+        'plan': plan,
+        if (promoCode != null && promoCode.isNotEmpty) 'promoCode': promoCode,
+      }),
     );
     Map<String, dynamic>? data;
     if (res.body.isNotEmpty) {
@@ -470,8 +519,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
   }
 
   /// Otwiera Stripe Checkout (Edge Function tworzy sesję, zwraca URL).
-  /// Wywołanie przez HTTP z tokenem z refreshSession() – bez odświeżania strony.
+  /// Tylko na webie – na mobile używamy IAP (RevenueCat).
   Future<void> _openStripeCheckout() async {
+    if (!kIsWeb) {
+      await _purchaseWithIap();
+      return;
+    }
     setState(() => _isLoadingStripe = true);
     try {
       Session? session;
@@ -489,8 +542,8 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         if (!mounted) return;
         setState(() => _isLoadingStripe = false);
         await _showMessageDialog(
-          'Błąd połączenia',
-          'Nie udało się połączyć z płatnościami. Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl',
+          context.l10n.premConnErrorTitle,
+          context.l10n.premConnErrorBody,
         );
         return;
       }
@@ -498,8 +551,8 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         if (!mounted) return;
         setState(() => _isLoadingStripe = false);
         await _showMessageDialog(
-          'Uwaga',
-          'Aby wykupić Premium, zaloguj się (Google lub e-mail z kodem powyżej).',
+          context.l10n.commonWarning,
+          context.l10n.premLoginToBuy,
         );
         return;
       }
@@ -509,8 +562,22 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           : _selectedPlan == _PremiumPlan.yearly
               ? 'yearly'
               : 'monthly';
+      final promoCode = _promoController.text.trim();
+      if (promoCode.isNotEmpty && plan == 'yearly_once') {
+        if (!mounted) return;
+        setState(() => _isLoadingStripe = false);
+        await _showMessageDialog(
+          context.l10n.premCodeLabel,
+          context.l10n.premCodeNotForOnce,
+        );
+        return;
+      }
       var token = session.accessToken;
-      var result = await _invokeCreateCheckoutSession(token, plan);
+      var result = await _invokeCreateCheckoutSession(
+        token,
+        plan,
+        promoCode: promoCode,
+      );
 
       if (!mounted) return;
 
@@ -523,7 +590,11 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           if (retrySession != null) {
             if (kIsWeb) await SupabaseConfig.auth.setSession(retrySession.refreshToken ?? retrySession.accessToken);
             token = retrySession.accessToken;
-            result = await _invokeCreateCheckoutSession(token, plan);
+            result = await _invokeCreateCheckoutSession(
+              token,
+              plan,
+              promoCode: promoCode,
+            );
           } else {
             break;
           }
@@ -538,13 +609,13 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
         final data = result.data;
         final errorMsg = data?['error'] as String?;
         final detail = data?['detail'] as String?;
-        final hint = 'Spróbuj za chwilę ponownie lub napisz do nas: contact@latwaforma.pl';
+        final hint = context.l10n.premTryLaterContact;
         final fullMsg = [
           errorMsg,
           if (detail != null && detail.isNotEmpty) detail,
           hint,
         ].where((e) => e != null && e.toString().isNotEmpty).join('\n\n');
-        await _showMessageDialog('Nie udało się otworzyć płatności', fullMsg);
+        await _showMessageDialog(context.l10n.premOpenPaymentFailed, fullMsg);
         return;
       }
 
@@ -559,25 +630,200 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           if (!mounted) return;
           ref.invalidate(profileProvider);
         } else {
-          if (mounted) await _showMessageDialog('Błąd', 'Nie można otworzyć strony płatności.');
+          if (mounted) await _showMessageDialog(context.l10n.commonError, context.l10n.premCannotOpenPaymentPage);
         }
       } else {
-        if (mounted) await _showMessageDialog('Błąd', errorMsg ?? 'Błąd tworzenia sesji płatności.');
+        if (mounted) await _showMessageDialog(context.l10n.commonError, errorMsg ?? context.l10n.premCheckoutSessionError);
       }
     } catch (e) {
       if (!mounted) return;
       final msg = e.toString();
       final is401 = msg.contains('401') || msg.contains('Invalid JWT');
-      final hint = 'Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl';
-      await _showMessageDialog(is401 ? 'Nie udało się otworzyć płatności' : 'Błąd', hint);
+      final hint = context.l10n.premTryLaterContactShort;
+      await _showMessageDialog(is401 ? context.l10n.premOpenPaymentFailed : context.l10n.commonError, hint);
     } finally {
       if (mounted) setState(() => _isLoadingStripe = false);
+    }
+  }
+
+  Future<void> _onHaveCode() async {
+    final user = SupabaseConfig.auth.currentUser;
+    if (user == null || user.isAnonymous) {
+      await _showMessageDialog(
+        context.l10n.commonWarning,
+        context.l10n.premLoginToUseCode,
+      );
+      return;
+    }
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+      try {
+        await RevenueCatService.instance.logIn(user.id);
+        await RevenueCatService.instance.presentAppleOfferCodeSheet();
+        if (!mounted) return;
+        ref.invalidate(profileProvider);
+      } catch (_) {
+        if (!mounted) return;
+        await _showMessageDialog(
+          context.l10n.premCodeLabel,
+          context.l10n.premCodeSheetFailed,
+        );
+      }
+      return;
+    }
+    setState(() => _showPromoField = true);
+  }
+
+  Future<void> _redeemOnPlay() async {
+    final user = SupabaseConfig.auth.currentUser;
+    final l10n = context.l10n;
+    if (user == null || user.isAnonymous) {
+      await _showMessageDialog(
+        l10n.commonWarning,
+        l10n.premLoginToUseCode,
+      );
+      return;
+    }
+    await RevenueCatService.instance.logIn(user.id);
+    final code = _promoController.text.trim();
+    if (code.isEmpty) {
+      await _showMessageDialog(l10n.premCodeLabel, l10n.premEnterCode);
+      return;
+    }
+    final uri = Uri.parse(
+      'https://play.google.com/redeem?code=${Uri.encodeComponent(code)}',
+    );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (!mounted) return;
+      await _showMessageDialog(l10n.premCodeLabel, l10n.premPlayStoreFailed);
+    }
+  }
+
+  /// Zakup Premium przez App Store / Play Billing (RevenueCat).
+  Future<void> _purchaseWithIap() async {
+    final user = SupabaseConfig.auth.currentUser;
+    if (user == null || user.isAnonymous) {
+      await _showMessageDialog(
+        context.l10n.commonWarning,
+        context.l10n.premLoginToBuyMobile,
+      );
+      return;
+    }
+    setState(() => _isLoadingIap = true);
+    try {
+      await RevenueCatService.instance.logIn(user.id);
+      final plan = switch (_selectedPlan) {
+        _PremiumPlan.monthly => StorePremiumPlan.monthly,
+        _PremiumPlan.yearly => StorePremiumPlan.yearly,
+        _PremiumPlan.yearlyOnce => StorePremiumPlan.yearlyOnce,
+      };
+      final ok = await RevenueCatService.instance.purchasePlan(plan: plan);
+      if (ok) {
+        final now = DateTime.now();
+        final expires = _selectedPlan == _PremiumPlan.monthly
+            ? DateTime(now.year, now.month + 1, now.day)
+            : DateTime(now.year + 1, now.month, now.day);
+        await SupabaseService().updateSubscriptionTier(
+          user.id,
+          tier: 'premium',
+          expiresAt: expires,
+        );
+      }
+      if (!mounted) return;
+      ref.invalidate(profileProvider);
+      // Webhook może chwilę potrwać – kilka odświeżeń profilu.
+      for (var i = 0; i < 4; i++) {
+        await Future<void>.delayed(Duration(milliseconds: 600 + i * 400));
+        if (!mounted) return;
+        ref.invalidate(profileProvider);
+      }
+      if (!mounted) return;
+      if (ok) {
+        await _showMessageDialog(
+          context.l10n.premTitle,
+          context.l10n.premThanksActive,
+        );
+      } else {
+        await _showMessageDialog(
+          context.l10n.premInfo,
+          context.l10n.premPurchasePending,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('purchase_cancelled') ||
+          msg.contains('cancelled') ||
+          msg.contains('canceled') ||
+          msg.contains('user cancelled')) {
+        return;
+      }
+      await _showMessageDialog(
+        context.l10n.premPurchaseErrorTitle,
+        context.l10n.premPurchaseErrorBody(error: '$e'),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoadingIap = false);
+    }
+  }
+
+  Future<void> _restorePurchases() async {
+    final user = SupabaseConfig.auth.currentUser;
+    if (user == null || user.isAnonymous) {
+      await _showMessageDialog(context.l10n.commonWarning, context.l10n.premLoginToRestore);
+      return;
+    }
+    setState(() => _isRestoring = true);
+    try {
+      await RevenueCatService.instance.logIn(user.id);
+      final ok = await RevenueCatService.instance.restorePurchases();
+      if (ok) {
+        await SupabaseService().updateSubscriptionTier(user.id, tier: 'premium');
+      }
+      if (!mounted) return;
+      ref.invalidate(profileProvider);
+      for (var i = 0; i < 3; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 700));
+        if (!mounted) return;
+        ref.invalidate(profileProvider);
+      }
+      if (!mounted) return;
+      await _showMessageDialog(
+        ok ? context.l10n.premRestoredTitle : context.l10n.premNoPurchasesTitle,
+        ok
+            ? context.l10n.premRestoredBody
+            : context.l10n.premNoPurchasesBody,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      await _showMessageDialog(context.l10n.commonError, context.l10n.premRestoreFailed(error: '$e'));
+    } finally {
+      if (mounted) setState(() => _isRestoring = false);
+    }
+  }
+
+  Future<void> _manageMobileSubscription() async {
+    final uri = Uri.parse(
+      defaultTargetPlatform == TargetPlatform.iOS
+          ? 'https://apps.apple.com/account/subscriptions'
+          : 'https://play.google.com/store/account/subscriptions',
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      await _showMessageDialog(
+        context.l10n.premSubscription,
+        context.l10n.premManageHint,
+      );
     }
   }
 
   /// Otwiera Stripe Customer Portal – zarządzanie subskrypcją, rezygnacja (miesięczna lub roczna).
   /// Przy 401 próbuje raz odświeżyć sesję (używa sesji z refreshSession) i ponowić żądanie.
   Future<void> _openPortalSession() async {
+    if (!kIsWeb) {
+      await _manageMobileSubscription();
+      return;
+    }
     setState(() => _isLoadingPortal = true);
     try {
       Session? session;
@@ -590,7 +836,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       if (session == null) {
         if (!mounted) return;
         setState(() => _isLoadingPortal = false);
-        await _showMessageDialog('Sesja wygasła', 'Zaloguj się ponownie.');
+        await _showMessageDialog(context.l10n.premSessionExpired, context.l10n.premLoginAgain);
         return;
       }
 
@@ -618,9 +864,9 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       if (response.status == 401) {
         setState(() => _isLoadingPortal = false);
         final portalHint = kIsWeb
-            ? 'Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.'
-            : 'Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.';
-        await _showMessageDialog('Sesja wygasła', portalHint);
+            ? context.l10n.premPortalHintWeb
+            : context.l10n.premPortalHintMobile;
+        await _showMessageDialog(context.l10n.premSessionExpired, portalHint);
         return;
       }
 
@@ -635,20 +881,20 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           if (!mounted) return;
           ref.invalidate(profileProvider);
         } else {
-          if (mounted) await _showMessageDialog('Błąd', 'Nie można otworzyć portalu.');
+          if (mounted) await _showMessageDialog(context.l10n.commonError, context.l10n.premCannotOpenPortal);
         }
       } else {
-        if (mounted) await _showMessageDialog('Błąd', errorMsg ?? 'Błąd otwierania portalu.');
+        if (mounted) await _showMessageDialog(context.l10n.commonError, errorMsg ?? context.l10n.premPortalOpenError);
       }
     } catch (e) {
       if (!mounted) return;
       final msg = e.toString();
       final is401 = msg.contains('401') || msg.contains('Invalid JWT');
       await _showMessageDialog(
-        'Błąd',
+        context.l10n.commonError,
         is401
-            ? 'Sesja wygasła. Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.'
-            : 'Błąd: $e',
+            ? context.l10n.premSessionExpiredCancel
+            : context.l10n.premErrorWithDetail(error: '$e'),
       );
     } finally {
       if (mounted) setState(() => _isLoadingPortal = false);
@@ -664,10 +910,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       await SupabaseService().updateSubscriptionTier(userId, tier: 'premium', expiresAt: null);
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      await _showMessageDialog('Premium', 'Premium aktywowane. Ciesz się pełnym dostępem!');
+      await _showMessageDialog(context.l10n.premTitle, context.l10n.premActivatedEnjoy);
     } catch (e) {
       if (!mounted) return;
-      await _showMessageDialog('Błąd', 'Błąd: $e');
+      await _showMessageDialog(context.l10n.commonError, context.l10n.premErrorWithDetail(error: '$e'));
     } finally {
       if (mounted) setState(() => _isActivating = false);
     }
@@ -694,9 +940,9 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go(AppRoutes.dashboard),
         ),
-        title: const Text('Łatwa Forma Premium'),
+        title: Text(context.l10n.premTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -737,7 +983,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    isPremium ? 'Masz Premium!' : 'Odblokuj pełny potencjał',
+                    isPremium ? context.l10n.premHavePremium : context.l10n.premUnlockPotential,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -747,7 +993,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                        'Wszystkie funkcje premium są dla Ciebie dostępne.',
+                        context.l10n.premAllFeaturesAvailable,
                         style: Theme.of(context).textTheme.bodyLarge,
                         textAlign: TextAlign.center,
                       ),
@@ -756,7 +1002,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                        'Ważne do: ${_formatDate(expiresAt)}',
+                        context.l10n.premValidUntil(date: _formatDate(expiresAt)),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
@@ -786,7 +1032,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                           Icon(Icons.schedule, color: Theme.of(context).colorScheme.primary, size: 22),
                           const SizedBox(width: 8),
                           Text(
-                            'Okres próbny (24 h)',
+                            context.l10n.premTrialTitle,
                             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.onSurface,
@@ -796,9 +1042,14 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Wszystkie funkcje premium są teraz dostępne. '
-                        '${trialRemaining != null ? 'Pozostało: ${trialRemaining.inHours}h ${trialRemaining.inMinutes % 60}min. ' : ''}'
-                        'Po tym czasie wykup Premium, żeby zachować dostęp.',
+                        context.l10n.premTrialBody(
+                          remaining: trialRemaining != null
+                              ? context.l10n.premTrialLeft(
+                                  hours: trialRemaining.inHours,
+                                  minutes: trialRemaining.inMinutes % 60,
+                                )
+                              : '',
+                        ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -808,23 +1059,23 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                 ),
               ),
             if (!isPremium) ...[
-              _buildFeatureRow(context, icon: Icons.calendar_today, label: 'Przeglądanie historii innych dni niż dziś'),
-              _buildFeatureRow(context, icon: Icons.pie_chart_outline, label: 'Podgląd makroskładników na dashboardzie'),
-              _buildFeatureRow(context, icon: Icons.psychology, label: 'Porada AI (limit 100 dziennie)'),
-              _buildFeatureRow(context, icon: Icons.camera_alt, label: 'Analiza AI posiłku ze zdjęcia'),
-              _buildFeatureRow(context, icon: Icons.restaurant_menu, label: 'Dodawanie posiłku ze składników'),
-              _buildFeatureRow(context, icon: Icons.storefront, label: 'Dodawanie posiłku „na mieście”'),
-              _buildFeatureRow(context, icon: Icons.directions_run, label: 'Szybkie dodawanie w aktywnościach'),
-              _buildFeatureRow(context, icon: Icons.share, label: 'Udostępnianie podsumowania i tygodniowych statystyk'),
-              _buildFeatureRow(context, icon: Icons.picture_as_pdf, label: 'Eksport raportów do PDF'),
-              _buildFeatureRow(context, icon: Icons.tune, label: 'Własny cel kaloryczny w edycji profilu'),
-              _buildFeatureRow(context, icon: Icons.balance, label: 'Własne makroskładniki w edycji profilu'),
-              _buildFeatureRow(context, icon: Icons.sync, label: 'Integracje Strava i Garmin bez limitów'),
-              _buildFeatureRow(context, icon: Icons.emoji_events, label: 'Zaawansowane cele i wyzwania'),
+              _buildFeatureRow(context, icon: Icons.calendar_today, label: context.l10n.premFeatHistoryOtherDays),
+              _buildFeatureRow(context, icon: Icons.pie_chart_outline, label: context.l10n.premFeatMacrosDash),
+              _buildFeatureRow(context, icon: Icons.psychology, label: context.l10n.premFeatAiAdvice),
+              _buildFeatureRow(context, icon: Icons.camera_alt, label: context.l10n.premFeatAiPhoto),
+              _buildFeatureRow(context, icon: Icons.restaurant_menu, label: context.l10n.premFeatIngredients),
+              _buildFeatureRow(context, icon: Icons.storefront, label: context.l10n.premFeatEatingOut),
+              _buildFeatureRow(context, icon: Icons.directions_run, label: context.l10n.premFeatQuickActivity),
+              _buildFeatureRow(context, icon: Icons.share, label: context.l10n.premFeatShare),
+              _buildFeatureRow(context, icon: Icons.picture_as_pdf, label: context.l10n.premFeatPdf),
+              _buildFeatureRow(context, icon: Icons.tune, label: context.l10n.premFeatCustomCalories),
+              _buildFeatureRow(context, icon: Icons.balance, label: context.l10n.premFeatCustomMacros),
+              _buildFeatureRow(context, icon: Icons.sync, label: context.l10n.premFeatStrava),
+              _buildFeatureRow(context, icon: Icons.emoji_events, label: context.l10n.premFeatGoals),
               const SizedBox(height: 24),
               if (!isLoggedIn) _buildLoginToBuyCard(context) else ...[
               Text(
-                'Wybierz plan',
+                context.l10n.premChoosePlan,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -833,51 +1084,108 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
               _buildPlanCard(
                 context,
                 plan: _PremiumPlan.monthly,
-                title: 'Miesięcznie',
-                price: '69,98 zł',
-                period: 'miesięcznie',
+                title: context.l10n.premPlanMonthly,
+                price: _monthlyPriceLabel,
+                period: context.l10n.premPlanMonthlyPeriod,
               ),
               const SizedBox(height: 8),
               _buildPlanCard(
                 context,
                 plan: _PremiumPlan.yearly,
-                title: 'Rocznie',
-                price: '194,95 zł',
-                period: 'rocznie',
-                badge: 'Oszczędzasz ~17%',
-                priceSubtitle: 'ok. 16,25 zł / miesięcznie',
+                title: context.l10n.premPlanYearly,
+                price: _yearlyPriceLabel,
+                period: context.l10n.premPlanYearlyPeriod,
+                badge: context.l10n.premBadgeSave,
+                priceSubtitle: _yearlyPerMonthLabel,
               ),
+              if (kIsWeb) ...[
+                const SizedBox(height: 8),
+                _buildPlanCard(
+                  context,
+                  plan: _PremiumPlan.yearlyOnce,
+                  title: context.l10n.premPlanYearlyOnce,
+                  price: _yearlyOncePriceLabel,
+                  period: context.l10n.premPlanYearlyOncePeriod,
+                  badge: context.l10n.premBadgeBlik,
+                  priceSubtitle: context.l10n.premYearlyOnceSubtitle,
+                ),
+              ],
               const SizedBox(height: 8),
-              _buildPlanCard(
-                context,
-                plan: _PremiumPlan.yearlyOnce,
-                title: 'Rocznie (jednorazowo)',
-                price: '194,95 zł',
-                period: 'za rok',
-                badge: 'BLIK + karta',
-                priceSubtitle: 'płatność raz na rok, bez subskrypcji',
+              Align(
+                alignment: Alignment.center,
+                child: TextButton(
+                  onPressed: (_isLoadingStripe || _isLoadingIap) ? null : _onHaveCode,
+                  child: Text(context.l10n.premHaveCode),
+                ),
               ),
-              const SizedBox(height: 24),
+              if (_showPromoField && (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS)) ...[
+                TextField(
+                  controller: _promoController,
+                  textCapitalization: TextCapitalization.characters,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  decoration: InputDecoration(
+                    labelText: context.l10n.premCodeLabel,
+                    isDense: true,
+                    border: const OutlineInputBorder(),
+                    suffixIcon: kIsWeb
+                        ? null
+                        : IconButton(
+                            tooltip: context.l10n.premRedeemTooltip,
+                            onPressed: _redeemOnPlay,
+                            icon: const Icon(Icons.arrow_forward),
+                          ),
+                  ),
+                  onSubmitted: kIsWeb ? null : (_) => _redeemOnPlay(),
+                ),
+                const SizedBox(height: 8),
+              ],
+              const SizedBox(height: 16),
               FilledButton.icon(
-                onPressed: _isLoadingStripe ? null : _openStripeCheckout,
-                icon: _isLoadingStripe
+                onPressed: (_isLoadingStripe || _isLoadingIap)
+                    ? null
+                    : (kIsWeb ? _openStripeCheckout : _purchaseWithIap),
+                icon: (_isLoadingStripe || _isLoadingIap)
                     ? const SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.workspace_premium),
-                label: Text(_isLoadingStripe ? 'Otwieram płatność…' : 'Wykup Premium'),
+                label: Text(
+                  (_isLoadingStripe || _isLoadingIap)
+                      ? (kIsWeb ? context.l10n.premOpeningPayment : context.l10n.premProcessingPurchase)
+                      : context.l10n.premBuy,
+                ),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
               ),
+              if (!kIsWeb) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _isRestoring ? null : _restorePurchases,
+                  icon: _isRestoring
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.restore),
+                  label: Text(_isRestoring ? context.l10n.premRestoring : context.l10n.premRestorePurchases),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'BLIK, PayPal i karta przy „Rocznie (jednorazowo)”; subskrypcja – karta, Apple Pay, Google Pay.',
+                    kIsWeb
+                        ? context.l10n.premPaymentNoteWeb
+                        : context.l10n.premPaymentNoteMobile,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -885,12 +1193,42 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Po opłaceniu konto Premium aktywuje się automatycznie.',
+                    context.l10n.premAutoActivate,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () => openLegalOrExternal(
+                          context,
+                          AppConstants.privacyPolicyUrl,
+                        ),
+                        child: Text(context.l10n.premPrivacy),
+                      ),
+                      TextButton(
+                        onPressed: () => openLegalOrExternal(
+                          context,
+                          AppConstants.termsUrl,
+                        ),
+                        child: Text(context.l10n.premTerms),
+                      ),
+                      TextButton(
+                        onPressed: () => launchUrl(
+                          Uri.parse(AppConstants.appleEulaUrl),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                        child: Text(context.l10n.premEula),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const HealthDisclaimer(compact: true),
                 ],
               ),
               if (kDebugMode) ...[
@@ -904,7 +1242,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.science),
-                  label: Text(_isActivating ? 'Aktywuję…' : 'Aktywuj Premium (test)'),
+                  label: Text(_isActivating ? context.l10n.premActivating : context.l10n.premActivateTest),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -913,28 +1251,30 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
               ],
             ] else ...[
               Text(
-                'Dostępne funkcje:',
+                context.l10n.premAvailableFeatures,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 12),
-              _buildFeatureRow(context, icon: Icons.calendar_today, label: 'Historia innych dni', isActive: true),
-              _buildFeatureRow(context, icon: Icons.pie_chart_outline, label: 'Makroskładniki na dashboardzie', isActive: true),
-              _buildFeatureRow(context, icon: Icons.psychology, label: 'Porada AI (limit 100 dziennie)', isActive: true),
-              _buildFeatureRow(context, icon: Icons.camera_alt, label: 'Analiza AI posiłku', isActive: true),
-              _buildFeatureRow(context, icon: Icons.restaurant_menu, label: 'Posiłek ze składników', isActive: true),
-              _buildFeatureRow(context, icon: Icons.storefront, label: 'Posiłek „na mieście”', isActive: true),
-              _buildFeatureRow(context, icon: Icons.directions_run, label: 'Szybkie dodawanie aktywności', isActive: true),
-              _buildFeatureRow(context, icon: Icons.share, label: 'Udostępnianie podsumowania i statystyk', isActive: true),
-              _buildFeatureRow(context, icon: Icons.picture_as_pdf, label: 'Eksport do PDF', isActive: true),
-              _buildFeatureRow(context, icon: Icons.tune, label: 'Własny cel kaloryczny', isActive: true),
-              _buildFeatureRow(context, icon: Icons.balance, label: 'Własne makroskładniki', isActive: true),
-              _buildFeatureRow(context, icon: Icons.sync, label: 'Integracje Strava i Garmin', isActive: true),
-              _buildFeatureRow(context, icon: Icons.emoji_events, label: 'Zaawansowane cele', isActive: true),
+              _buildFeatureRow(context, icon: Icons.calendar_today, label: context.l10n.premFeatActiveHistory, isActive: true),
+              _buildFeatureRow(context, icon: Icons.pie_chart_outline, label: context.l10n.premFeatActiveMacros, isActive: true),
+              _buildFeatureRow(context, icon: Icons.psychology, label: context.l10n.premFeatAiAdvice, isActive: true),
+              _buildFeatureRow(context, icon: Icons.camera_alt, label: context.l10n.premFeatActiveAiPhoto, isActive: true),
+              _buildFeatureRow(context, icon: Icons.restaurant_menu, label: context.l10n.premFeatActiveIngredients, isActive: true),
+              _buildFeatureRow(context, icon: Icons.storefront, label: context.l10n.premFeatActiveEatingOut, isActive: true),
+              _buildFeatureRow(context, icon: Icons.directions_run, label: context.l10n.premFeatActiveQuickActivity, isActive: true),
+              _buildFeatureRow(context, icon: Icons.share, label: context.l10n.premFeatActiveShare, isActive: true),
+              _buildFeatureRow(context, icon: Icons.picture_as_pdf, label: context.l10n.premFeatActivePdf, isActive: true),
+              _buildFeatureRow(context, icon: Icons.tune, label: context.l10n.premFeatActiveCalories, isActive: true),
+              _buildFeatureRow(context, icon: Icons.balance, label: context.l10n.premFeatActiveMacrosCustom, isActive: true),
+              _buildFeatureRow(context, icon: Icons.sync, label: context.l10n.premFeatActiveStrava, isActive: true),
+              _buildFeatureRow(context, icon: Icons.emoji_events, label: context.l10n.premFeatActiveGoals, isActive: true),
               const SizedBox(height: 24),
               OutlinedButton.icon(
-                onPressed: _isLoadingPortal ? null : _openPortalSession,
+                onPressed: _isLoadingPortal
+                    ? null
+                    : (kIsWeb ? _openPortalSession : _manageMobileSubscription),
                 icon: _isLoadingPortal
                     ? const SizedBox(
                         width: 18,
@@ -943,7 +1283,9 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                       )
                     : const Icon(Icons.settings),
                 label: Text(
-                  _isLoadingPortal ? 'Otwieram…' : 'Anuluj subskrypcję',
+                  _isLoadingPortal
+                      ? context.l10n.premOpening
+                      : (kIsWeb ? context.l10n.premCancelSub : context.l10n.premManageSub),
                 ),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -951,7 +1293,9 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
               ),
               const SizedBox(height: 8),
               Text(
-                'Możesz anulować subskrypcję. Dostęp do Premium pozostanie do końca opłaconego okresu.',
+                kIsWeb
+                    ? context.l10n.premCancelNoteWeb
+                    : context.l10n.premCancelNoteMobile,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -969,12 +1313,26 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
     final result = await AuthLinkService().signInWithGoogle();
     if (!mounted) return;
     setState(() => _isSigningInWithGoogle = false);
-    if (result.success && result.infoMessage != null) {
-      await _showMessageDialog('Informacja', result.infoMessage!);
-    } else if (result.canceled) {
-      // użytkownik anulował – bez komunikatu
-    } else if (result.errorMessage != null && result.errorMessage!.isNotEmpty) {
-      await _showMessageDialog('Błąd', result.errorMessage!);
+    await _handleSocialLoginResult(result);
+  }
+
+  Future<void> _signInWithApple() async {
+    setState(() => _isSigningInWithApple = true);
+    final result = await AuthLinkService().signInWithApple();
+    if (!mounted) return;
+    setState(() => _isSigningInWithApple = false);
+    await _handleSocialLoginResult(result);
+  }
+
+  Future<void> _handleSocialLoginResult(AuthLinkResult result) async {
+    if (result.canceled || result.redirected) return;
+    if (result.success) {
+      ref.invalidate(profileProvider);
+      if (mounted) setState(() {});
+      return;
+    }
+    if (result.errorMessage != null && result.errorMessage!.isNotEmpty) {
+      await _showMessageDialog(context.l10n.commonError, result.errorMessage!);
     }
   }
 
@@ -986,7 +1344,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Aby wykupić Premium, potrzebne jest konto. Zaloguj się przez Google albo podaj adres e-mail – wyślemy wiadomość z linkiem weryfikacyjnym i kodem.',
+              context.l10n.premLoginToBuyCard,
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
@@ -1000,12 +1358,25 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.g_mobiledata, size: 24),
-              label: Text(_isSigningInWithGoogle ? 'Otwieram…' : 'Kontynuuj z Google'),
+              label: Text(_isSigningInWithGoogle ? context.l10n.premSigningIn : context.l10n.premContinueGoogle),
               style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _isSigningInWithApple ? null : _signInWithApple,
+              icon: _isSigningInWithApple
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.apple, size: 22),
+              label: Text(_isSigningInWithApple ? context.l10n.premSigningIn : context.l10n.premContinueApple),
+              style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
             ),
             const SizedBox(height: 16),
             Text(
-              'lub e-mail:',
+              context.l10n.premOrEmail,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -1016,10 +1387,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                 controller: _loginEmailController,
                 keyboardType: TextInputType.emailAddress,
                 autofillHints: const [AutofillHints.email],
-                decoration: const InputDecoration(
-                  labelText: 'Adres e-mail',
-                  hintText: 'np. jan@example.com',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: context.l10n.premEmailLabel,
+                  hintText: context.l10n.premEmailHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -1032,12 +1403,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.email),
-                label: Text(_isSendingCode ? 'Wysyłam…' : 'Wyślij kod'),
+                label: Text(_isSendingCode ? context.l10n.premSending : context.l10n.premSendCode),
                 style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
               ),
             ] else ...[
               Text(
-                'Potwierdź tożsamość: wpisz poniżej kod z maila albo kliknij link weryfikacyjny w wiadomości (sprawdź też folder Spam).',
+                context.l10n.premConfirmIdentityHint,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
@@ -1048,10 +1419,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                 keyboardType: TextInputType.number,
                 maxLength: 12,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Kod weryfikacyjny',
-                  hintText: 'np. 123456',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: context.l10n.premVerificationCode,
+                  hintText: context.l10n.premCodeHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -1064,7 +1435,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.check_circle),
-                label: Text(_isVerifying ? 'Sprawdzam…' : 'Zatwierdź i zaloguj'),
+                label: Text(_isVerifying ? context.l10n.premChecking : context.l10n.premConfirmAndSignIn),
                 style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
               ),
               const SizedBox(height: 8),
@@ -1077,7 +1448,7 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> with WidgetsBindi
                           _loginCodeController.clear();
                         });
                       },
-                child: const Text('Wyślij kod ponownie na inny adres'),
+                child: Text(context.l10n.premResendOtherEmail),
               ),
             ],
           ],

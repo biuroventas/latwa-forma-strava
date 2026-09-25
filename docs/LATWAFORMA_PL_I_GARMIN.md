@@ -7,7 +7,7 @@ Architektura zgodna z **PLAN_INFRASTRUKTURY.md**: landing pod **latwaforma.pl**,
 ## Architektura (skrót)
 
 | Adres | Zawartość |
-|-------|-----------|
+| --- | --- |
 | **latwaforma.pl**, **www.latwaforma.pl** | Landing (strona główna + polityka prywatności + regulamin) |
 | **app.latwaforma.pl** | Aplikacja web (Flutter) – to samo co aplikacja mobilna, w przeglądarce |
 | **api.latwaforma.pl** | Backend (Supabase) – opcjonalna domena własna |
@@ -20,7 +20,7 @@ Szczegóły DNS, hostingu, maili, ENV i skalowania: **docs/PLAN_INFRASTRUKTURY.m
 ## Czego potrzebujesz (domena, hosting, e-mail)
 
 | Co | Po co |
-|----|--------|
+| --- | --- |
 | **Domena latwaforma.pl** | Rejestrator: OVH (zgodnie z planem). Wymagana przez Garmin. |
 | **Hosting landing + poczta** | Np. WebH – landing (latwaforma.pl, www) + skrzynki @latwaforma.pl. |
 | **Hosting aplikacji web** | Vercel, Firebase Hosting lub Netlify – deploy Flutter Web pod **app.latwaforma.pl**. |
@@ -59,6 +59,7 @@ Dzięki temu **Garmin** ma „valid website” (latwaforma.pl) z linkiem do poli
 4. SPA (odświeżanie, deep linki) – Vercel/Netlify/Firebase obsługują to domyślnie.
 
 W aplikacji (Profil) linki „Polityka prywatności” i „Regulamin” powinny prowadzić na **latwaforma.pl** (landing), np.:
+
 - `https://latwaforma.pl/polityka-prywatnosci.html`
 - `https://latwaforma.pl/regulamin.html`
 
@@ -84,7 +85,7 @@ Ustaw je w **lib/core/constants/app_constants.dart** (`privacyPolicyUrl`, `terms
 ## Krok 6. Wymagania Garmin – checklist
 
 | Wymóg Garmin | Jak spełniasz |
-|--------------|----------------|
+| --- | --- |
 | **Valid website representing the company** | **latwaforma.pl** (landing) z nazwą Łatwa Forma / firmą. |
 | **Privacy policy, same domain, link on homepage** | Polityka pod **latwaforma.pl/polityka-prywatnosci.html**; na stronie głównej (landing) link „Polityka prywatności”. |
 | **Externally accessible** | Strona i polityka dostępne bez logowania. |

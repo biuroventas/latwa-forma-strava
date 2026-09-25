@@ -6,177 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/router/app_router.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/utils/calculations.dart';
-import '../../../core/utils/real_tdee_estimator.dart';
 import '../../../shared/services/supabase_service.dart';
-import '../../../shared/models/user_profile.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
+import '../goal_verification.dart';
 import '../../../core/providers/profile_provider.dart';
 import '../../../shared/widgets/premium_gate.dart';
-
-/// Wynik weryfikacji celu na podstawie ostatnich 7 dni.
-class GoalVerificationResult {
-  final bool hasEnoughData;
-  final int daysWithData;
-  final double avgDailyCalories;
-  final double weightChangeKg;
-  final double? realTDEE;
-  final double? correctedTargetCalories;
-  final double? currentTargetCalories;
-  final double? calculatorTDEE;
-  final String? suggestionText;
-  final String goal;
-  final UserProfile? profile;
-
-  const GoalVerificationResult({
-    required this.hasEnoughData,
-    required this.daysWithData,
-    required this.avgDailyCalories,
-    required this.weightChangeKg,
-    this.realTDEE,
-    this.correctedTargetCalories,
-    this.currentTargetCalories,
-    this.calculatorTDEE,
-    this.suggestionText,
-    required this.goal,
-    this.profile,
-  });
-}
-
-final goalVerificationProvider = FutureProvider.autoDispose<GoalVerificationResult>((ref) async {
-  final userId = SupabaseConfig.auth.currentUser?.id;
-  if (userId == null) throw Exception('User not logged in');
-
-  final service = SupabaseService();
-  final today = DateTime.now();
-  final startDate = today.subtract(const Duration(days: 6));
-
-  final profile = await service.getProfile(userId);
-  if (profile == null) {
-    return GoalVerificationResult(
-      hasEnoughData: false,
-      daysWithData: 0,
-      avgDailyCalories: 0,
-      weightChangeKg: 0,
-      goal: AppConstants.goalMaintain,
-    );
-  }
-
-  double totalCalories = 0;
-  int daysWithCalories = 0;
-
-  for (int i = 0; i < 7; i++) {
-    final date = startDate.add(Duration(days: i));
-    final meals = await service.getMeals(userId, date: date);
-
-    double dayCalories = 0;
-    for (var meal in meals) {
-      dayCalories += meal.calories;
-    }
-    totalCalories += dayCalories;
-    if (dayCalories > 0) daysWithCalories++;
-  }
-
-  final avgDailyCalories = daysWithCalories > 0 ? totalCalories / 7 : 0.0;
-
-  final weightLogs = await service.getWeightLogsInRange(
-    userId,
-    startDate: startDate,
-    endDate: today,
-  );
-
-  double weightChangeKg = 0;
-  if (weightLogs.length >= 2) {
-    final first = weightLogs.first;
-    final last = weightLogs.last;
-    weightChangeKg = last.weightKg - first.weightKg;
-  }
-
-  final hasEnoughData = RealTdeeEstimator.hasEnoughData(
-    daysWithCalories: daysWithCalories,
-    weightLogsInRange: weightLogs.length,
-  );
-
-  double? realTDEE;
-  double? correctedTargetCalories;
-  String? suggestionText;
-
-  if (hasEnoughData && avgDailyCalories > 100) {
-    realTDEE = RealTdeeEstimator.estimateRealTDEE(
-      avgDailyCalories: avgDailyCalories,
-      weightChangeKgPerWeek: weightChangeKg,
-    );
-
-    final deficitKcal = profile.weeklyWeightChange != null && profile.goal == AppConstants.goalWeightLoss
-        ? profile.weeklyWeightChange! * 7700 / 7
-        : null;
-    final surplusKcal = profile.weeklyWeightChange != null && profile.goal == AppConstants.goalWeightGain
-        ? profile.weeklyWeightChange! * 7700 / 7
-        : null;
-
-    correctedTargetCalories = RealTdeeEstimator.getCorrectedTargetCalories(
-      realTDEE: realTDEE,
-      goal: profile.goal,
-      deficitKcal: deficitKcal,
-      surplusKcal: surplusKcal,
-    );
-
-    final currentTarget = profile.targetCalories ?? profile.tdee ?? 0;
-    final diff = (correctedTargetCalories - currentTarget).abs();
-
-    if (diff > 100) {
-      final realStr = realTDEE.toStringAsFixed(0);
-      final calcStr = (profile.tdee ?? 0).toStringAsFixed(0);
-      final corrStr = correctedTargetCalories.toStringAsFixed(0);
-
-      switch (profile.goal) {
-        case AppConstants.goalWeightLoss:
-          if (weightChangeKg >= 0) {
-            suggestionText = 'Waga stała przy ~${avgDailyCalories.toStringAsFixed(0)} kcal. '
-                'Twoje realne zapotrzebowanie to ~$realStr kcal. '
-                'Chcesz schudnąć? Spróbuj ~$corrStr kcal.';
-          } else {
-            suggestionText = 'Chudniesz przy ~${avgDailyCalories.toStringAsFixed(0)} kcal. '
-                'Realne TDEE: ~$realStr kcal. Sugerowany cel: ~$corrStr kcal.';
-          }
-          break;
-        case AppConstants.goalWeightGain:
-          if (weightChangeKg <= 0) {
-            suggestionText = 'Waga stała przy ~${avgDailyCalories.toStringAsFixed(0)} kcal. '
-                'Twoje realne zapotrzebowanie to ~$realStr kcal. '
-                'Chcesz przytyć? Spróbuj ~$corrStr kcal.';
-          } else {
-            suggestionText = 'Tyjesz przy ~${avgDailyCalories.toStringAsFixed(0)} kcal. '
-                'Realne TDEE: ~$realStr kcal. Sugerowany cel: ~$corrStr kcal.';
-          }
-          break;
-        default:
-          suggestionText = 'Realne zapotrzebowanie: ~$realStr kcal '
-              '(kalkulator: $calcStr kcal). Cel: ~$corrStr kcal.';
-      }
-    }
-  }
-
-  return GoalVerificationResult(
-    hasEnoughData: hasEnoughData,
-    daysWithData: daysWithCalories,
-    avgDailyCalories: avgDailyCalories,
-    weightChangeKg: weightChangeKg,
-    realTDEE: realTDEE,
-    correctedTargetCalories: correctedTargetCalories,
-    currentTargetCalories: profile.targetCalories ?? profile.tdee,
-    calculatorTDEE: profile.tdee,
-    suggestionText: suggestionText,
-    goal: profile.goal,
-    profile: profile,
-  );
-});
 
 final weeklyStatsProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
   final userId = SupabaseConfig.auth.currentUser?.id;
@@ -243,6 +84,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   Future<void> _shareWeeklySummaryScreenshot() async {
     final boundary = _weeklySummaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
     if (boundary == null) return;
+    final l10n = context.l10n;
 
     final completer = Completer<void>();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -266,7 +108,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         if (kIsWeb) {
           final now = DateTime.now();
           final xFile = XFile.fromData(bytes, name: 'tygodniowe_${now.day}_${now.month}.png');
-          await Share.shareXFiles([xFile], text: '📊 Łatwa Forma – Tygodniowe podsumowanie');
+          await Share.shareXFiles([xFile], text: l10n.moreShareWeeklySummaryText);
         } else {
           final tempDir = await getTemporaryDirectory();
           final now = DateTime.now();
@@ -276,14 +118,14 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           final shareRect = box.localToGlobal(Offset.zero) & box.size;
           await Share.shareXFiles(
             [XFile(file.path)],
-            text: '📊 Łatwa Forma – Tygodniowe podsumowanie',
+            text: l10n.moreShareWeeklySummaryText,
             sharePositionOrigin: shareRect,
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Błąd udostępniania: $e')),
+            SnackBar(content: Text(l10n.moreShareError(error: e.toString()))),
           );
         }
       } finally {
@@ -295,16 +137,17 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final statsAsync = ref.watch(weeklyStatsProvider);
     final verificationAsync = ref.watch(goalVerificationProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statystyki'),
+        title: Text(l10n.moreStatisticsTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.local_fire_department),
-            tooltip: 'Serie',
+            tooltip: l10n.moreStreaksTooltip,
             onPressed: () => context.push(AppRoutes.streaks),
           ),
         ],
@@ -332,19 +175,19 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Tygodniowe podsumowanie',
+                              l10n.moreWeeklySummary,
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.share),
-                              tooltip: 'Udostępnij',
+                              tooltip: l10n.moreShareTooltip,
                               onPressed: () async {
                                 final canProceed = await checkPremiumOrNavigate(
                                   context,
                                   ref,
-                                  featureName: 'Udostępnianie tygodniowych statystyk',
+                                  featureName: l10n.moreShareWeeklyStatsFeature,
                                 );
                                 if (canProceed && mounted) _shareWeeklySummaryScreenshot();
                               },
@@ -356,7 +199,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         const SizedBox(height: 16),
                         _buildStatsCard(
                           context,
-                          'Średnie dzienne kalorie',
+                          l10n.moreAvgDailyCalories,
                           '${(stats['avgCalories'] as double).toStringAsFixed(0)} kcal',
                           Icons.local_fire_department,
                           Colors.orange,
@@ -364,7 +207,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         const SizedBox(height: 12),
                         _buildStatsCard(
                           context,
-                          'Całkowite kalorie (tydzień)',
+                          l10n.moreTotalCaloriesWeek,
                           '${(stats['totalCalories'] as double).toStringAsFixed(0)} kcal',
                           Icons.restaurant,
                           Colors.green,
@@ -372,7 +215,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         const SizedBox(height: 12),
                         _buildStatsCard(
                           context,
-                          'Spalone kalorie (tydzień)',
+                          l10n.moreBurnedCaloriesWeek,
                           '${(stats['totalBurned'] as double).toStringAsFixed(0)} kcal',
                           Icons.fitness_center,
                           Colors.red,
@@ -380,7 +223,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         const SizedBox(height: 12),
                         _buildStatsCard(
                           context,
-                          'Woda (tydzień)',
+                          l10n.moreWaterWeek,
                           '${(stats['totalWater'] as double).toStringAsFixed(0)} ml',
                           Icons.water_drop,
                           Colors.blue,
@@ -390,7 +233,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Kalorie w ciągu tygodnia',
+                    l10n.moreCaloriesDuringWeek,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -407,7 +250,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Makroskładniki (tydzień)',
+                    l10n.moreMacrosWeek,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -429,14 +272,14 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Błąd: $error'),
+              Text(l10n.moreErrorWithDetails(error: error.toString())),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   ref.invalidate(weeklyStatsProvider);
                   ref.invalidate(goalVerificationProvider);
                 },
-                child: const Text('Spróbuj ponownie'),
+                child: Text(l10n.commonRetry),
               ),
             ],
           ),
@@ -468,6 +311,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
   Future<void> _applyVerification(GoalVerificationResult v) async {
     if (v.profile == null || v.correctedTargetCalories == null) return;
+    final l10n = context.l10n;
 
     setState(() => _isApplyingVerification = true);
 
@@ -492,7 +336,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           userId: v.profile!.userId,
           oldTargetCalories: v.currentTargetCalories,
           newTargetCalories: v.correctedTargetCalories,
-          reason: 'Weryfikacja na podstawie danych z ostatniego tygodnia',
+          reason: l10n.moreGoalHistoryReason,
         );
       } catch (_) {
         // Ignoruj błąd historii – profil został zaktualizowany
@@ -507,7 +351,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Cel zaktualizowany do ~${v.correctedTargetCalories!.toStringAsFixed(0)} kcal',
+              l10n.moreGoalUpdated(
+                calories: v.correctedTargetCalories!.toStringAsFixed(0),
+              ),
             ),
             backgroundColor: Colors.green,
           ),
@@ -516,7 +362,10 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(l10n.moreErrorWithDetails(error: e.toString())),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -541,13 +390,22 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   }
 
   Widget _buildWeeklyChart(List<double> dailyCalories) {
+    final l10n = context.l10n;
     final maxCalories = dailyCalories.reduce((a, b) => a > b ? a : b);
     // Zaokrąglenie do 500 w górę + 20% margines – unika nakładania się etykiet (np. 6000 i 6131)
     final rawMax = (maxCalories * 1.2).ceilToDouble();
     final chartMax = (rawMax / 500).ceil() * 500.0;
     final interval = chartMax <= 2000 ? 500.0 : 1000.0;
 
-    const days = ['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Nie'];
+    final days = [
+      l10n.moreDayMon,
+      l10n.moreDayTue,
+      l10n.moreDayWed,
+      l10n.moreDayThu,
+      l10n.moreDayFri,
+      l10n.moreDaySat,
+      l10n.moreDaySun,
+    ];
     return BarChart(
       BarChartData(
         barTouchData: BarTouchData(
@@ -614,6 +472,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   }
 
   Widget _buildMacroCard(BuildContext context, double protein, double fat, double carbs) {
+    final l10n = context.l10n;
     final total = protein + fat + carbs;
     final proteinPercent = (total > 0 ? (protein / total * 100) : 0).toDouble();
     final fatPercent = (total > 0 ? (fat / total * 100) : 0).toDouble();
@@ -627,9 +486,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildMacroStat(context, 'Białko', protein.toDouble(), proteinPercent, Colors.blue),
-                _buildMacroStat(context, 'Tłuszcze', fat.toDouble(), fatPercent, Colors.orange),
-                _buildMacroStat(context, 'Węgle', carbs.toDouble(), carbsPercent, Colors.green),
+                _buildMacroStat(context, l10n.moreProtein, protein.toDouble(), proteinPercent, Colors.blue),
+                _buildMacroStat(context, l10n.moreFat, fat.toDouble(), fatPercent, Colors.orange),
+                _buildMacroStat(context, l10n.moreCarbs, carbs.toDouble(), carbsPercent, Colors.green),
               ],
             ),
             const SizedBox(height: 16),
@@ -704,7 +563,14 @@ class _VerificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final surface = Theme.of(context).colorScheme.surface;
+    final weightChange = result.weightChangeKg == 0
+        ? l10n.moreWeightStable
+        : result.weightChangeKg > 0
+            ? l10n.moreWeightIncrease(kg: result.weightChangeKg.toStringAsFixed(1))
+            : l10n.moreWeightDecrease(kg: result.weightChangeKg.toStringAsFixed(1));
+
     return Material(
       color: surface,
       elevation: 1,
@@ -720,7 +586,7 @@ class _VerificationCard extends StatelessWidget {
                 Icon(Icons.analytics, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Weryfikacja celu',
+                  l10n.moreGoalVerification,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -730,14 +596,12 @@ class _VerificationCard extends StatelessWidget {
             const SizedBox(height: 12),
             if (!result.hasEnoughData) ...[
               Text(
-                'Wprowadzaj posiłki i wagę codziennie przez tydzień. '
-                'Aplikacja zweryfikuje Twój cel i zaproponuje poprawki, '
-                'jeśli Twoje realne zapotrzebowanie różni się od kalkulatora.',
+                l10n.moreGoalVerificationHint,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
               Text(
-                'Postęp: ${result.daysWithData}/7 dni z danymi',
+                l10n.moreProgressDaysWithData(days: result.daysWithData),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 8),
@@ -751,18 +615,20 @@ class _VerificationCard extends StatelessWidget {
               ),
             ] else if (result.suggestionText != null) ...[
               Text(
-                'Na podstawie ostatnich 7 dni:',
+                l10n.moreBasedOnLast7Days,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
               ),
               const SizedBox(height: 8),
               Text(
-                '• Średnio: ~${result.avgDailyCalories.toStringAsFixed(0)} kcal/dzień',
+                l10n.moreAvgCaloriesPerDayBullet(
+                  calories: result.avgDailyCalories.toStringAsFixed(0),
+                ),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               Text(
-                '• Waga: ${result.weightChangeKg == 0 ? "stała" : result.weightChangeKg > 0 ? "wzrost (+${result.weightChangeKg.toStringAsFixed(1)} kg)" : "spadek (${result.weightChangeKg.toStringAsFixed(1)} kg)"}',
+                l10n.moreWeightBullet(change: weightChange),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
@@ -784,20 +650,21 @@ class _VerificationCard extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.check_circle),
-                  label: Text(isApplying ? 'Zapisywanie…' : 'Wprowadź poprawiony cel'),
+                  label: Text(isApplying ? l10n.moreSaving : l10n.moreApplyCorrectedGoal),
                 ),
               ),
             ] else ...[
               Text(
-                'Masz wystarczająco danych. Twój obecny cel jest zgodny z trendem – '
-                'nie ma potrzeby korekty.',
+                l10n.moreGoalAligned,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               if (result.realTDEE != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    'Realne zapotrzebowanie: ~${result.realTDEE!.toStringAsFixed(0)} kcal',
+                    l10n.moreRealTdee(
+                      calories: result.realTDEE!.toStringAsFixed(0),
+                    ),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),

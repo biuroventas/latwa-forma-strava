@@ -7,7 +7,7 @@ Aplikacja: Flutter (mobilna + web) + landing. Infrastruktura przygotowana pod sk
 ## Cele
 
 | Element | Cel |
-|--------|-----|
+| --- | --- |
 | Domena | **latwaforma.pl** (rejestrator: OVH) |
 | Poczta | **contact@latwaforma.pl**, **norbert.wroblewski@latwaforma.pl** |
 | Landing | **latwaforma.pl** / **www.latwaforma.pl** |
@@ -23,7 +23,7 @@ Aplikacja: Flutter (mobilna + web) + landing. Infrastruktura przygotowana pod sk
 ### 1. Domeny i DNS (OVH)
 
 | Domena / subdomena | Przeznaczenie | Typ rekordu | Cel |
-|-------------------|---------------|-------------|-----|
+| --- | --- | --- | --- |
 | **latwaforma.pl** | Strona główna / landing | A | IP hostingu OVH (landing + maile) |
 | **www.latwaforma.pl** | Landing (z „www”) | CNAME lub A | Ten sam hosting co latwaforma.pl |
 | **api.latwaforma.pl** | Backend (Supabase) | CNAME | Docelowo: Supabase custom domain lub VPS |
@@ -55,7 +55,7 @@ Aplikacja: Flutter (mobilna + web) + landing. Infrastruktura przygotowana pod sk
 ### 5. Konfiguracja DNS (OVH) – zestawienie
 
 | Typ | Nazwa | Wartość / cel |
-|-----|--------|----------------|
+| --- | --- | --- |
 | **A** | @ (lub latwaforma.pl) | IP hostingu OVH (landing) |
 | **A** | www | IP hostingu OVH (albo CNAME www → latwaforma.pl) |
 | **CNAME** | app | adres z Vercel/Firebase/Netlify (np. xxx.vercel.app) |

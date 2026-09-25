@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
@@ -34,12 +35,13 @@ class FavoriteMealsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final favoriteMeals = ref.watch(favoriteMealsProvider);
     final favoriteActivities = ref.watch(favoriteActivitiesProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ulubione'),
+        title: Text(l10n.trackFavorites),
       ),
       body: favoriteMeals.when(
         data: (meals) {
@@ -48,8 +50,8 @@ class FavoriteMealsScreen extends ConsumerWidget {
               if (meals.isEmpty && activities.isEmpty) {
                 return EmptyStateWidget(
                   icon: Icons.favorite_border,
-                  title: 'Brak ulubionych',
-                  subtitle: 'Dodaj posiłki lub aktywności do ulubionych przy ich zapisywaniu',
+                  title: l10n.trackNoFavorites,
+                  subtitle: l10n.trackNoFavoritesSubtitle,
                   iconColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                 );
               }
@@ -62,12 +64,12 @@ class FavoriteMealsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   children: [
                     // Sekcja: Ulubione posiłki
-                    _sectionHeader(context, Icons.restaurant, 'Ulubione posiłki', Colors.green),
+                    _sectionHeader(context, Icons.restaurant, l10n.trackFavoriteMeals, Colors.green),
                     if (meals.isEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 16, bottom: 16),
                         child: Text(
-                          'Brak ulubionych posiłków',
+                          l10n.trackNoFavoriteMeals,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
@@ -77,12 +79,12 @@ class FavoriteMealsScreen extends ConsumerWidget {
                       ...meals.map((meal) => _mealCard(context, ref, meal)),
                     const SizedBox(height: 24),
                     // Sekcja: Ulubione aktywności
-                    _sectionHeader(context, Icons.fitness_center, 'Ulubione aktywności', Colors.orange),
+                    _sectionHeader(context, Icons.fitness_center, l10n.trackFavoriteActivities, Colors.orange),
                     if (activities.isEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 16, bottom: 16),
                         child: Text(
-                          'Brak ulubionych aktywności',
+                          l10n.trackNoFavoriteActivities,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                               ),
@@ -99,11 +101,11 @@ class FavoriteMealsScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Błąd: $err'),
+                  Text(l10n.trackErrorWithDetails(error: '$err')),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(favoriteActivitiesProvider),
-                    child: const Text('Spróbuj ponownie'),
+                    child: Text(l10n.commonRetry),
                   ),
                 ],
               ),
@@ -115,11 +117,11 @@ class FavoriteMealsScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Błąd: $error'),
+              Text(l10n.trackErrorWithDetails(error: '$error')),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(favoriteMealsProvider),
-                child: const Text('Spróbuj ponownie'),
+                child: Text(l10n.commonRetry),
               ),
             ],
           ),
@@ -178,13 +180,13 @@ class FavoriteMealsScreen extends ConsumerWidget {
               icon: const Icon(Icons.add_circle),
               color: Theme.of(context).colorScheme.primary,
               tooltip: initialDate != null
-                  ? 'Dodaj do posiłków ${initialDate!.day}.${initialDate!.month}.${initialDate!.year}'
-                  : 'Dodaj do dzisiejszych posiłków',
+                  ? context.l10n.trackAddToMealsOnDate(date: '${initialDate!.day}.${initialDate!.month}.${initialDate!.year}')
+                  : context.l10n.trackAddToTodaysMeals,
               onPressed: () => _quickAddMeal(context, ref, meal, initialDate),
             ),
             IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: 'Edytuj',
+              tooltip: context.l10n.trackEdit,
               onPressed: () async {
                 final result = await context.push<bool>(AppRoutes.editFavorite, extra: meal);
                 if (result == true && context.mounted) ref.invalidate(favoriteMealsProvider);
@@ -193,7 +195,7 @@ class FavoriteMealsScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.delete_outline),
               color: Colors.red,
-              tooltip: 'Usuń z ulubionych',
+              tooltip: context.l10n.trackRemoveFromFavorites,
               onPressed: () => _deleteFavoriteMeal(context, ref, meal),
             ),
           ],
@@ -214,7 +216,7 @@ class FavoriteMealsScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 4),
             Text(
-              '${activity.caloriesBurned.toStringAsFixed(0)} kcal spalone',
+              context.l10n.trackKcalBurned(kcal: activity.caloriesBurned.toStringAsFixed(0)),
               style: TextStyle(
                 color: Colors.orange.shade700,
                 fontWeight: FontWeight.w500,
@@ -233,14 +235,14 @@ class FavoriteMealsScreen extends ConsumerWidget {
               icon: const Icon(Icons.add_circle),
               color: Theme.of(context).colorScheme.primary,
               tooltip: initialDate != null
-                  ? 'Dodaj do aktywności ${initialDate!.day}.${initialDate!.month}.${initialDate!.year}'
-                  : 'Dodaj do dzisiejszych aktywności',
+                  ? context.l10n.trackAddToActivitiesOnDate(date: '${initialDate!.day}.${initialDate!.month}.${initialDate!.year}')
+                  : context.l10n.trackAddToTodaysActivities,
               onPressed: () => _quickAddActivity(context, ref, activity, initialDate),
             ),
             IconButton(
               icon: const Icon(Icons.delete_outline),
               color: Colors.red,
-              tooltip: 'Usuń z ulubionych',
+              tooltip: context.l10n.trackRemoveFromFavorites,
               onPressed: () => _deleteFavoriteActivity(context, ref, activity),
             ),
           ],
@@ -265,16 +267,13 @@ class FavoriteMealsScreen extends ConsumerWidget {
       await service.createMeal(meal);
       await StreakUpdater.updateStreak(userId, AppConstants.streakMeals, effectiveDate);
       if (context.mounted) {
-        SuccessMessage.show(
-          context,
-          date != null
-              ? '${favoriteMeal.name} dodany do posiłków ${date.day}.${date.month}.${date.year}'
-              : '${favoriteMeal.name} dodany do dzisiejszych posiłków',
-        );
+        SuccessMessage.show(context, date != null
+              ? context.l10n.trackMealAddedToMealsOnDate(name: favoriteMeal.name, date: '${date.day}.${date.month}.${date.year}')
+              : context.l10n.trackMealAddedToTodaysMeals(name: favoriteMeal.name), l10n: context.l10n);
         context.pop(true);
       }
     } catch (e) {
-      if (context.mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (context.mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     }
   }
 
@@ -294,16 +293,13 @@ class FavoriteMealsScreen extends ConsumerWidget {
       await service.createActivity(activity);
       await StreakUpdater.updateStreak(userId, AppConstants.streakActivities, effectiveDate);
       if (context.mounted) {
-        SuccessMessage.show(
-          context,
-          date != null
-              ? '${favoriteActivity.name} dodana do aktywności ${date.day}.${date.month}.${date.year}'
-              : '${favoriteActivity.name} dodana do dzisiejszych aktywności',
-        );
+        SuccessMessage.show(context, date != null
+              ? context.l10n.trackActivityAddedToActivitiesOnDate(name: favoriteActivity.name, date: '${date.day}.${date.month}.${date.year}')
+              : context.l10n.trackActivityAddedToTodaysActivities(name: favoriteActivity.name), l10n: context.l10n);
         context.pop(true);
       }
     } catch (e) {
-      if (context.mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (context.mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     }
   }
 
@@ -311,18 +307,18 @@ class FavoriteMealsScreen extends ConsumerWidget {
     if (favoriteMeal.id == null) return;
     final confirmed = await DeleteConfirmationDialog.show(
       context,
-      title: 'Usuń z ulubionych',
-      content: 'Czy na pewno chcesz usunąć "${favoriteMeal.name}" z ulubionych?',
+      title: context.l10n.trackRemoveFromFavorites,
+      content: context.l10n.trackRemoveFromFavoritesConfirm(name: favoriteMeal.name),
     );
     if (!confirmed) return;
     try {
       await SupabaseService().deleteFavoriteMeal(favoriteMeal.id!);
       if (context.mounted) {
         ref.invalidate(favoriteMealsProvider);
-        SuccessMessage.show(context, 'Usunięto z ulubionych');
+        SuccessMessage.show(context, context.l10n.trackRemovedFromFavorites, l10n: context.l10n);
       }
     } catch (e) {
-      if (context.mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (context.mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     }
   }
 
@@ -330,18 +326,18 @@ class FavoriteMealsScreen extends ConsumerWidget {
     if (favoriteActivity.id == null) return;
     final confirmed = await DeleteConfirmationDialog.show(
       context,
-      title: 'Usuń z ulubionych',
-      content: 'Czy na pewno chcesz usunąć "${favoriteActivity.name}" z ulubionych?',
+      title: context.l10n.trackRemoveFromFavorites,
+      content: context.l10n.trackRemoveFromFavoritesConfirm(name: favoriteActivity.name),
     );
     if (!confirmed) return;
     try {
       await SupabaseService().deleteFavoriteActivity(favoriteActivity.id!);
       if (context.mounted) {
         ref.invalidate(favoriteActivitiesProvider);
-        SuccessMessage.show(context, 'Usunięto z ulubionych');
+        SuccessMessage.show(context, context.l10n.trackRemovedFromFavorites, l10n: context.l10n);
       }
     } catch (e) {
-      if (context.mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (context.mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     }
   }
 }

@@ -7,6 +7,7 @@ Dostałeś maila, że hosting **hosting-perso** jest dostępny, a transfer domen
 ## 1. Hasło FTP
 
 W mailu hasło jest linkiem do panelu OVH („Secret”).  
+
 1. Wejdź na **https://www.ovh.com/manager/** i zaloguj się.  
 2. Kliknij w link z maila („Hasło”) albo w panelu: **Hosting** → Twój hosting (**latwafe**) → zakładka **FTP** / **Dane do logowania**.  
 3. **Pokaż** / **Skopiuj** hasło FTP i zapisz je w bezpiecznym miejscu (Notatnik, menedżer haseł).

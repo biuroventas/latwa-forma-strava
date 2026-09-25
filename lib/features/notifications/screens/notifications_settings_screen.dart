@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/providers/locale_provider.dart';
 import '../../../shared/services/notification_service.dart';
 
 class NotificationsSettingsScreen extends StatefulWidget {
@@ -22,12 +24,7 @@ class _NotificationsSettingsScreenState
   List<_WaterReminder> _waterReminders = [
     _WaterReminder(enabled: false, hour: 9, minute: 0),
   ];
-  List<_MealReminder> _mealReminders = [
-    _MealReminder(label: 'Śniadanie', enabled: false, hour: 8, minute: 0),
-    _MealReminder(label: 'Obiad', enabled: false, hour: 13, minute: 0),
-    _MealReminder(label: 'Kolacja', enabled: false, hour: 19, minute: 0),
-    _MealReminder(label: 'Przekąska', enabled: false, hour: 16, minute: 0),
-  ];
+  List<_MealReminder> _mealReminders = [];
 
   @override
   void initState() {
@@ -35,10 +32,18 @@ class _NotificationsSettingsScreenState
     _loadFromPrefs();
   }
 
+  List<_MealReminder> _defaultMealReminders(AppLocalizations l10n) => [
+        _MealReminder(label: l10n.moreMealBreakfast, enabled: false, hour: 8, minute: 0),
+        _MealReminder(label: l10n.moreMealLunch, enabled: false, hour: 13, minute: 0),
+        _MealReminder(label: l10n.moreMealDinner, enabled: false, hour: 19, minute: 0),
+        _MealReminder(label: l10n.moreMealSnack, enabled: false, hour: 16, minute: 0),
+      ];
+
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final waterJson = prefs.getString(_keyWaterReminders);
     final mealJson = prefs.getString(_keyMealReminders);
+    final l10n = lookupAppLocalizations(currentAppLocale());
 
     if (waterJson != null) {
       try {
@@ -60,14 +65,18 @@ class _NotificationsSettingsScreenState
         setState(() {
           _mealReminders = list
               .map((e) => _MealReminder(
-                    label: e['label'] as String? ?? 'Posiłek',
+                    label: e['label'] as String? ?? l10n.moreMealDefault,
                     enabled: e['enabled'] as bool? ?? false,
                     hour: e['hour'] as int? ?? 12,
                     minute: e['minute'] as int? ?? 0,
                   ))
               .toList();
         });
-      } catch (_) {}
+      } catch (_) {
+        setState(() => _mealReminders = _defaultMealReminders(l10n));
+      }
+    } else {
+      setState(() => _mealReminders = _defaultMealReminders(l10n));
     }
     _rescheduleAll();
   }
@@ -184,9 +193,10 @@ class _NotificationsSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Powiadomienia'),
+        title: Text(l10n.moreNotificationsTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -204,7 +214,7 @@ class _NotificationsSettingsScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Przypomnienia o wodzie',
+                          l10n.moreWaterReminders,
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -216,7 +226,7 @@ class _NotificationsSettingsScreenState
                             ? _addWaterReminder
                             : null,
                         icon: const Icon(Icons.add, size: 20),
-                        label: const Text('Dodaj'),
+                        label: Text(l10n.moreAdd),
                       ),
                     ],
                   ),
@@ -243,7 +253,7 @@ class _NotificationsSettingsScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Przypomnienia o posiłkach',
+                          l10n.moreMealReminders,
                           style:
                               Theme.of(context).textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -254,7 +264,7 @@ class _NotificationsSettingsScreenState
                         onPressed:
                             _mealReminders.length < 50 ? _addMealReminder : null,
                         icon: const Icon(Icons.add, size: 20),
-                        label: const Text('Dodaj'),
+                        label: Text(l10n.moreAdd),
                       ),
                     ],
                   ),
@@ -494,7 +504,8 @@ class _MealNameDialogState extends State<_MealNameDialog> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: 'Posiłek');
+    final l10n = lookupAppLocalizations(currentAppLocale());
+    _controller = TextEditingController(text: l10n.moreMealDefault);
   }
 
   @override
@@ -505,27 +516,32 @@ class _MealNameDialogState extends State<_MealNameDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Nowe przypomnienie o posiłku'),
+      title: Text(l10n.moreNewMealReminder),
       content: TextField(
         controller: _controller,
         autofocus: true,
-        decoration: const InputDecoration(
-          labelText: 'Nazwa posiłku',
-          hintText: 'np. Drugie śniadanie, Podwieczorek',
+        decoration: InputDecoration(
+          labelText: l10n.moreMealNameLabel,
+          hintText: l10n.moreMealNameHint,
         ),
-        onSubmitted: (value) => context.pop(value.trim().isEmpty ? 'Posiłek' : value.trim()),
+        onSubmitted: (value) => context.pop(
+          value.trim().isEmpty ? l10n.moreMealDefault : value.trim(),
+        ),
       ),
       actions: [
         TextButton(
           onPressed: () => context.pop(),
-          child: const Text('Anuluj'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: () => context.pop(
-            _controller.text.trim().isEmpty ? 'Posiłek' : _controller.text.trim(),
+            _controller.text.trim().isEmpty
+                ? l10n.moreMealDefault
+                : _controller.text.trim(),
           ),
-          child: const Text('Dodaj'),
+          child: Text(l10n.moreAdd),
         ),
       ],
     );
@@ -586,15 +602,16 @@ class _MealEditDialogState extends State<_MealEditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: const Text('Edytuj przypomnienie'),
+      title: Text(l10n.moreEditReminder),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _labelController,
-            decoration: const InputDecoration(
-              labelText: 'Nazwa posiłku',
+            decoration: InputDecoration(
+              labelText: l10n.moreMealNameLabel,
             ),
           ),
           const SizedBox(height: 16),
@@ -611,17 +628,19 @@ class _MealEditDialogState extends State<_MealEditDialog> {
       actions: [
         TextButton(
           onPressed: () => context.pop(),
-          child: const Text('Anuluj'),
+          child: Text(l10n.commonCancel),
         ),
         FilledButton(
           onPressed: () => context.pop(
             _MealEditResult(
-              label: _labelController.text.trim().isEmpty ? widget.label : _labelController.text.trim(),
+              label: _labelController.text.trim().isEmpty
+                  ? widget.label
+                  : _labelController.text.trim(),
               hour: _time.hour,
               minute: _time.minute,
             ),
           ),
-          child: const Text('Zapisz'),
+          child: Text(l10n.commonSave),
         ),
       ],
     );

@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "Ta aplikacja potrzebuje dostępu do kamery, aby skanować kody kreskowe produktów i analizować zdjęcia posiłków.";
+"NSPhotoLibraryAddUsageDescription" = "Ta aplikacja potrzebuje dostępu do zapisywania zdjęć w galerii.";
+"NSPhotoLibraryUsageDescription" = "Ta aplikacja potrzebuje dostępu do galerii, aby wybierać zdjęcia posiłków do analizy.";
+"NSUserNotificationsUsageDescription" = "Ta aplikacja potrzebuje uprawnień do powiadomień, aby przypominać o piciu wody i innych celach.";

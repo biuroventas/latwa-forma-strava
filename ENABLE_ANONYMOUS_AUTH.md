@@ -22,6 +22,7 @@ Błąd autoryzacji może wynikać z tego, że anonimowa autoryzacja nie jest wł
    - Możesz również sprawdzić inne ustawienia autoryzacji
 
 5. **Uruchom aplikację ponownie:**
+
    ```bash
    flutter run
    ```

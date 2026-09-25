@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/utils/success_message.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../core/config/supabase_config.dart';
@@ -14,8 +15,9 @@ import '../../../core/utils/streak_updater.dart';
 /// kalorie i makroskładniki przeliczają się automatycznie na podstawie danych z Open Food Facts.
 class BarcodeProductScreen extends StatefulWidget {
   final Map<String, dynamic> product;
+  final DateTime? date;
 
-  const BarcodeProductScreen({super.key, required this.product});
+  const BarcodeProductScreen({super.key, required this.product, this.date});
 
   @override
   State<BarcodeProductScreen> createState() => _BarcodeProductScreenState();
@@ -42,6 +44,11 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
   double get _totalCarbs =>
       _weightG != null && _weightG! > 0 ? (_weightG! / 100) * _carbsPer100 : 0.0;
 
+  DateTime get _effectiveCreatedAt {
+    final d = widget.date ?? DateTime.now();
+    return DateTime(d.year, d.month, d.day, 12, 0);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -61,21 +68,27 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
   Future<void> _saveDirectly() async {
     if (_weightG == null || _weightG! <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Podaj wagę produktu')),
+        SnackBar(content: Text(context.l10n.trackEnterProductWeight)),
       );
       return;
     }
 
     setState(() => _isSaving = true);
+    final l10n = context.l10n;
+    final defaultMealName = l10n.trackDefaultMealName;
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
-      if (userId == null) throw Exception('Użytkownik nie jest zalogowany');
+      if (userId == null) throw Exception(l10n.trackUserNotLoggedIn);
 
-      await StreakUpdater.updateStreak(userId, AppConstants.streakMeals, DateTime.now());
+      await StreakUpdater.updateStreak(
+        userId,
+        AppConstants.streakMeals,
+        widget.date ?? DateTime.now(),
+      );
 
       final meal = Meal(
         userId: userId,
-        name: widget.product['name'] as String? ?? AppConstants.defaultMealName,
+        name: widget.product['name'] as String? ?? defaultMealName,
         calories: _totalCalories,
         proteinG: _totalProtein,
         fatG: _totalFat,
@@ -86,18 +99,17 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
         saltG: 0,
         weightG: _weightG,
         source: AppConstants.mealSourceBarcode,
+        createdAt: _effectiveCreatedAt,
       );
 
       await SupabaseService().createMeal(meal);
 
-      if (mounted) {
-        context.pop(true);
-        SuccessMessage.show(context, 'Posiłek dodany pomyślnie!');
-      }
+      if (!mounted) return;
+      context.pop(true);
+      SuccessMessage.show(context, l10n.trackMealAddedSuccess, l10n: l10n);
     } catch (e) {
-      if (mounted) {
-        ErrorHandler.showSnackBar(context, error: e);
-      }
+      if (!mounted) return;
+      ErrorHandler.showSnackBar(context, l10n: l10n, error: e);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -106,14 +118,24 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
   void _openEditScreen() {
     if (_weightG == null || _weightG! <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Podaj wagę produktu')),
+        SnackBar(content: Text(context.l10n.trackEnterProductWeight)),
+      );
+      return;
+    }
+
+    final userId = SupabaseConfig.auth.currentUser?.id;
+    if (userId == null) {
+      ErrorHandler.showSnackBar(
+        context,
+        l10n: context.l10n,
+        error: Exception(context.l10n.trackUserNotLoggedIn),
       );
       return;
     }
 
     context.push(AppRoutes.mealsAdd, extra: Meal(
-      userId: SupabaseConfig.auth.currentUser!.id,
-      name: widget.product['name'] as String? ?? AppConstants.defaultMealName,
+      userId: userId,
+      name: widget.product['name'] as String? ?? context.l10n.trackDefaultMealName,
       calories: _totalCalories,
       proteinG: _totalProtein,
       fatG: _totalFat,
@@ -124,6 +146,7 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
       saltG: 0,
       weightG: _weightG,
       source: AppConstants.mealSourceBarcode,
+      createdAt: _effectiveCreatedAt,
     )).then((result) {
       if (result == true && mounted) context.pop(true);
     });
@@ -131,9 +154,10 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dodaj produkt'),
+        title: Text(l10n.trackAddProduct),
       ),
       body: Form(
         key: _formKey,
@@ -148,7 +172,7 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.product['name'] as String? ?? 'Produkt',
+                      widget.product['name'] as String? ?? l10n.trackProduct,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -156,7 +180,7 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
                     if (widget.product['brand'] != null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        'Marka: ${widget.product['brand']}',
+                        l10n.trackBrand(brand: '${widget.product['brand']}'),
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ],
@@ -166,7 +190,7 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Wartości odżywcze (na 100g):',
+              l10n.trackNutritionPer100g,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -179,9 +203,9 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildPer100Item('kcal', _calPer100.toStringAsFixed(0)),
-                    _buildPer100Item('B', _proteinPer100.toStringAsFixed(1)),
-                    _buildPer100Item('T', _fatPer100.toStringAsFixed(1)),
-                    _buildPer100Item('W', _carbsPer100.toStringAsFixed(1)),
+                    _buildPer100Item(l10n.trackMacroAbbrevProtein, _proteinPer100.toStringAsFixed(1)),
+                    _buildPer100Item(l10n.trackMacroAbbrevFat, _fatPer100.toStringAsFixed(1)),
+                    _buildPer100Item(l10n.trackMacroAbbrevCarbs, _carbsPer100.toStringAsFixed(1)),
                   ],
                 ),
               ),
@@ -189,10 +213,10 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
             const SizedBox(height: 24),
             TextFormField(
               controller: _weightController,
-              decoration: const InputDecoration(
-                labelText: 'Waga (g) *',
-                hintText: 'np. 150',
-                helperText: 'Ile gramów produktu zjadasz?',
+              decoration: InputDecoration(
+                labelText: l10n.trackWeightGRequired,
+                hintText: l10n.trackWeightHintExample,
+                helperText: l10n.trackWeightHelper,
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [
@@ -200,14 +224,14 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
               ],
               validator: (v) {
                 final w = double.tryParse(v ?? '');
-                if (w == null || w <= 0) return 'Podaj wagę produktu';
+                if (w == null || w <= 0) return l10n.trackEnterProductWeight;
                 return null;
               },
             ),
             const SizedBox(height: 24),
             if (_weightG != null && _weightG! > 0) ...[
               Text(
-                'Twoja porcja:',
+                l10n.trackYourPortion,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -221,9 +245,9 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildTotalItem(context, 'kcal', _totalCalories.toStringAsFixed(0)),
-                      _buildTotalItem(context, 'Białko', _totalProtein.toStringAsFixed(1)),
-                      _buildTotalItem(context, 'Tłuszcze', _totalFat.toStringAsFixed(1)),
-                      _buildTotalItem(context, 'Węgle', _totalCarbs.toStringAsFixed(1)),
+                      _buildTotalItem(context, l10n.trackProtein, _totalProtein.toStringAsFixed(1)),
+                      _buildTotalItem(context, l10n.trackFat, _totalFat.toStringAsFixed(1)),
+                      _buildTotalItem(context, l10n.trackCarbsShort, _totalCarbs.toStringAsFixed(1)),
                     ],
                   ),
                 ),
@@ -237,7 +261,7 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
                 style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                 child: _isSaving
                     ? const CircularProgressIndicator()
-                    : const Text('Dodaj posiłek'),
+                    : Text(l10n.trackAddMeal),
               ),
             ),
             const SizedBox(height: 8),
@@ -246,7 +270,7 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
               child: OutlinedButton(
                 onPressed: _isSaving ? null : _openEditScreen,
                 style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-                child: const Text('Edytuj przed zapisem'),
+                child: Text(l10n.trackEditBeforeSave),
               ),
             ),
           ],
@@ -271,10 +295,15 @@ class _BarcodeProductScreenState extends State<BarcodeProductScreen> {
           value,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
               ),
         ),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+        ),
       ],
     );
   }

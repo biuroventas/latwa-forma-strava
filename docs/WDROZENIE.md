@@ -20,9 +20,11 @@ Krótki przewodnik: co zrobić, żeby opublikować aplikację w sklepach, w inte
 2. **App Store Connect:** Stwórz aplikację, wypełnij metadane (opis, screenshots, kategoria, prywatność).
 3. **Xcode:** Otwórz `ios/Runner.xcworkspace`, ustaw **Team** i **Bundle ID** (np. `pl.latwaforma.app`). W **Signing & Capabilities** wybierz swój certyfikat i provisioning profile (Distribution).
 4. **Build:**
+
    ```bash
    flutter build ipa
    ```
+
    Plik `.ipa` będzie w `build/ios/ipa/`.
 5. **Upload:** Przez Xcode (Window → Organizer → Distribute App) albo **Transporter** (z Mac App Store) – wybierz plik `.ipa` i wyślij do App Store Connect.
 6. **W App Store Connect:** Wybierz build, wyślij do recenzji.
@@ -34,22 +36,28 @@ Dokładna instrukcja: [docs.flutter.dev/deployment/ios](https://docs.flutter.dev
 1. **Konto:** Google Play Console (25 USD jednorazowo) – [play.google.com/console](https://play.google.com/console).
 2. **Aplikacja:** Utwórz aplikację, wypełnij dane sklepu (opis, grafiki, polityka prywatności, kategoria).
 3. **Klucz do podpisywania:** Wygeneruj keystore (jeśli jeszcze nie masz):
+
    ```bash
    keytool -genkey -v -keystore latwa-forma-upload-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
    ```
+
    Zapisz hasło i `latwa-forma-upload-key.jks` w bezpiecznym miejscu.
 4. **Konfiguracja:** W projekcie utwórz (lub uzupełnij) `android/key.properties`:
+
    ```
    storePassword=...
    keyPassword=...
    keyAlias=upload
    storeFile=../latwa-forma-upload-key.jks
    ```
+
    W `android/app/build.gradle.kts` dodaj odczyt `key.properties` i konfigurację `signingConfigs` (instrukcja w [docs.flutter.dev/deployment/android](https://docs.flutter.dev/deployment/android)).
 5. **Build:**
+
    ```bash
    flutter build appbundle
    ```
+
    Plik `.aab` będzie w `build/app/outputs/bundle/release/`.
 6. **Upload:** W Play Console → Twoja aplikacja → Release → Production (lub testing) → Create new release → Upload `app-release.aab`.
 
@@ -58,9 +66,11 @@ Dokładna instrukcja: [docs.flutter.dev/deployment/ios](https://docs.flutter.dev
 ## 2. Strona (Web)
 
 1. **Build:**
+
    ```bash
    flutter build web
    ```
+
    Wynik w `build/web/` (pliki do wrzucenia na serwer).
 
 2. **Hosting** – opcje:
@@ -78,9 +88,11 @@ Dokładna instrukcja: [docs.flutter.dev/deployment/web](https://docs.flutter.dev
 ## 3. Windows
 
 1. **Build:**
+
    ```bash
    flutter build windows
    ```
+
    Aplikacja w `build/windows/runner/Release/` (folder z `.exe` i DLL).
 
 2. **Dystrybucja:**
@@ -94,9 +106,11 @@ Dokładna instrukcja: [docs.flutter.dev/deployment/web](https://docs.flutter.dev
 ## 4. Mac (desktop)
 
 1. **Build:**
+
    ```bash
    flutter build macos
    ```
+
    Aplikacja w `build/macos/Build/Products/Release/` (plik `.app`).
 
 2. **Notaryzacja (żeby macOS nie blokował):** Potrzebne konto Apple Developer. Podpisz i prześlij do Apple do notaryzacji (Xcode lub `xcrun notarytool`). Bez tego użytkownicy zobaczą ostrzeżenie „aplikacja od nieznanego dewelopera”.
@@ -109,13 +123,13 @@ Dokładna instrukcja: [docs.flutter.dev/deployment/web](https://docs.flutter.dev
 
 ## Szybka lista kontrolna
 
-| Platforma   | Konto / narzędzie              | Komenda build           | Gdzie wgrać / co udostępnić      |
-|------------|---------------------------------|-------------------------|-----------------------------------|
-| iOS        | Apple Developer, Xcode          | `flutter build ipa`     | App Store Connect (Transporter)   |
-| Android    | Play Console, keystore          | `flutter build appbundle` | Play Console (upload .aab)     |
-| Web        | Konto u hostingu                | `flutter build web`     | Hosting (Firebase/Vercel/Netlify/…) |
-| Windows    | –                               | `flutter build windows` | ZIP / Microsoft Store (MSIX)    |
-| macOS      | Apple Developer (do notaryzacji)| `flutter build macos`   | DMG / Mac App Store              |
+| Platforma | Konto / narzędzie | Komenda build | Gdzie wgrać / co udostępnić |
+| --- | --- | --- | --- |
+| iOS | Apple Developer, Xcode | `flutter build ipa` | App Store Connect (Transporter) |
+| Android | Play Console, keystore | `flutter build appbundle` | Play Console (upload .aab) |
+| Web | Konto u hostingu | `flutter build web` | Hosting (Firebase/Vercel/Netlify/…) |
+| Windows | – | `flutter build windows` | ZIP / Microsoft Store (MSIX) |
+| macOS | Apple Developer (do notaryzacji) | `flutter build macos` | DMG / Mac App Store |
 
 ---
 

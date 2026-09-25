@@ -5,6 +5,7 @@ Aplikacja do śledzenia kalorii, makroskładników i aktywności fizycznej.
 ## Funkcjonalności
 
 ### Podstawowe
+
 - ✅ Ekran powitalny z logo i informacjami
 - ✅ Onboarding (płeć, wiek, wzrost, waga, cel, aktywność)
 - ✅ Automatyczne obliczenia: BMR, TDEE, makroskładniki, szacowany termin
@@ -12,34 +13,40 @@ Aplikacja do śledzenia kalorii, makroskładników i aktywności fizycznej.
 - ✅ Makroskładniki na dashboardzie (włączane/wyłączane, preferencja zapisywana)
 
 ### Posiłki
+
 - ✅ Dodawanie: ręczne, składniki, kod kreskowy (Open Food Facts), AI ze zdjęcia (OpenAI Vision)
 - ✅ „Jem na mieście” – szybkie szacowanie kalorii (pizza, burger, chińczyk itd.)
 - ✅ Ulubione posiłki – zapis i szybkie dodawanie do wybranego dnia
 - ✅ Lista posiłków z nawigacją dni, date picker, edycja i usuwanie
 
 ### Aktywności
+
 - ✅ Dodawanie spalonych kalorii (ręcznie)
 - ✅ Integracja ze Strava – import treningów
 - ✅ Integracja z Garmin Connect – import aktywności
 - ✅ Lista aktywności z nawigacją dni, date picker, edycja i usuwanie
 
 ### Woda
+
 - ✅ Śledzenie z szybkimi przyciskami (100, 200, 250, 500 ml) i własną ilością
 - ✅ Cel wody z profilu (water_goal_ml)
 - ✅ Przegląd dowolnego dnia – edycja i usuwanie wpisów z przeszłości
 - ✅ Nawigacja dni i date picker
 
 ### Waga i pomiary
+
 - ✅ Śledzenie wagi z wykresem i historią
 - ✅ Pomiary ciała z wykresami i historią
 
 ### Profil i ustawienia
+
 - ✅ Profil użytkownika z edycją danych
 - ✅ Powiadomienia – przypomnienia o wodzie i posiłkach (konfigurowalne godziny)
 - ✅ Integracje Strava i Garmin w profilu
 - ✅ Eksport danych – CSV (pełne dane) lub PDF (raport z ostatnich 30 dni)
 
 ### Statystyki i cele
+
 - ✅ Statystyki – wykresy, weryfikacja celu, podsumowanie tygodnia
 - ✅ Serie (streaks) – dostęp z poziomu Statystyk
 - ✅ Cele i wyzwania – śledzenie postępów (waga, deficyt, woda, treningi, seria)
@@ -56,6 +63,7 @@ Aplikacja do śledzenia kalorii, makroskładników i aktywności fizycznej.
 1. Sklonuj repozytorium lub pobierz pliki projektu
 
 2. Zainstaluj zależności:
+
 ```bash
 flutter pub get
 ```
@@ -63,6 +71,7 @@ flutter pub get
 3. Skonfiguruj zmienne środowiskowe:
    - Skopiuj `.env.example` do `.env`
    - Wypełnij klucze API:
+
      ```
      SUPABASE_URL=...
      SUPABASE_ANON_KEY=...
@@ -82,16 +91,19 @@ flutter pub get
 ## Uruchomienie
 
 ### iOS
+
 ```bash
 flutter run -d ios
 ```
 
 ### Android
+
 ```bash
 flutter run -d android
 ```
 
 ### Web
+
 ```bash
 flutter run -d chrome
 ```
@@ -131,6 +143,7 @@ lib/
 ## Obliczenia
 
 Aplikacja automatycznie oblicza:
+
 - **BMR** (Basal Metabolic Rate) - wzór Harris-Benedict
 - **TDEE** (Total Daily Energy Expenditure) - na podstawie poziomu aktywności
 - **Makroskładniki** - białko, tłuszcze, węglowodany

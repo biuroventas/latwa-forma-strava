@@ -40,7 +40,7 @@ Lista tego, co powinna mieć aplikacja, żeby była **legalna** (RODO, prawo kon
 ## 4. Informacje o subskrypcji (masz w praktyce ✓)
 
 - **Wymóg:** Przed zakupem użytkownik powinien widzieć cenę, okres, sposób anulowania.
-- **Status:** Ekran Premium pokazuje ceny (69,98 zł / 194,95 zł), okres (miesięcznie/rocznie). Rezygnacja przez Stripe Customer Portal („Anuluj subskrypcję” w Premium). Warto w regulaminie jasno opisać: „Subskrypcję możesz anulować w dowolnym momencie w aplikacji (Premium → Anuluj subskrypcję).”
+- **Status:** Ekran Premium pokazuje ceny 69,99 zł / 194,99 zł (IAP i strona), okres (miesięcznie/rocznie). Rezygnacja: Apple ID / Google Play albo Stripe Customer Portal na webie. Warto w regulaminie jasno opisać: „Subskrypcję możesz anulować w dowolnym momencie w aplikacji (Premium → Anuluj subskrypcję).”
 
 ---
 
@@ -64,14 +64,14 @@ Lista tego, co powinna mieć aplikacja, żeby była **legalna** (RODO, prawo kon
 
 - **Polityka prywatności:** URL w karcie aplikacji (wymagane).
 - **Formularz „Bezpieczeństwo danych”:** W Play Console wypełnij, jakie dane zbierasz i w jakim celu (zgodne z polityką).
-- **Usunięcie konta:** Podobnie jak Apple – opcja usunięcia konta w aplikacji (masz „Usuń konto” – sprawdź, że usuwa dane).
+- **Usunięcie konta:** Apple i Google wymagają opcji w aplikacji **oraz** (Google Play) strony www. W aplikacji: Profil → Usuń konto. Strona: `https://latwaforma.pl/usun-konto.html` – ten URL wpisz w Play Console (Data safety).
 
 ---
 
 ## 7. Podsumowanie – co masz i co dokończyć
 
 | Element | Status | Działanie |
-|--------|--------|-----------|
+| --- | --- | --- |
 | Polityka prywatności | ✓ | Opublikuj pod stałym URL; dopisz Stripe, Google, powiadomienia; link w aplikacji ✓ |
 | Regulamin | Do dodania | Napisz regulamin (subskrypcja, rezygnacja, odstąpienie); opublikuj; ustaw URL w aplikacji |
 | Linki w aplikacji | ✓ | Profil → Polityka prywatności i Regulamin (URL regulaminu ustaw w kodzie) |

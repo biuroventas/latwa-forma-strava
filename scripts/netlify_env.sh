@@ -11,6 +11,8 @@ if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_ANON_KEY" ]; then
   [ -n "$GARMIN_CLIENT_ID" ] && echo "GARMIN_CLIENT_ID=$GARMIN_CLIENT_ID" >> env.production
   [ -n "$GARMIN_CLIENT_SECRET" ] && echo "GARMIN_CLIENT_SECRET=$GARMIN_CLIENT_SECRET" >> env.production
   [ -n "$GARMIN_REDIRECT_URI" ] && echo "GARMIN_REDIRECT_URI=$GARMIN_REDIRECT_URI" >> env.production
+  [ -n "$TURSO_DATABASE_URL" ] && echo "TURSO_DATABASE_URL=$TURSO_DATABASE_URL" >> env.production
+  [ -n "$TURSO_AUTH_TOKEN" ] && echo "TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN" >> env.production
   echo "Created env.production from Netlify env vars"
 else
   echo "Warning: SUPABASE_URL or SUPABASE_ANON_KEY not set – app will run without backend"

@@ -1,0 +1,1432 @@
+{
+  "profErrNetwork": {
+    "pl": "Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.",
+    "en": "No internet connection. Check your network and try again."
+  },
+  "profErrCors": {
+    "pl": "Błąd połączenia z usługą. Odśwież stronę i spróbuj ponownie.",
+    "en": "Could not reach the service. Refresh the page and try again."
+  },
+  "profErrTimeout": {
+    "pl": "Przekroczono limit czasu. Spróbuj ponownie.",
+    "en": "Request timed out. Please try again."
+  },
+  "profErrAuth": {
+    "pl": "Błąd autoryzacji. Zaloguj się ponownie.",
+    "en": "Authorization error. Please sign in again."
+  },
+  "profErrNotFound": {
+    "pl": "Nie znaleziono zasobu.",
+    "en": "Resource not found."
+  },
+  "profErrServer": {
+    "pl": "Błąd serwera. Spróbuj później.",
+    "en": "Server error. Please try again later."
+  },
+  "profErrGeneric": {
+    "pl": "Wystąpił błąd. Spróbuj ponownie.",
+    "en": "Something went wrong. Please try again."
+  },
+  "profOfflineBanner": {
+    "pl": "Brak połączenia z internetem.",
+    "en": "No internet connection."
+  },
+  "premFeatureTitle": {
+    "pl": "Funkcja Premium",
+    "en": "Premium feature"
+  },
+  "premFeatureDialog": {
+    "pl": "{feature} jest dostępna w planie Premium. Czy chcesz dowiedzieć się więcej?",
+    "en": "{feature} is available with Premium. Want to learn more?",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premFeatureThis": {
+    "pl": "Ta funkcja",
+    "en": "This feature"
+  },
+  "premSeePremium": {
+    "pl": "Zobacz Premium",
+    "en": "See Premium"
+  },
+  "premLockedTitle": {
+    "pl": "{feature} jest w Premium",
+    "en": "{feature} is in Premium",
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premLockedBody": {
+    "pl": "Odblokuj nieograniczoną poradę AI, eksport PDF i więcej.",
+    "en": "Unlock unlimited AI advice, PDF export, and more."
+  },
+  "premCheckPremium": {
+    "pl": "Sprawdź Premium",
+    "en": "Check Premium"
+  },
+  "premThanks": {
+    "pl": "Dziękujemy!",
+    "en": "Thank you!"
+  },
+  "premActivatedBody": {
+    "pl": "Premium zostało aktywowane.\nCiesz się pełnym dostępem do Łatwa Forma – eksport PDF, porady AI, integracje i więcej.",
+    "en": "Premium is now active.\nEnjoy full access to Łatwa Forma — PDF export, AI advice, integrations, and more."
+  },
+  "premBackToApp": {
+    "pl": "Wróć do aplikacji",
+    "en": "Back to the app"
+  },
+  "premCloseTabHint": {
+    "pl": "Możesz też zamknąć tę kartę, jeśli płatność była w osobnym oknie.",
+    "en": "You can also close this tab if payment opened in a separate window."
+  },
+  "premPaymentCancelled": {
+    "pl": "Płatność anulowana",
+    "en": "Payment cancelled"
+  },
+  "premCancelBody": {
+    "pl": "Nic nie zostało pobrane. Możesz wrócić i wybrać plan, kiedy będziesz gotowy.",
+    "en": "Nothing was charged. You can go back and choose a plan whenever you're ready."
+  },
+  "premBackToPlans": {
+    "pl": "Wróć do planów Premium",
+    "en": "Back to Premium plans"
+  },
+  "premGoToApp": {
+    "pl": "Przejdź do aplikacji",
+    "en": "Go to the app"
+  },
+  "premTitle": {
+    "pl": "Łatwa Forma Premium",
+    "en": "Łatwa Forma Premium"
+  },
+  "premHavePremium": {
+    "pl": "Masz Premium!",
+    "en": "You have Premium!"
+  },
+  "premUnlockPotential": {
+    "pl": "Odblokuj pełny potencjał",
+    "en": "Unlock your full potential"
+  },
+  "premAllFeaturesAvailable": {
+    "pl": "Wszystkie funkcje premium są dla Ciebie dostępne.",
+    "en": "All premium features are available for you."
+  },
+  "premValidUntil": {
+    "pl": "Ważne do: {date}",
+    "en": "Valid until: {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premTrialTitle": {
+    "pl": "Okres próbny (24 h)",
+    "en": "Trial period (24 h)"
+  },
+  "premTrialLeft": {
+    "pl": "Pozostało: {hours}h {minutes}min. ",
+    "en": "Left: {hours}h {minutes}min. ",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "premTrialBody": {
+    "pl": "Wszystkie funkcje premium są teraz dostępne. {remaining}Po tym czasie funkcje Premium się wyłączą, dopóki nie wykupisz planu. Okres próbny nie pobiera opłaty i nie zapisuje Cię automatycznie na subskrypcję.",
+    "en": "All premium features are available now. {remaining}After that, Premium features turn off until you purchase a plan. The trial does not charge you and does not auto-enroll you in a subscription.",
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "premFeatHistoryOtherDays": {
+    "pl": "Przeglądanie historii innych dni niż dziś",
+    "en": "Browse history for days other than today"
+  },
+  "premFeatMacrosDash": {
+    "pl": "Podgląd makroskładników na dashboardzie",
+    "en": "Macro breakdown on the dashboard"
+  },
+  "premFeatAiAdvice": {
+    "pl": "Porada AI (limit 100 dziennie)",
+    "en": "AI advice (100/day limit)"
+  },
+  "premFeatAiPhoto": {
+    "pl": "Analiza AI posiłku ze zdjęcia",
+    "en": "AI meal analysis from a photo"
+  },
+  "premFeatIngredients": {
+    "pl": "Dodawanie posiłku ze składników",
+    "en": "Add a meal from ingredients"
+  },
+  "premFeatEatingOut": {
+    "pl": "Dodawanie posiłku „na mieście”",
+    "en": "Add an eating-out meal"
+  },
+  "premFeatQuickActivity": {
+    "pl": "Szybkie dodawanie w aktywnościach",
+    "en": "Quick add in activities"
+  },
+  "premFeatShare": {
+    "pl": "Udostępnianie podsumowania i tygodniowych statystyk",
+    "en": "Share summary and weekly stats"
+  },
+  "premFeatPdf": {
+    "pl": "Eksport raportów do PDF",
+    "en": "Export reports to PDF"
+  },
+  "premFeatCustomCalories": {
+    "pl": "Własny cel kaloryczny w edycji profilu",
+    "en": "Custom calorie goal in profile edit"
+  },
+  "premFeatCustomMacros": {
+    "pl": "Własne makroskładniki w edycji profilu",
+    "en": "Custom macros in profile edit"
+  },
+  "premFeatStrava": {
+    "pl": "Integracje Strava bez limitów",
+    "en": "Unlimited Strava integrations"
+  },
+  "premFeatGoals": {
+    "pl": "Zaawansowane cele i wyzwania",
+    "en": "Advanced goals and challenges"
+  },
+  "premChoosePlan": {
+    "pl": "Wybierz plan",
+    "en": "Choose a plan"
+  },
+  "premPlanMonthly": {
+    "pl": "Łatwa Forma Premium – miesięcznie",
+    "en": "Łatwa Forma Premium – monthly"
+  },
+  "premPlanMonthlyPeriod": {
+    "pl": "1 miesiąc, auto-odnawiane",
+    "en": "1 month, auto-renewing"
+  },
+  "premPlanYearly": {
+    "pl": "Łatwa Forma Premium – rocznie",
+    "en": "Łatwa Forma Premium – yearly"
+  },
+  "premPlanYearlyPeriod": {
+    "pl": "12 miesięcy, auto-odnawiane",
+    "en": "12 months, auto-renewing"
+  },
+  "premBadgeSave": {
+    "pl": "Oszczędzasz ~17%",
+    "en": "Save ~17%"
+  },
+  "premPlanYearlyOnce": {
+    "pl": "Rocznie (jednorazowo)",
+    "en": "Yearly (one-time)"
+  },
+  "premPlanYearlyOncePeriod": {
+    "pl": "za rok",
+    "en": "per year"
+  },
+  "premBadgeBlik": {
+    "pl": "Tylko BLIK",
+    "en": "BLIK only"
+  },
+  "premYearlyOnceSubtitle": {
+    "pl": "płatność raz na rok, bez subskrypcji",
+    "en": "pay once a year, no subscription"
+  },
+  "premHaveCode": {
+    "pl": "Mam kod",
+    "en": "I have a code"
+  },
+  "premCodeLabel": {
+    "pl": "Kod",
+    "en": "Code"
+  },
+  "premRedeemTooltip": {
+    "pl": "Zrealizuj",
+    "en": "Redeem"
+  },
+  "premOpeningPayment": {
+    "pl": "Otwieram płatność…",
+    "en": "Opening payment…"
+  },
+  "premProcessingPurchase": {
+    "pl": "Przetwarzam zakup…",
+    "en": "Processing purchase…"
+  },
+  "premBuy": {
+    "pl": "Wykup Premium",
+    "en": "Get Premium"
+  },
+  "premRestoring": {
+    "pl": "Przywracam…",
+    "en": "Restoring…"
+  },
+  "premRestorePurchases": {
+    "pl": "Przywróć zakupy",
+    "en": "Restore purchases"
+  },
+  "premPaymentNoteWeb": {
+    "pl": "Rocznie (jednorazowo) – tylko BLIK. Subskrypcja – karta, Apple Pay, Google Pay. Subskrypcja odnawia się automatycznie, dopóki jej nie anulujesz.",
+    "en": "Yearly (one-time) – BLIK only. Subscription – card, Apple Pay, Google Pay. Subscription renews automatically until you cancel."
+  },
+  "premPaymentNoteMobile": {
+    "pl": "Płatność przez App Store / Google Play. „Łatwa Forma Premium – miesięcznie” (1 miesiąc) i „Łatwa Forma Premium – rocznie” (12 miesięcy) odnawiają się automatycznie za cenę pokazaną powyżej, aż anulujesz w ustawieniach sklepu. BLIK jest na latwaforma.pl. Podstawowe funkcje działają bez subskrypcji.",
+    "en": "Payment via App Store / Google Play. “Łatwa Forma Premium – monthly” (1 month) and “Łatwa Forma Premium – yearly” (12 months) renew automatically at the price shown above until you cancel in store settings. BLIK is on latwaforma.pl. Basic features work without a subscription."
+  },
+  "premAutoActivate": {
+    "pl": "Po opłaceniu konto Premium aktywuje się automatycznie.",
+    "en": "After payment, Premium activates automatically."
+  },
+  "premPrivacy": {
+    "pl": "Polityka prywatności",
+    "en": "Privacy policy"
+  },
+  "premTerms": {
+    "pl": "Regulamin",
+    "en": "Terms of service"
+  },
+  "premEula": {
+    "pl": "Terms of Use (EULA)",
+    "en": "Terms of Use (EULA)"
+  },
+  "premActivating": {
+    "pl": "Aktywuję…",
+    "en": "Activating…"
+  },
+  "premActivateTest": {
+    "pl": "Aktywuj Premium (test)",
+    "en": "Activate Premium (test)"
+  },
+  "premAvailableFeatures": {
+    "pl": "Dostępne funkcje:",
+    "en": "Available features:"
+  },
+  "premFeatActiveHistory": {
+    "pl": "Historia innych dni",
+    "en": "History of other days"
+  },
+  "premFeatActiveMacros": {
+    "pl": "Makro na dashboardzie",
+    "en": "Macros on dashboard"
+  },
+  "premFeatActiveAiPhoto": {
+    "pl": "Analiza AI posiłku",
+    "en": "AI meal analysis"
+  },
+  "premFeatActiveIngredients": {
+    "pl": "Posiłek ze składników",
+    "en": "Meal from ingredients"
+  },
+  "premFeatActiveEatingOut": {
+    "pl": "Posiłek „na mieście”",
+    "en": "Eating-out meal"
+  },
+  "premFeatActiveQuickActivity": {
+    "pl": "Szybkie dodawanie aktywności",
+    "en": "Quick activity add"
+  },
+  "premFeatActiveShare": {
+    "pl": "Udostępnianie podsumowania i statystyk",
+    "en": "Share summary and stats"
+  },
+  "premFeatActivePdf": {
+    "pl": "Eksport do PDF",
+    "en": "Export to PDF"
+  },
+  "premFeatActiveCalories": {
+    "pl": "Własny cel kaloryczny",
+    "en": "Custom calorie goal"
+  },
+  "premFeatActiveMacrosCustom": {
+    "pl": "Własne makroskładniki",
+    "en": "Custom macros"
+  },
+  "premFeatActiveStrava": {
+    "pl": "Integracje Strava",
+    "en": "Strava integrations"
+  },
+  "premFeatActiveGoals": {
+    "pl": "Zaawansowane cele",
+    "en": "Advanced goals"
+  },
+  "premOpening": {
+    "pl": "Otwieram…",
+    "en": "Opening…"
+  },
+  "premCancelSub": {
+    "pl": "Anuluj subskrypcję",
+    "en": "Cancel subscription"
+  },
+  "premManageSub": {
+    "pl": "Zarządzaj subskrypcją",
+    "en": "Manage subscription"
+  },
+  "premCancelNoteWeb": {
+    "pl": "Możesz anulować subskrypcję. Dostęp do Premium pozostanie do końca opłaconego okresu.",
+    "en": "You can cancel the subscription. Premium access remains until the end of the paid period."
+  },
+  "premCancelNoteMobile": {
+    "pl": "Anulowanie w ustawieniach App Store / Google Play. Dostęp Premium do końca opłaconego okresu.",
+    "en": "Cancel in App Store / Google Play settings. Premium access until the end of the paid period."
+  },
+  "premEnterEmail": {
+    "pl": "Podaj adres e-mail.",
+    "en": "Enter an email address."
+  },
+  "premCodeSent": {
+    "pl": "Kod wysłany",
+    "en": "Code sent"
+  },
+  "premCodeSentBody": {
+    "pl": "Wysłaliśmy link i kod na {email}. Sprawdź skrzynkę (także folder Spam) – kliknij link w mailu albo wpisz kod poniżej.",
+    "en": "We sent a link and code to {email}. Check your inbox (and Spam) — tap the link in the email or enter the code below.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "premSignedIn": {
+    "pl": "Zalogowano",
+    "en": "Signed in"
+  },
+  "premSignedInBuy": {
+    "pl": "Możesz teraz wykupić Premium.",
+    "en": "You can now purchase Premium."
+  },
+  "premAccountExistsTitle": {
+    "pl": "Konto z tym adresem e-mail istnieje.",
+    "en": "An account with this email already exists."
+  },
+  "premAccountExistsBody": {
+    "pl": "Próbujesz się zalogować na konto powiązane z tym adresem e-mail. Na tym urządzeniu masz inne dane (profil, posiłki itd.).\n\nCo chcesz zrobić?\n\n• Zaktualizować tamto konto – obecnymi danymi z tego urządzenia (profil, posiłki zostaną przeniesione).\n\n• Przywrócić dane konta – zobaczysz dane przypisane do konta z tym e-mailem (obecne dane z urządzenia nie będą użyte).\n\nW obu przypadkach musisz potwierdzić tożsamość – kliknij link w mailu lub wpisz kod weryfikacyjny.",
+    "en": "You're signing in to an account linked to this email. This device has different data (profile, meals, etc.).\n\nWhat do you want to do?\n\n• Update that account – with the current data from this device (profile and meals will be moved).\n\n• Restore account data – you'll see data linked to the email account (current device data won't be used).\n\nIn both cases you must verify your identity — tap the link in the email or enter the verification code."
+  },
+  "premRestoreAccountData": {
+    "pl": "Przywróć dane konta",
+    "en": "Restore account data"
+  },
+  "premUpdateWithCurrent": {
+    "pl": "Zaktualizuj konto tymi danymi",
+    "en": "Update account with this data"
+  },
+  "premConfirmIdentity": {
+    "pl": "Potwierdź tożsamość",
+    "en": "Confirm identity"
+  },
+  "premVerifyEmailSent": {
+    "pl": "Wysłaliśmy wiadomość na {email}. Możesz kliknąć link weryfikacyjny w mailu albo wpisać kod poniżej (sprawdź też folder Spam).",
+    "en": "We sent a message to {email}. You can tap the verification link in the email or enter the code below (check Spam too).",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "premVerificationCode": {
+    "pl": "Kod weryfikacyjny",
+    "en": "Verification code"
+  },
+  "premCodeHint": {
+    "pl": "np. 123456",
+    "en": "e.g. 123456"
+  },
+  "premEnterFullCode": {
+    "pl": "Wpisz pełny kod z maila (min. 6 znaków).",
+    "en": "Enter the full code from the email (min. 6 characters)."
+  },
+  "premLoggedInMergeError": {
+    "pl": "Zalogowano. Błąd przenoszenia danych: {error}",
+    "en": "Signed in. Data transfer error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premVerifyErrorTitle": {
+    "pl": "Błąd weryfikacji",
+    "en": "Verification error"
+  },
+  "premVerifyErrorBody": {
+    "pl": "Kod wygasł lub jest nieprawidłowy. Wyślij ponownie.",
+    "en": "The code expired or is invalid. Send it again."
+  },
+  "premConfirm": {
+    "pl": "Zatwierdź",
+    "en": "Confirm"
+  },
+  "premConnErrorTitle": {
+    "pl": "Błąd połączenia",
+    "en": "Connection error"
+  },
+  "premConnErrorBody": {
+    "pl": "Nie udało się połączyć z płatnościami. Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl",
+    "en": "Could not connect to payments. Try again shortly or email us: contact@latwaforma.pl"
+  },
+  "premLoginToBuy": {
+    "pl": "Aby wykupić Premium, zaloguj się (Apple, Google albo e-mail z kodem powyżej).",
+    "en": "To buy Premium, sign in (Apple, Google, or email with the code above)."
+  },
+  "premCodeNotForOnce": {
+    "pl": "Ten kod nie działa przy płatności jednorazowej.",
+    "en": "This code does not work with one-time payment."
+  },
+  "premTryLaterContact": {
+    "pl": "Spróbuj za chwilę ponownie lub napisz do nas: contact@latwaforma.pl",
+    "en": "Try again shortly or email us: contact@latwaforma.pl"
+  },
+  "premOpenPaymentFailed": {
+    "pl": "Nie udało się otworzyć płatności",
+    "en": "Could not open payment"
+  },
+  "premCannotOpenPaymentPage": {
+    "pl": "Nie można otworzyć strony płatności.",
+    "en": "Could not open the payment page."
+  },
+  "premCheckoutSessionError": {
+    "pl": "Błąd tworzenia sesji płatności.",
+    "en": "Could not create the payment session."
+  },
+  "premTryLaterContactShort": {
+    "pl": "Spróbuj za chwilę lub napisz do nas: contact@latwaforma.pl",
+    "en": "Try again shortly or email us: contact@latwaforma.pl"
+  },
+  "premLoginToUseCode": {
+    "pl": "Aby użyć kodu, zaloguj się (Apple, Google albo e-mail).",
+    "en": "To use a code, sign in (Apple, Google, or email)."
+  },
+  "premCodeSheetFailed": {
+    "pl": "Nie udało się otworzyć wpisywania kodu. Spróbuj ponownie.",
+    "en": "Could not open the code entry sheet. Please try again."
+  },
+  "premEnterCode": {
+    "pl": "Wpisz kod.",
+    "en": "Enter a code."
+  },
+  "premPlayStoreFailed": {
+    "pl": "Nie udało się otworzyć Sklepu Play.",
+    "en": "Could not open the Play Store."
+  },
+  "premLoginToBuyMobile": {
+    "pl": "Aby wykupić Premium, zaloguj się (Google, Apple lub e-mail z kodem powyżej).",
+    "en": "To buy Premium, sign in (Google, Apple, or email with the code above)."
+  },
+  "premThanksActive": {
+    "pl": "Dziękujemy! Premium powinno być już aktywne. Jeśli funkcje są jeszcze zablokowane, odczekaj chwilę lub wróć do aplikacji.",
+    "en": "Thank you! Premium should now be active. If features are still locked, wait a moment or reopen the app."
+  },
+  "premPurchasePending": {
+    "pl": "Zakup zakończony. Status Premium odświeży się za chwilę. Jeśli nie – użyj „Przywróć zakupy”.",
+    "en": "Purchase finished. Premium status will refresh shortly. If not — use “Restore purchases”."
+  },
+  "premInfo": {
+    "pl": "Informacja",
+    "en": "Info"
+  },
+  "premPurchaseErrorTitle": {
+    "pl": "Błąd zakupu",
+    "en": "Purchase error"
+  },
+  "premPurchaseErrorBody": {
+    "pl": "Nie udało się dokończyć zakupu. Sprawdź połączenie i konfigurację sklepu, albo napisz: contact@latwaforma.pl\n\n{error}",
+    "en": "Could not complete the purchase. Check your connection and store setup, or email: contact@latwaforma.pl\n\n{error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premLoginToRestore": {
+    "pl": "Zaloguj się, aby przywrócić zakupy.",
+    "en": "Sign in to restore purchases."
+  },
+  "premRestoredTitle": {
+    "pl": "Zakupy przywrócone",
+    "en": "Purchases restored"
+  },
+  "premNoPurchasesTitle": {
+    "pl": "Brak aktywnych zakupów",
+    "en": "No active purchases"
+  },
+  "premRestoredBody": {
+    "pl": "Twoje Premium zostało przywrócone. Jeśli nie widzisz odblokowania, odczekaj chwilę.",
+    "en": "Your Premium has been restored. If you don't see unlocks yet, wait a moment."
+  },
+  "premNoPurchasesBody": {
+    "pl": "Nie znaleziono aktywnej subskrypcji powiązanej z tym kontem sklepu.",
+    "en": "No active subscription was found for this store account."
+  },
+  "premRestoreFailed": {
+    "pl": "Nie udało się przywrócić zakupów: {error}",
+    "en": "Could not restore purchases: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premSubscription": {
+    "pl": "Subskrypcja",
+    "en": "Subscription"
+  },
+  "premManageHint": {
+    "pl": "Otwórz ustawienia subskrypcji w sklepie Apple / Google, aby anulować lub zarządzać Premium.",
+    "en": "Open subscription settings in the Apple / Google store to cancel or manage Premium."
+  },
+  "premSessionExpired": {
+    "pl": "Sesja wygasła",
+    "en": "Session expired"
+  },
+  "premLoginAgain": {
+    "pl": "Zaloguj się ponownie.",
+    "en": "Please sign in again."
+  },
+  "premPortalHintWeb": {
+    "pl": "Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.",
+    "en": "Refresh the page (F5) and try again. If it keeps happening, sign out and sign back in."
+  },
+  "premPortalHintMobile": {
+    "pl": "Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.",
+    "en": "Sign out in Profile and sign back in, then try “Cancel subscription” again."
+  },
+  "premCannotOpenPortal": {
+    "pl": "Nie można otworzyć portalu.",
+    "en": "Could not open the portal."
+  },
+  "premPortalOpenError": {
+    "pl": "Błąd otwierania portalu.",
+    "en": "Could not open the portal."
+  },
+  "premSessionExpiredCancel": {
+    "pl": "Sesja wygasła. Wyloguj się w profilu i zaloguj ponownie, potem spróbuj „Anuluj subskrypcję” jeszcze raz.",
+    "en": "Session expired. Sign out in Profile and sign back in, then try “Cancel subscription” again."
+  },
+  "premErrorWithDetail": {
+    "pl": "Błąd: {error}",
+    "en": "Error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premActivatedEnjoy": {
+    "pl": "Premium aktywowane. Ciesz się pełnym dostępem!",
+    "en": "Premium activated. Enjoy full access!"
+  },
+  "premLoginToBuyCard": {
+    "pl": "Aby wykupić Premium, potrzebne jest konto. Zaloguj się przez Google, Apple albo podaj adres e-mail – wyślemy wiadomość z linkiem weryfikacyjnym i kodem.",
+    "en": "To buy Premium you need an account. Sign in with Google, Apple, or enter your email — we'll send a verification link and code."
+  },
+  "premSigningIn": {
+    "pl": "Logowanie…",
+    "en": "Signing in…"
+  },
+  "premContinueGoogle": {
+    "pl": "Kontynuuj z Google",
+    "en": "Continue with Google"
+  },
+  "premContinueApple": {
+    "pl": "Kontynuuj z Apple",
+    "en": "Continue with Apple"
+  },
+  "premOrEmail": {
+    "pl": "lub e-mail:",
+    "en": "or email:"
+  },
+  "premEmailLabel": {
+    "pl": "Adres e-mail",
+    "en": "Email address"
+  },
+  "premEmailHint": {
+    "pl": "np. jan@example.com",
+    "en": "e.g. jane@example.com"
+  },
+  "premSending": {
+    "pl": "Wysyłam…",
+    "en": "Sending…"
+  },
+  "premSendCode": {
+    "pl": "Wyślij kod",
+    "en": "Send code"
+  },
+  "premConfirmIdentityHint": {
+    "pl": "Potwierdź tożsamość: wpisz poniżej kod z maila albo kliknij link weryfikacyjny w wiadomości (sprawdź też folder Spam).",
+    "en": "Confirm identity: enter the code from the email below or tap the verification link in the message (check Spam too)."
+  },
+  "premChecking": {
+    "pl": "Sprawdzam…",
+    "en": "Checking…"
+  },
+  "premConfirmAndSignIn": {
+    "pl": "Zatwierdź i zaloguj",
+    "en": "Confirm and sign in"
+  },
+  "premResendOtherEmail": {
+    "pl": "Wyślij kod ponownie na inny adres",
+    "en": "Send code again to another address"
+  },
+  "profTitle": {
+    "pl": "Profil",
+    "en": "Profile"
+  },
+  "profNotifications": {
+    "pl": "Powiadomienia",
+    "en": "Notifications"
+  },
+  "profNoProfile": {
+    "pl": "Brak profilu",
+    "en": "No profile"
+  },
+  "profErrorWithDetail": {
+    "pl": "Błąd: {error}",
+    "en": "Error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profAccountGoogle": {
+    "pl": "Konto Google",
+    "en": "Google account"
+  },
+  "profAccountEmail": {
+    "pl": "Konto e-mail",
+    "en": "Email account"
+  },
+  "profAccountSignedIn": {
+    "pl": "Konto zalogowane",
+    "en": "Signed-in account"
+  },
+  "profSignOutTitle": {
+    "pl": "Wyloguj się",
+    "en": "Sign out"
+  },
+  "profSignOutBody": {
+    "pl": "Czy na pewno chcesz się wylogować? Możesz ponownie zalogować się później.",
+    "en": "Are you sure you want to sign out? You can sign in again later."
+  },
+  "profSignOutConfirm": {
+    "pl": "Wyloguj",
+    "en": "Sign out"
+  },
+  "profDeleteAccountTitle": {
+    "pl": "Usuń konto",
+    "en": "Delete account"
+  },
+  "profDeleteAccountBody": {
+    "pl": "Twoje dane zostaną całkowicie usunięte i nie będzie można ich przywrócić. Gdy wrócisz do aplikacji, trzeba będzie uzupełnić profil od nowa.\n\nJeśli masz subskrypcję Premium w Google Play lub App Store, anuluj ją osobno w sklepie – usunięcie konta jej nie kończy.\n\nCzy na pewno chcesz usunąć konto?",
+    "en": "Your data will be permanently deleted and cannot be restored. When you return to the app, you'll need to set up your profile again.\n\nIf you have a Premium subscription in Google Play or the App Store, cancel it separately in the store — deleting the account does not end it.\n\nAre you sure you want to delete your account?"
+  },
+  "profAccountDeleted": {
+    "pl": "Konto zostało usunięte",
+    "en": "Account deleted"
+  },
+  "profDeleteUnavailable": {
+    "pl": "Usługa usuwania konta jest niedostępna. Skontaktuj się z nami: {email}",
+    "en": "Account deletion is unavailable. Contact us: {email}",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "profSessionExpiredRetry": {
+    "pl": "Sesja wygasła. Zaloguj się ponownie i spróbuj jeszcze raz.",
+    "en": "Session expired. Sign in again and try once more."
+  },
+  "profNoPermission": {
+    "pl": "Brak uprawnień do wykonania tej operacji.",
+    "en": "You don't have permission to do this."
+  },
+  "profDeleteFailed": {
+    "pl": "Nie udało się usunąć konta. Spróbuj ponownie później.",
+    "en": "Could not delete the account. Please try again later."
+  },
+  "profInviteTitle": {
+    "pl": "Zaproś znajomego",
+    "en": "Invite a friend"
+  },
+  "profInviteBody": {
+    "pl": "Podaj adres e-mail osoby, której chcesz wysłać zaproszenie do Łatwa Forma.",
+    "en": "Enter the email of the person you want to invite to Łatwa Forma."
+  },
+  "profEmailLabel": {
+    "pl": "Adres e-mail",
+    "en": "Email address"
+  },
+  "profEmailHintFriend": {
+    "pl": "np. znajomy@example.com",
+    "en": "e.g. friend@example.com"
+  },
+  "profSessionExpiredWebInvite": {
+    "pl": "Sesja wygasła. Odśwież stronę (F5) i zaloguj się ponownie, potem wyślij zaproszenie.",
+    "en": "Session expired. Refresh the page (F5), sign in again, then send the invite."
+  },
+  "profLoginAgainRetry": {
+    "pl": "Zaloguj się ponownie i spróbuj jeszcze raz.",
+    "en": "Sign in again and try once more."
+  },
+  "profInviteSent": {
+    "pl": "Zaproszenie wysłane",
+    "en": "Invitation sent"
+  },
+  "profSessionExpiredWebRetry": {
+    "pl": "Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie. Jeśli problem się powtarza, wyloguj się i zaloguj ponownie.",
+    "en": "Session expired. Refresh the page (F5) and try again. If it keeps happening, sign out and sign back in."
+  },
+  "profSessionExpiredInviteMobile": {
+    "pl": "Sesja wygasła. Wyloguj się i zaloguj ponownie, potem wyślij zaproszenie.",
+    "en": "Session expired. Sign out and sign back in, then send the invite."
+  },
+  "profInviteAlreadySent": {
+    "pl": "Na ten adres wysłano już zaproszenie. Sprawdź skrzynkę (w tym spam) lub podaj inny adres.",
+    "en": "An invitation was already sent to this address. Check the inbox (including spam) or use another address."
+  },
+  "profEmailAlreadyRegistered": {
+    "pl": "Ten adres e-mail jest już zarejestrowany w Łatwa Forma. Zaproś kogoś innego.",
+    "en": "This email is already registered in Łatwa Forma. Invite someone else."
+  },
+  "profInviteRateLimit": {
+    "pl": "Zbyt wiele zaproszeń. Poczekaj chwilę i spróbuj ponownie.",
+    "en": "Too many invitations. Wait a moment and try again."
+  },
+  "profEnterValidEmail": {
+    "pl": "Podaj prawidłowy adres e-mail.",
+    "en": "Enter a valid email address."
+  },
+  "profInviteSendFailed": {
+    "pl": "Nie udało się wysłać zaproszenia. Spróbuj ponownie.",
+    "en": "Could not send the invitation. Please try again."
+  },
+  "profSessionExpiredWebShort": {
+    "pl": "Sesja wygasła. Odśwież stronę (F5) i spróbuj ponownie.",
+    "en": "Session expired. Refresh the page (F5) and try again."
+  },
+  "profSessionExpiredSignOutIn": {
+    "pl": "Sesja wygasła. Wyloguj się i zaloguj ponownie.",
+    "en": "Session expired. Sign out and sign back in."
+  },
+  "profSendInvite": {
+    "pl": "Wyślij zaproszenie",
+    "en": "Send invitation"
+  },
+  "profInviteSentExclaim": {
+    "pl": "Zaproszenie wysłane!",
+    "en": "Invitation sent!"
+  },
+  "profSaveProgress": {
+    "pl": "Zapisz postępy",
+    "en": "Save progress"
+  },
+  "profSaveProgressHint": {
+    "pl": "Zaloguj się przez Apple, Google albo e-mail, aby nie stracić danych",
+    "en": "Sign in with Apple, Google, or email so you don't lose your data"
+  },
+  "profBasicData": {
+    "pl": "Dane podstawowe",
+    "en": "Basic info"
+  },
+  "profGender": {
+    "pl": "Płeć",
+    "en": "Gender"
+  },
+  "profAge": {
+    "pl": "Wiek",
+    "en": "Age"
+  },
+  "profAgeYears": {
+    "pl": "{age} lat",
+    "en": "{age} years",
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "profHeight": {
+    "pl": "Wzrost",
+    "en": "Height"
+  },
+  "profCurrentWeight": {
+    "pl": "Aktualna waga",
+    "en": "Current weight"
+  },
+  "profTargetWeight": {
+    "pl": "Waga docelowa",
+    "en": "Target weight"
+  },
+  "profActivityLevel": {
+    "pl": "Poziom aktywności",
+    "en": "Activity level"
+  },
+  "profGoal": {
+    "pl": "Cel",
+    "en": "Goal"
+  },
+  "profCalculations": {
+    "pl": "Obliczenia",
+    "en": "Calculations"
+  },
+  "profBmrExplain": {
+    "pl": "Zapotrzebowanie kaloryczne w spoczynku – ile kalorii spalasz bez aktywności.",
+    "en": "Resting calorie needs — how many calories you burn with no activity."
+  },
+  "profTdeeExplain": {
+    "pl": "Całkowite dzienne zapotrzebowanie – ile kalorii spalasz w ciągu dnia z uwzględnieniem aktywności.",
+    "en": "Total daily energy expenditure — calories burned in a day including activity."
+  },
+  "profCalorieGoalExplain": {
+    "pl": "Zalecane dzienne spożycie kalorii do osiągnięcia celu wagowego.",
+    "en": "Recommended daily calorie intake to reach your weight goal."
+  },
+  "profWaterGoal": {
+    "pl": "Cel picia wody",
+    "en": "Water goal"
+  },
+  "profWaterGoalExplanation": {
+    "pl": "Obliczone z Twojej wagi: {mlPerKg} ml na każdy kg ({weightKg} kg → ok. {rawMl} ml, zaokrąglone do {goalMl} ml). Możesz zmienić cel ręcznie.",
+    "en": "Calculated from your weight: {mlPerKg} ml per kg ({weightKg} kg → about {rawMl} ml, rounded to {goalMl} ml). You can change the goal manually.",
+    "placeholders": {
+      "mlPerKg": {
+        "type": "int"
+      },
+      "weightKg": {
+        "type": "String"
+      },
+      "rawMl": {
+        "type": "int"
+      },
+      "goalMl": {
+        "type": "int"
+      }
+    }
+  },
+  "profMacros": {
+    "pl": "Makro",
+    "en": "Macros"
+  },
+  "profProtein": {
+    "pl": "Białko",
+    "en": "Protein"
+  },
+  "profFat": {
+    "pl": "Tłuszcze",
+    "en": "Fat"
+  },
+  "profCarbs": {
+    "pl": "Węglowodany",
+    "en": "Carbs"
+  },
+  "profCarbsShort": {
+    "pl": "Węgle",
+    "en": "Carbs"
+  },
+  "profTargetDateTitle": {
+    "pl": "Termin osiągnięcia celu:",
+    "en": "Target date:"
+  },
+  "profTargetDateHint": {
+    "pl": "Działaj zgodnie z planem, a ten dzień się nie opóźni.",
+    "en": "Stick to the plan and this day won't slip."
+  },
+  "profSpeedUpHint": {
+    "pl": "Chcesz przyspieszyć cel? Edytuj tempo zmiany wagi w trybie edycji profilu (ikona ołówka u góry).",
+    "en": "Want to reach your goal sooner? Edit the weight-change rate in profile edit mode (pencil icon at the top)."
+  },
+  "profAiAdvice": {
+    "pl": "Porada AI",
+    "en": "AI advice"
+  },
+  "profAiAdviceHint": {
+    "pl": "Zapytaj o dietę, odżywianie i aktywność",
+    "en": "Ask about diet, nutrition, and activity"
+  },
+  "profBmiTitle": {
+    "pl": "Kalkulator BMI",
+    "en": "BMI calculator"
+  },
+  "profBmiHint": {
+    "pl": "Sprawdź swój wskaźnik masy ciała",
+    "en": "Check your body mass index"
+  },
+  "profTrialLeft": {
+    "pl": "Pozostało: {hours}h {minutes}min",
+    "en": "Left: {hours}h {minutes}min",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "profPremiumTitleActive": {
+    "pl": "Łatwa Forma Premium",
+    "en": "Łatwa Forma Premium"
+  },
+  "profPremiumTitle": {
+    "pl": "Subskrypcja Premium",
+    "en": "Premium subscription"
+  },
+  "profActive": {
+    "pl": "Aktywna",
+    "en": "Active"
+  },
+  "profPremiumHintActive": {
+    "pl": "Nieograniczona AI, eksport PDF, integracje",
+    "en": "Unlimited AI, PDF export, integrations"
+  },
+  "profPremiumHint": {
+    "pl": "Odblokuj pełny potencjał – AI, PDF, integracje",
+    "en": "Unlock full potential — AI, PDF, integrations"
+  },
+  "profIntegrations": {
+    "pl": "Integracje",
+    "en": "Integrations"
+  },
+  "profIntegrationsHint": {
+    "pl": "Strava – importuj aktywności i spalone kalorie",
+    "en": "Strava — import activities and calories burned"
+  },
+  "profExport": {
+    "pl": "Eksport danych",
+    "en": "Data export"
+  },
+  "profExportHint": {
+    "pl": "Wyeksportuj swoje dane do CSV",
+    "en": "Export your data to CSV"
+  },
+  "profInviteHint": {
+    "pl": "Wyślij zaproszenie e-mailem do aplikacji Łatwa Forma",
+    "en": "Send an email invite to the Łatwa Forma app"
+  },
+  "profPrivacy": {
+    "pl": "Polityka prywatności",
+    "en": "Privacy policy"
+  },
+  "profTerms": {
+    "pl": "Regulamin",
+    "en": "Terms of service"
+  },
+  "profEula": {
+    "pl": "Terms of Use (EULA)",
+    "en": "Terms of Use (EULA)"
+  },
+  "profDeleteAccountPage": {
+    "pl": "Usuń konto (strona)",
+    "en": "Delete account (web)"
+  },
+  "profYourAccount": {
+    "pl": "Twoje konto",
+    "en": "Your account"
+  },
+  "profDeviceData": {
+    "pl": "Dane na tym urządzeniu",
+    "en": "Data on this device"
+  },
+  "profDeviceDataHint": {
+    "pl": "Korzystasz bez konta. Możesz usunąć zapisany profil i posiłki z tego urządzenia.",
+    "en": "You're using the app without an account. You can delete the saved profile and meals from this device."
+  },
+  "profDeleteData": {
+    "pl": "Usuń dane",
+    "en": "Delete data"
+  },
+  "profGenderMale": {
+    "pl": "Mężczyzna",
+    "en": "Male"
+  },
+  "profGenderFemale": {
+    "pl": "Kobieta",
+    "en": "Female"
+  },
+  "profGenderOther": {
+    "pl": "Inna",
+    "en": "Other"
+  },
+  "profActSedentary": {
+    "pl": "Siedzący",
+    "en": "Sedentary"
+  },
+  "profActLight": {
+    "pl": "Lekka",
+    "en": "Light"
+  },
+  "profActModerate": {
+    "pl": "Umiarkowana",
+    "en": "Moderate"
+  },
+  "profActIntense": {
+    "pl": "Intensywna",
+    "en": "Intense"
+  },
+  "profActVeryIntense": {
+    "pl": "Bardzo intensywna",
+    "en": "Very intense"
+  },
+  "profGoalLoss": {
+    "pl": "Utrata wagi",
+    "en": "Weight loss"
+  },
+  "profGoalGain": {
+    "pl": "Przybranie wagi",
+    "en": "Weight gain"
+  },
+  "profGoalMaintain": {
+    "pl": "Utrzymanie wagi",
+    "en": "Maintain weight"
+  },
+  "profGenderRequired": {
+    "pl": "Płeć *",
+    "en": "Gender *"
+  },
+  "profAgeRequired": {
+    "pl": "Wiek *",
+    "en": "Age *"
+  },
+  "profYearsSuffix": {
+    "pl": "lat",
+    "en": "yrs"
+  },
+  "profHeightRequired": {
+    "pl": "Wzrost (cm) *",
+    "en": "Height (cm) *"
+  },
+  "profCurrentWeightRequired": {
+    "pl": "Aktualna waga (kg) *",
+    "en": "Current weight (kg) *"
+  },
+  "profTargetWeightRequired": {
+    "pl": "Waga docelowa (kg) *",
+    "en": "Target weight (kg) *"
+  },
+  "profWeightDiffError": {
+    "pl": "Różnica między wagami musi wynosić co najmniej 1 kg",
+    "en": "The difference between weights must be at least 1 kg"
+  },
+  "profActivityRequired": {
+    "pl": "Poziom aktywności *",
+    "en": "Activity level *"
+  },
+  "profActSedentaryDesc": {
+    "pl": "Brak aktywności lub minimalna",
+    "en": "No activity or minimal"
+  },
+  "profActLightDesc": {
+    "pl": "1-3 treningi / tydzień",
+    "en": "1–3 workouts / week"
+  },
+  "profActModerateDesc": {
+    "pl": "3-5 treningów / tydzień",
+    "en": "3–5 workouts / week"
+  },
+  "profActIntenseDesc": {
+    "pl": "6-7 treningów / tydzień",
+    "en": "6–7 workouts / week"
+  },
+  "profActVeryIntenseDesc": {
+    "pl": "2x dziennie / ciężka praca",
+    "en": "2× daily / hard physical work"
+  },
+  "profWaterGoalMl": {
+    "pl": "Cel wody (ml)",
+    "en": "Water goal (ml)"
+  },
+  "profWaterGoalHelper": {
+    "pl": "Możesz zmienić ręcznie. Poniżej wyjaśnienie, skąd bierze się propozycja.",
+    "en": "You can change it manually. Below is how the suggestion is calculated."
+  },
+  "profSaveChanges": {
+    "pl": "Zapisz zmiany",
+    "en": "Save changes"
+  },
+  "profWantLose": {
+    "pl": "Chcę schudnąć.",
+    "en": "I want to lose weight."
+  },
+  "profWantGain": {
+    "pl": "Chcę przybrać na wadze.",
+    "en": "I want to gain weight."
+  },
+  "profWantMaintain": {
+    "pl": "Chcę utrzymać obecną wagę.",
+    "en": "I want to maintain my current weight."
+  },
+  "profAdjustPlan": {
+    "pl": "Dostosuj plan",
+    "en": "Adjust plan"
+  },
+  "profPlanPremiumOnly": {
+    "pl": "Własny cel kaloryczny i makroskładniki są dostępne w Premium.",
+    "en": "Custom calorie goal and macros are available with Premium."
+  },
+  "profSeePremium": {
+    "pl": "Zobacz Premium",
+    "en": "See Premium"
+  },
+  "profWeightRate": {
+    "pl": "Tempo zmiany wagi",
+    "en": "Weight change rate"
+  },
+  "profRateKgWeek": {
+    "pl": "{rate} kg/tydz.",
+    "en": "{rate} kg/week",
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "profRateZero": {
+    "pl": "0 kg/tydz.",
+    "en": "0 kg/week"
+  },
+  "profMaintainRateZero": {
+    "pl": "Dla utrzymania wagi tempo = 0",
+    "en": "For weight maintenance the rate is 0"
+  },
+  "profRecommendedRate": {
+    "pl": "Zalecane tempo: 0,5 kg/tydz. – bezpieczne i zdrowe. Szybsze chudnięcie może być niezdrowe (utrata mięśni, niedobory, zmęczenie).",
+    "en": "Recommended rate: 0.5 kg/week — safe and healthy. Faster loss can be unhealthy (muscle loss, deficiencies, fatigue)."
+  },
+  "profEstTargetDate": {
+    "pl": "Szacunkowy termin osiągnięcia celu: {date}",
+    "en": "Estimated target date: {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profMoveSlider": {
+    "pl": "Przesuń suwak, aby zobaczyć plan",
+    "en": "Move the slider to see the plan"
+  },
+  "profCustomCalorieGoal": {
+    "pl": "Własny cel kaloryczny",
+    "en": "Custom calorie goal"
+  },
+  "profGoalKcal": {
+    "pl": "Cel (kcal)",
+    "en": "Goal (kcal)"
+  },
+  "profLeaveEmptyFromRate": {
+    "pl": "Zostaw puste, aby obliczyć z tempa.",
+    "en": "Leave empty to calculate from the rate."
+  },
+  "profCustomMacros": {
+    "pl": "Własne makroskładniki",
+    "en": "Custom macros"
+  },
+  "profMacrosAutoRecalc": {
+    "pl": "Kalorie i termin przeliczą się automatycznie.",
+    "en": "Calories and date will recalculate automatically."
+  },
+  "profMacroSum": {
+    "pl": "Suma: {kcal} kcal",
+    "en": "Total: {kcal} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroPerGram": {
+    "pl": "1g = {kcal} kcal",
+    "en": "1g = {kcal} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "profValuesNotNegative": {
+    "pl": "Wartości nie mogą być ujemne.",
+    "en": "Values cannot be negative."
+  },
+  "profMacroMaxProtein": {
+    "pl": "białko max {g} g",
+    "en": "protein max {g} g",
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroMaxFat": {
+    "pl": "tłuszcze max {g} g",
+    "en": "fat max {g} g",
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroMaxCarbs": {
+    "pl": "węglowodany max {g} g",
+    "en": "carbs max {g} g",
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroOverLimit": {
+    "pl": "⚠️ Wartości przekraczają zalecane limity dzienne: {parts}. Wprowadź realistyczne wartości dla zdrowej diety.",
+    "en": "⚠️ Values exceed recommended daily limits: {parts}. Enter realistic values for a healthy diet.",
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroCaloriesUnreal": {
+    "pl": "⚠️ Łączna liczba kalorii ({calories} kcal) jest nierealistyczna dla dziennego zapotrzebowania. Zalecane maksimum to ok. {max} kcal/dzień.",
+    "en": "⚠️ Total calories ({calories} kcal) are unrealistic for daily needs. Recommended max is about {max} kcal/day.",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroLossSurplus": {
+    "pl": "Twój cel to chudnięcie (waga docelowa niższa niż obecna), ale wprowadzone makroskładniki dają {surplus} kcal powyżej zapotrzebowania (TDEE: {tdee} kcal). Zmniejsz kalorie/makroskładniki, aby osiągnąć deficyt.",
+    "en": "Your goal is weight loss (target below current), but the macros give {surplus} kcal above needs (TDEE: {tdee} kcal). Lower calories/macros to create a deficit.",
+    "placeholders": {
+      "surplus": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroGainDeficit": {
+    "pl": "Twój cel to przybieranie na wadze (waga docelowa wyższa niż obecna), ale wprowadzone makroskładniki dają deficyt (TDEE: {tdee} kcal). Zwiększ kalorie/makroskładniki, aby osiągnąć nadwyżkę.",
+    "en": "Your goal is weight gain (target above current), but the macros create a deficit (TDEE: {tdee} kcal). Increase calories/macros to create a surplus.",
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnCalAboveTdeeLoss": {
+    "pl": "⚠️ Cel kaloryczny jest wyższy niż TDEE ({tdee} kcal). Aby schudnąć, musisz mieć deficyt kaloryczny. Maksymalny bezpieczny deficyt to ~1100 kcal/dzień (ok. 1 kg/tydzień).",
+    "en": "⚠️ Calorie goal is above TDEE ({tdee} kcal). To lose weight you need a calorie deficit. Max safe deficit is ~1100 kcal/day (about 1 kg/week).",
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnDeficitHuge": {
+    "pl": "⚠️ Deficyt kaloryczny jest bardzo duży ({deficit} kcal/dzień). Zalecany maksymalny deficyt to 1000-1500 kcal/dzień dla bezpiecznej utraty wagi.",
+    "en": "⚠️ Calorie deficit is very large ({deficit} kcal/day). Recommended max deficit is 1000–1500 kcal/day for safe weight loss.",
+    "placeholders": {
+      "deficit": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnDeficitTiny": {
+    "pl": "⚠️ Deficyt kaloryczny jest bardzo mały. Dla skutecznej utraty wagi zalecany jest deficyt 500-1000 kcal/dzień.",
+    "en": "⚠️ Calorie deficit is very small. For effective weight loss, a 500–1000 kcal/day deficit is recommended."
+  },
+  "profWarnCalBelowTdeeGain": {
+    "pl": "⚠️ Cel kaloryczny jest niższy niż TDEE ({tdee} kcal). Aby przybrać na wadze, musisz mieć nadwyżkę kaloryczną. Zalecana nadwyżka to 250-500 kcal/dzień (ok. 0.25-0.5 kg/tydzień).",
+    "en": "⚠️ Calorie goal is below TDEE ({tdee} kcal). To gain weight you need a calorie surplus. Recommended surplus is 250–500 kcal/day (about 0.25–0.5 kg/week).",
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnSurplusHuge": {
+    "pl": "⚠️ Nadwyżka kaloryczna jest bardzo duża ({surplus} kcal/dzień). Zalecana nadwyżka to 250-500 kcal/dzień dla zdrowego przybierania na wadze.",
+    "en": "⚠️ Calorie surplus is very large ({surplus} kcal/day). Recommended surplus is 250–500 kcal/day for healthy weight gain.",
+    "placeholders": {
+      "surplus": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnSurplusTiny": {
+    "pl": "⚠️ Nadwyżka kaloryczna jest bardzo mała. Dla skutecznego przybierania na wadze zalecana jest nadwyżka 250-500 kcal/dzień.",
+    "en": "⚠️ Calorie surplus is very small. For effective weight gain, a 250–500 kcal/day surplus is recommended."
+  },
+  "profWarnMaintainFar": {
+    "pl": "⚠️ Cel kaloryczny różni się znacznie od TDEE ({tdee} kcal). Dla utrzymania wagi cel powinien być zbliżony do TDEE (±100-200 kcal).",
+    "en": "⚠️ Calorie goal differs a lot from TDEE ({tdee} kcal). For maintenance it should be close to TDEE (±100–200 kcal).",
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profCannotSaveLoss": {
+    "pl": "Nie można zapisać: Cel kaloryczny ({calories} kcal) jest wyższy niż TDEE ({tdee} kcal). Aby schudnąć, musisz mieć deficyt kaloryczny.",
+    "en": "Cannot save: Calorie goal ({calories} kcal) is above TDEE ({tdee} kcal). To lose weight you need a calorie deficit.",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profCannotSaveGain": {
+    "pl": "Nie można zapisać: Cel kaloryczny ({calories} kcal) jest niższy niż TDEE ({tdee} kcal). Aby przybrać na wadze, musisz mieć nadwyżkę kaloryczną.",
+    "en": "Cannot save: Calorie goal ({calories} kcal) is below TDEE ({tdee} kcal). To gain weight you need a calorie surplus.",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profUserNotLoggedIn": {
+    "pl": "Użytkownik nie jest zalogowany",
+    "en": "User is not signed in"
+  },
+  "profGoalHistoryEdit": {
+    "pl": "Edycja profilu",
+    "en": "Profile edit"
+  },
+  "profUpdatedSuccess": {
+    "pl": "Profil zaktualizowany pomyślnie! Cel został przeliczony.",
+    "en": "Profile updated successfully! Your goal was recalculated."
+  },
+  "profSaveError": {
+    "pl": "Błąd podczas zapisywania: {error}",
+    "en": "Error while saving: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profCalorieGoal": {
+    "pl": "Cel kaloryczny",
+    "en": "Calorie goal"
+  }
+}

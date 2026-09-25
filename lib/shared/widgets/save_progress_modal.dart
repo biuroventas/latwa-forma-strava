@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Modal wyświetlany użytkownikowi anonimowemu po dodaniu określonej liczby posiłków.
@@ -12,6 +13,9 @@ class SaveProgressModal extends StatelessWidget {
     this.onLinkApple,
     this.onLinkGoogle,
     this.onEnterCode,
+    this.allowDismiss = true,
+    this.titleText,
+    this.bodyText,
   });
 
   final int mealsCount;
@@ -21,6 +25,9 @@ class SaveProgressModal extends StatelessWidget {
   final VoidCallback? onLinkGoogle;
   /// Gdy podane – pokazuje link „Mam już kod z maila”, żeby dokończyć weryfikację bez ponownego wysyłania.
   final VoidCallback? onEnterCode;
+  final bool allowDismiss;
+  final String? titleText;
+  final String? bodyText;
 
   static const String _prefKey = 'save_progress_modal_dismissed';
 
@@ -37,12 +44,13 @@ class SaveProgressModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
       title: Row(
         children: [
           Icon(Icons.save_alt, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 8),
-          const Text('Zapisz postępy'),
+          Text(titleText ?? l10n.onbSaveProgressTitle),
         ],
       ),
       content: Column(
@@ -50,16 +58,15 @@ class SaveProgressModal extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            mealsCount > 0
-                ? 'Masz już $mealsCount posiłków! '
-                  'Zaloguj się, aby nie stracić danych przy reinstalacji aplikacji.'
-                : 'Załóż konto, żeby Twoje posiłki, aktywności i waga były zapisane w chmurze '
-                  'i dostępne na każdym urządzeniu – nic nie zginie przy reinstalacji.',
+            bodyText ??
+                (mealsCount > 0
+                    ? l10n.onbSaveProgressBodyWithMeals(count: mealsCount)
+                    : l10n.onbSaveProgressBodyEmpty),
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
           Text(
-            'Wybierz sposób logowania:',
+            l10n.onbChooseLoginMethod,
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 16),
@@ -72,7 +79,7 @@ class SaveProgressModal extends StatelessWidget {
                   onLinkApple!();
                 },
                 icon: const Icon(Icons.apple, size: 20),
-                label: const Text('Kontynuuj z Apple'),
+                label: Text(l10n.onbContinueApple),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -87,7 +94,7 @@ class SaveProgressModal extends StatelessWidget {
                   onLinkGoogle!();
                 },
                 icon: const Icon(Icons.g_mobiledata, size: 24),
-                label: const Text('Kontynuuj z Google'),
+                label: Text(l10n.onbContinueGoogle),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -101,7 +108,7 @@ class SaveProgressModal extends StatelessWidget {
                 onLinkEmail();
               },
               icon: const Icon(Icons.email, size: 20),
-              label: const Text('Kontynuuj z emailem'),
+              label: Text(l10n.onbContinueWithEmail),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
@@ -116,7 +123,7 @@ class SaveProgressModal extends StatelessWidget {
                   onEnterCode!();
                 },
                 child: Text(
-                  'Mam już kod z maila – wpisz go',
+                  l10n.onbEnterCodeLink,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontSize: 14,
@@ -130,11 +137,10 @@ class SaveProgressModal extends StatelessWidget {
               Navigator.of(context).pop();
               onDismiss();
             },
-            child: const Text('Później'),
+            child: Text(allowDismiss ? l10n.onbLater : l10n.guestTrialViewOnly),
           ),
         ],
       ),
     );
   }
 }
-

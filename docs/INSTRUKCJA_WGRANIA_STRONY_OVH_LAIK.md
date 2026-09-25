@@ -78,7 +78,7 @@ Pełna ścieżka (do wklejenia w „Idź do folderu” w Finderze, jeśli nie wi
 Potrzebujesz **pięciu plików** z tego projektu:
 
 | Co wgrać na serwer | Skąd wziąć na komputerze |
-|--------------------|---------------------------|
+| --- | --- |
 | **index.html** | Folder **Latwa_Forma** → w środku folder **landing_latwaforma_pl** → plik **index.html** |
 | **polityka-prywatnosci.html** | Folder **Latwa_Forma** → w środku folder **web** → plik **polityka-prywatnosci.html** |
 | **regulamin.html** | Folder **Latwa_Forma** → w środku folder **web** → plik **regulamin.html** |
@@ -122,7 +122,7 @@ Jeśli widzisz błąd „Strona nie działa” lub pustą stronę – wróć do 
 ## Przydatne linki (do zapisania)
 
 | Do czego | Link |
-|----------|------|
+| --- | --- |
 | Panel OVH (logowanie) | https://www.ovh.com/manager/ |
 | Strona FTP tego hostingu (po zalogowaniu) | https://www.ovh.com/manager/#/web/hosting/latwafe.cluster121.hosting.ovh.net/ftp |
 | Twoja strona (dopóki trwa transfer domeny) | http://latwafe.cluster121.hosting.ovh.net |
@@ -145,7 +145,7 @@ Jeśli napiszesz, na którym kroku jesteś i co dokładnie widzisz na ekranie, m
 Kolejność ma znaczenie. Szczegóły znajdziesz w **docs/INSTRUKCJA_WDROZENIA_LAIK.md** (Części 5–7) oraz **docs/OVH_CO_DALEJ.md**.
 
 | Krok | Co zrobić | Gdzie |
-|------|-----------|--------|
+| --- | --- | --- |
 | **1** | **Domena** – gdy transfer latwaforma.pl się skończy, sprawdź w OVH (Domeny → latwaforma.pl → Strefa DNS), czy domena wskazuje na hosting. | Panel OVH |
 | **2** | **SSL (https)** – w panelu OVH: Hosting → latwaforma.pl → zakładka **Certyfikaty SSL** → włącz **Let's Encrypt** dla latwaforma.pl. Po kilku minutach strona będzie pod **https://latwaforma.pl**. | Panel OVH |
 | **3** | **Poczta e-mail** – w OVH (Hosting lub sekcja E-mail) załóż skrzynki: **contact@latwaforma.pl**, **norbert.wroblewski@latwaforma.pl**. Ustaw hasła i zapisz je. | Panel OVH |

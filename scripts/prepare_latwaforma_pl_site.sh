@@ -14,6 +14,8 @@ cp "$ROOT/web/polityka-prywatnosci.html" "$OUT/"
 cp "$ROOT/web/regulamin.html" "$OUT/"
 cp "$ROOT/web/privacy.html" "$OUT/"
 cp "$ROOT/web/terms.html" "$OUT/"
+cp "$ROOT/web/usun-konto.html" "$OUT/"
+cp "$ROOT/web/delete-account.html" "$OUT/"
 # auth_redirect – opcjonalnie, jeśli chcesz magic link na tej samej domenie
 mkdir -p "$OUT/auth_redirect"
 cp "$ROOT/web/auth_redirect/index.html" "$OUT/auth_redirect/" 2>/dev/null || true

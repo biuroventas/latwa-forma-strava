@@ -1,0 +1,788 @@
+{
+  "onbContinueApple": {
+    "pl": "Kontynuuj z Apple",
+    "en": "Continue with Apple"
+  },
+  "onbContinueGoogle": {
+    "pl": "Kontynuuj z Google",
+    "en": "Continue with Google"
+  },
+  "onbContinueWithEmail": {
+    "pl": "Kontynuuj z emailem",
+    "en": "Continue with email"
+  },
+  "onbStartWithoutAccount": {
+    "pl": "Zacznij bez konta",
+    "en": "Start without an account"
+  },
+  "onbCreateAccount": {
+    "pl": "Załóż konto",
+    "en": "Create account"
+  },
+  "onbCreateAccountEmail": {
+    "pl": "Załóż konto e-mailem",
+    "en": "Create account with email"
+  },
+  "onbEnterCodeLink": {
+    "pl": "Mam już kod z maila – wpisz go",
+    "en": "I already have a code from email – enter it"
+  },
+  "onbAlreadyHaveCode": {
+    "pl": "Mam już kod z maila",
+    "en": "I already have a code from email"
+  },
+  "onbLegalPrefix": {
+    "pl": "Korzystając z aplikacji, akceptujesz ",
+    "en": "By using the app, you accept the "
+  },
+  "onbTerms": {
+    "pl": "Regulamin",
+    "en": "Terms of Service"
+  },
+  "onbLegalAnd": {
+    "pl": " i ",
+    "en": " and "
+  },
+  "onbPrivacyPolicyAccusative": {
+    "pl": "Politykę prywatności",
+    "en": "Privacy Policy"
+  },
+  "onbLegalPeriod": {
+    "pl": ".",
+    "en": "."
+  },
+  "onbPrivacyPolicy": {
+    "pl": "Polityka prywatności",
+    "en": "Privacy Policy"
+  },
+  "onbContact": {
+    "pl": "Kontakt",
+    "en": "Contact"
+  },
+  "onbFollowUs": {
+    "pl": "Śledź nas: ",
+    "en": "Follow us: "
+  },
+  "onbSocialComingSoon": {
+    "pl": "{name} – wkrótce",
+    "en": "{name} – coming soon",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCopyrightFull": {
+    "pl": "© 2026 Łatwa Forma | {company}\nNIP {nip} · {address}",
+    "en": "© 2026 Łatwa Forma | {company}\nTax ID {nip} · {address}",
+    "placeholders": {
+      "company": {
+        "type": "String"
+      },
+      "nip": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCopyrightShort": {
+    "pl": "© 2026 Łatwa Forma | {company}\nNIP {nip}",
+    "en": "© 2026 Łatwa Forma | {company}\nTax ID {nip}",
+    "placeholders": {
+      "company": {
+        "type": "String"
+      },
+      "nip": {
+        "type": "String"
+      }
+    }
+  },
+  "onbFeatureCaloriesTitle": {
+    "pl": "Kalorie i makro dopasowane do Ciebie",
+    "en": "Calories and macros tailored to you"
+  },
+  "onbFeatureCaloriesDesc": {
+    "pl": "Dzienny limit i makro pod Twój cel",
+    "en": "Daily limit and macros for your goal"
+  },
+  "onbFeatureWeightTitle": {
+    "pl": "Śledzenie wagi i postępów",
+    "en": "Weight and progress tracking"
+  },
+  "onbFeatureWeightDesc": {
+    "pl": "Waga i zmiany w jednym miejscu",
+    "en": "Weight and changes in one place"
+  },
+  "onbFeaturePlanTitle": {
+    "pl": "Prosty plan do celu",
+    "en": "A simple plan to your goal"
+  },
+  "onbFeaturePlanDesc": {
+    "pl": "Jasna droga do Twojej wagi",
+    "en": "A clear path to your target weight"
+  },
+  "onbFeatureAiTitle": {
+    "pl": "Pomoc AI",
+    "en": "AI help"
+  },
+  "onbFeatureAiDesc": {
+    "pl": "Porady i posiłek ze zdjęcia",
+    "en": "Tips and meals from a photo"
+  },
+  "onbFeatureProductsTitle": {
+    "pl": "Baza produktów",
+    "en": "Product database"
+  },
+  "onbFeatureProductsDesc": {
+    "pl": "Szukaj i skanuj kod kreskowy",
+    "en": "Search and scan barcodes"
+  },
+  "onbBenefitCalories": {
+    "pl": "plan kalorii dopasowany do Ciebie",
+    "en": "a calorie plan tailored to you"
+  },
+  "onbBenefitWeight": {
+    "pl": "śledzenie wagi i postępów",
+    "en": "weight and progress tracking"
+  },
+  "onbBenefitPlan": {
+    "pl": "prosty plan do celu",
+    "en": "a simple plan to your goal"
+  },
+  "onbBenefitAi": {
+    "pl": "pomoc AI",
+    "en": "AI help"
+  },
+  "onbLoginOrRegister": {
+    "pl": "Zaloguj się lub załóż konto",
+    "en": "Sign in or create an account"
+  },
+  "onbLoginOrCreateShort": {
+    "pl": "Zaloguj lub załóż konto",
+    "en": "Sign in or create an account"
+  },
+  "onbLoginSheetBody": {
+    "pl": "Masz konto? Zaloguj się. Nowy użytkownik? Załóż konto – Twoje dane będą zapisane.",
+    "en": "Have an account? Sign in. New here? Create an account – your data will be saved."
+  },
+  "onbFaqTitle": {
+    "pl": "FAQ – najczęściej zadawane pytania",
+    "en": "FAQ – frequently asked questions"
+  },
+  "onbFaqShowLess": {
+    "pl": "Pokaż mniej",
+    "en": "Show less"
+  },
+  "onbFaqShowMore": {
+    "pl": "Zobacz więcej pytań ({count})",
+    "en": "See more questions ({count})",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbFaqFreeQ": {
+    "pl": "Czy aplikacja jest darmowa?",
+    "en": "Is the app free?"
+  },
+  "onbFaqFreeA": {
+    "pl": "Tak. Łatwa Forma jest darmowa do codziennego użytku: śledzenie kalorii, posiłków, wagi, wody i aktywności. Część funkcji (np. analiza AI ze zdjęcia, rozbudowane statystyki) jest dostępna w planie Premium.",
+    "en": "Yes. Łatwa Forma is free for everyday use: tracking calories, meals, weight, water, and activity. Some features (e.g. AI meal photo analysis, advanced stats) are available with Premium."
+  },
+  "onbFaqPhotoQ": {
+    "pl": "Jak działa licznik kalorii ze zdjęcia?",
+    "en": "How does calorie tracking from a photo work?"
+  },
+  "onbFaqPhotoA": {
+    "pl": "W ekranie dodawania posiłku wybierz „Analiza AI”. Zrób zdjęcie dania lub wybierz je z galerii. Aplikacja wysyła zdjęcie do modelu AI (wizja), który rozpoznaje potrawę i szacuje kalorie oraz makroskładniki (białko, tłuszcze, węglowodany). Możesz je potem poprawić i zapisać. Funkcja wymaga Premium.",
+    "en": "On the add-meal screen, choose “AI analysis”. Take a photo of your dish or pick one from your gallery. The app sends the image to an AI vision model that recognizes the food and estimates calories and macros (protein, fat, carbs). You can edit and save them afterward. This feature requires Premium."
+  },
+  "onbFaqLimitQ": {
+    "pl": "Jak aplikacja liczy mój dzienny limit kalorii?",
+    "en": "How does the app calculate my daily calorie limit?"
+  },
+  "onbFaqLimitA": {
+    "pl": "Na podstawie profilu (wiek, płeć, waga, wzrost, poziom aktywności) obliczamy BMR (wzór Harrisa-Benedicta), a potem TDEE. W zależności od celu (schudnięcie, utrzymanie, przytycie) dostosowujemy limit kalorii i makra.",
+    "en": "Based on your profile (age, sex, weight, height, activity level) we calculate BMR (Harris–Benedict formula), then TDEE. Depending on your goal (lose, maintain, or gain weight) we adjust your calorie limit and macros."
+  },
+  "onbFaqNoAccountQ": {
+    "pl": "Co to jest „Zacznij bez konta”?",
+    "en": "What is “Start without an account”?"
+  },
+  "onbFaqNoAccountA": {
+    "pl": "Możesz korzystać z aplikacji bez logowania. Dane są zapisywane lokalnie. Później możesz połączyć je z kontem (Apple, Google lub e-mail), aby mieć backup i synchronizację między urządzeniami.",
+    "en": "You can use the app without signing in. Data is stored locally. Later you can link it to an account (Apple, Google, or email) for backup and sync across devices."
+  },
+  "onbFaqStravaQ": {
+    "pl": "Czy mogę połączyć Strava lub Garmin?",
+    "en": "Can I connect Strava or Garmin?"
+  },
+  "onbFaqStravaA": {
+    "pl": "Tak, Strava. W ustawieniach (Profil → Integracje) możesz połączyć konto ze Strava. Importowane aktywności są uwzględniane w bilansie kalorii (spalone kcal). Garmin Connect pojawi się po uruchomieniu integracji.",
+    "en": "Yes for Strava. In settings (Profile → Integrations) you can connect your Strava account. Imported activities count toward your calorie balance (kcal burned). Garmin Connect will appear once that integration launches."
+  },
+  "onbFaqPremiumQ": {
+    "pl": "Co daje Premium?",
+    "en": "What does Premium include?"
+  },
+  "onbFaqPremiumA": {
+    "pl": "M.in. analiza posiłku ze zdjęcia (AI), rozbudowane statystyki, eksport danych, wyższy limit porad AI. W aplikacji ze sklepu płatności idą przez Google Play / App Store; na stronie latwaforma.pl – przez Stripe.",
+    "en": "Among other things: AI meal photo analysis, advanced stats, data export, and a higher AI advice limit. In store builds, payments go through Google Play / App Store; on latwaforma.pl – through Stripe."
+  },
+  "onbFaqGoalQ": {
+    "pl": "Jak zmienić cel (schudnięcie / utrzymanie / przytycie)?",
+    "en": "How do I change my goal (lose / maintain / gain)?"
+  },
+  "onbFaqGoalA": {
+    "pl": "W Profilu ustaw wagę docelową. Aplikacja na tej podstawie proponuje cel i dzienny limit; makra można też dostosować ręcznie w ustawieniach profilu.",
+    "en": "In Profile, set your target weight. The app suggests a goal and daily limit from that; you can also adjust macros manually in profile settings."
+  },
+  "onbFaqAddMealQ": {
+    "pl": "Jak dodać posiłek?",
+    "en": "How do I add a meal?"
+  },
+  "onbFaqAddMealA": {
+    "pl": "Z ekranu głównego lub zakładki „Posiłki” wybierz „Dodaj posiłek”. Możesz wpisać dane ręcznie, zeskanować kod kreskowy (Open Food Facts) lub użyć Analizy AI ze zdjęcia (Premium).",
+    "en": "From the home screen or the “Meals” tab, choose “Add meal”. You can enter details manually, scan a barcode (Open Food Facts), or use AI photo analysis (Premium)."
+  },
+  "onbFaqDataQ": {
+    "pl": "Gdzie są zapisane moje dane?",
+    "en": "Where is my data stored?"
+  },
+  "onbFaqDataA": {
+    "pl": "Dane są przechowywane na serwerach w Europie (Supabase). Przy „Zacznij bez konta” dane są lokalne do momentu połączenia z kontem.",
+    "en": "Data is stored on servers in Europe (Supabase). With “Start without an account”, data stays local until you link an account."
+  },
+  "onbFaqDeleteQ": {
+    "pl": "Jak usunąć konto i dane?",
+    "en": "How do I delete my account and data?"
+  },
+  "onbFaqDeleteA": {
+    "pl": "W aplikacji: Profil → Usuń konto. Możesz też złożyć wniosek na latwaforma.pl/usun-konto.html. Po zatwierdzeniu konto i powiązane dane są usuwane (to nie jest zamrożenie konta). Subskrypcję w Google Play / App Store anuluj osobno w sklepie. W razie problemów: contact@latwaforma.pl.",
+    "en": "In the app: Profile → Delete account. You can also submit a request at latwaforma.pl/usun-konto.html. After approval, the account and related data are deleted (this is not account freezing). Cancel a Google Play / App Store subscription separately in the store. If you need help: contact@latwaforma.pl."
+  },
+  "onbFaqMedicalQ": {
+    "pl": "Czy to aplikacja medyczna?",
+    "en": "Is this a medical app?"
+  },
+  "onbFaqMedicalA": {
+    "pl": "Nie. Łatwa Forma nie jest urządzeniem medycznym i nie diagnozuje, nie leczy ani nie zapobiega chorobom. Obliczenia i porady AI są orientacyjne. W sprawach zdrowia skonsultuj się z lekarzem lub dietetykiem.",
+    "en": "No. Łatwa Forma is not a medical device and does not diagnose, treat, or prevent disease. Calculations and AI advice are estimates. For health matters, talk to a doctor or dietitian."
+  },
+  "onbSendingLinkAndCode": {
+    "pl": "Wysyłanie linku i kodu...",
+    "en": "Sending link and code..."
+  },
+  "onbSignedIn": {
+    "pl": "Zalogowano",
+    "en": "Signed in"
+  },
+  "onbSignedInSuccess": {
+    "pl": "Zalogowano pomyślnie!",
+    "en": "Signed in successfully!"
+  },
+  "onbSignedInDataSaved": {
+    "pl": "Zostałeś zalogowany. Twoje dane są zapisane.",
+    "en": "You are signed in. Your data is saved."
+  },
+  "onbAccountLinked": {
+    "pl": "Konto połączone",
+    "en": "Account linked"
+  },
+  "onbEmailLinkedSuccess": {
+    "pl": "Twój adres e-mail został połączony z kontem. Możesz się teraz logować tym emailem.",
+    "en": "Your email has been linked to your account. You can now sign in with this email."
+  },
+  "onbEnterEmailTitle": {
+    "pl": "Podaj adres email",
+    "en": "Enter your email address"
+  },
+  "onbEnterEmailWhichAddress": {
+    "pl": "Na który adres wysłaliśmy link i kod? Podaj go, a następnie wpiszesz kod.",
+    "en": "Which address did we send the link and code to? Enter it, then you’ll enter the code."
+  },
+  "onbEmailAddressLabel": {
+    "pl": "Adres email",
+    "en": "Email address"
+  },
+  "onbEmailAddressLabelAlt": {
+    "pl": "Adres e-mail",
+    "en": "Email address"
+  },
+  "onbEmailAddressHint": {
+    "pl": "np. jan@example.com",
+    "en": "e.g. jane@example.com"
+  },
+  "onbCheckInbox": {
+    "pl": "Sprawdź skrzynkę",
+    "en": "Check your inbox"
+  },
+  "onbEnterCodeFromEmailTitle": {
+    "pl": "Wpisz kod z maila",
+    "en": "Enter the code from email"
+  },
+  "onbEnterCodeFromEmailLabel": {
+    "pl": "Wpisz kod z maila:",
+    "en": "Enter the code from email:"
+  },
+  "onbEmailCodeLabel": {
+    "pl": "Kod z maila",
+    "en": "Code from email"
+  },
+  "onbEmailCodeHint": {
+    "pl": "np. 123456",
+    "en": "e.g. 123456"
+  },
+  "onbSentLinkAndCode": {
+    "pl": "Wysłaliśmy link i kod na {email}. Sprawdź skrzynkę (także folder Spam) – możesz kliknąć link w mailu lub wpisać kod poniżej.",
+    "en": "We sent a link and code to {email}. Check your inbox (including Spam) – you can tap the link in the email or enter the code below.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbEnterCodeReceived": {
+    "pl": "Wpisz poniżej kod, który otrzymałeś na adres {email}.",
+    "en": "Enter the code you received at {email} below.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCodeSentTo": {
+    "pl": "Kod wysłany na: {email}",
+    "en": "Code sent to: {email}",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCodeSentEnterBelow": {
+    "pl": "Wysłaliśmy kod na {email}. Wpisz go poniżej.",
+    "en": "We sent a code to {email}. Enter it below.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbResend": {
+    "pl": "Wyślij ponownie",
+    "en": "Resend"
+  },
+  "onbSignIn": {
+    "pl": "Zaloguj",
+    "en": "Sign in"
+  },
+  "onbConfirmCode": {
+    "pl": "Potwierdź kod",
+    "en": "Confirm code"
+  },
+  "onbSuccess": {
+    "pl": "Sukces",
+    "en": "Success"
+  },
+  "onbSendLinkAndCode": {
+    "pl": "Wyślij link oraz kod",
+    "en": "Send link and code"
+  },
+  "onbEmailSignupBody": {
+    "pl": "Podaj adres e-mail. Wyślemy link i kod, którymi dokończysz założenie konta.",
+    "en": "Enter your email address. We’ll send a link and code to finish creating your account."
+  },
+  "onbEnterEmailRequired": {
+    "pl": "Podaj adres e-mail",
+    "en": "Enter an email address"
+  },
+  "onbIntroTitle": {
+    "pl": "Powiedz nam kilka rzeczy o sobie",
+    "en": "Tell us a few things about yourself"
+  },
+  "onbIntroBody": {
+    "pl": "Pokażemy Ci ile jeść każdego dnia,\naby osiągnąć swój cel.",
+    "en": "We’ll show you how much to eat each day\nto reach your goal."
+  },
+  "onbIntroDuration": {
+    "pl": "Zajmie mniej niż minutę",
+    "en": "Takes less than a minute"
+  },
+  "onbIntroStart": {
+    "pl": "Rozpocznij",
+    "en": "Get started"
+  },
+  "onbAnonErrorTitle": {
+    "pl": "Nie udało się rozpocząć bez konta",
+    "en": "Couldn’t start without an account"
+  },
+  "onbAnonErrorNoConfig": {
+    "pl": "Aplikacja nie ma połączenia z serwerem (brak konfiguracji w buildzie).",
+    "en": "The app isn’t connected to the server (missing configuration in this build)."
+  },
+  "onbAnonErrorTimeout": {
+    "pl": "Serwer nie odpowiedział w czasie. Sprawdź internet lub spróbuj później.",
+    "en": "The server didn’t respond in time. Check your internet or try again later."
+  },
+  "onbAnonErrorFailed": {
+    "pl": "Połączenie z serwerem nie powiodło się. Możesz:",
+    "en": "Connecting to the server failed. You can:"
+  },
+  "onbAnonErrorTipDomain": {
+    "pl": "• Upewnij się, że jesteś na adresie latwaforma.pl.",
+    "en": "• Make sure you’re on latwaforma.pl."
+  },
+  "onbAnonErrorTipRefresh": {
+    "pl": "• Odśwież stronę (F5) i spróbuj ponownie.",
+    "en": "• Refresh the page (F5) and try again."
+  },
+  "onbAnonErrorTipLogin": {
+    "pl": "• Albo zaloguj się przez Apple, Google albo e-mail – przycisk na górze.",
+    "en": "• Or sign in with Apple, Google, or email – button at the top."
+  },
+  "onbOpenLatwaForma": {
+    "pl": "Otwórz latwaforma.pl",
+    "en": "Open latwaforma.pl"
+  },
+  "onbSplashNoServerConfig": {
+    "pl": "Brak połączenia z serwerem. Sprawdź konfigurację (.env) i internet.",
+    "en": "No server connection. Check configuration (.env) and your internet."
+  },
+  "onbSplashNoConnection": {
+    "pl": "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
+    "en": "No connection. Check your internet and try again."
+  },
+  "onbSplashLoginFailed": {
+    "pl": "Nie udało się zalogować. Uzupełnij profil lub spróbuj zalogować się ponownie.",
+    "en": "Sign-in failed. Complete your profile or try signing in again."
+  },
+  "onbSplashGoogleFailed": {
+    "pl": "Logowanie Google nie powiodło się. Zaloguj się ponownie w tej samej karcie.",
+    "en": "Google sign-in failed. Sign in again in the same tab."
+  },
+  "onbSplashAbort": {
+    "pl": "Przerwij",
+    "en": "Cancel"
+  },
+  "onbPlanThanks": {
+    "pl": "Dziękujemy!",
+    "en": "Thank you!"
+  },
+  "onbPlanGotIt": {
+    "pl": "Mamy to!",
+    "en": "Got it!"
+  },
+  "onbPlanStepData": {
+    "pl": "Dane",
+    "en": "Data"
+  },
+  "onbPlanStepCalc": {
+    "pl": "Kalkulacja",
+    "en": "Calculation"
+  },
+  "onbPlanStepMacro": {
+    "pl": "Makro",
+    "en": "Macros"
+  },
+  "onbPlanStepDone": {
+    "pl": "Gotowe",
+    "en": "Done"
+  },
+  "onbPlanStatusAnalyzing": {
+    "pl": "Analizujemy Twoje dane…",
+    "en": "Analyzing your data…"
+  },
+  "onbPlanStatusCalories": {
+    "pl": "Obliczanie kalorii…",
+    "en": "Calculating calories…"
+  },
+  "onbPlanStatusMacro": {
+    "pl": "Makro…",
+    "en": "Macros…"
+  },
+  "onbPlanStatusAlmost": {
+    "pl": "Prawie gotowe…",
+    "en": "Almost ready…"
+  },
+  "onbPlanReadyTitle": {
+    "pl": "Twój plan jest gotowy!",
+    "en": "Your plan is ready!"
+  },
+  "onbPlanWhatDone": {
+    "pl": "Co zostało zrobione:",
+    "en": "What we did:"
+  },
+  "onbPlanCaloriesComputed": {
+    "pl": "• Na podstawie wzrostu, wagi, wieku i poziomu aktywności obliczyliśmy Twoje dzienne zapotrzebowanie kaloryczne.",
+    "en": "• Based on your height, weight, age, and activity level, we calculated your daily calorie needs."
+  },
+  "onbPlanCaloriesComputedWithValue": {
+    "pl": "• Na podstawie wzrostu, wagi, wieku i poziomu aktywności obliczyliśmy Twoje dzienne zapotrzebowanie kaloryczne: {calories} kcal.",
+    "en": "• Based on your height, weight, age, and activity level, we calculated your daily calorie needs: {calories} kcal.",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanTargetDate": {
+    "pl": "• Szacowany termin osiągnięcia celu: {date}",
+    "en": "• Estimated date to reach your goal: {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanChangeInProfile": {
+    "pl": "Możesz w każdej chwili zmienić te dane w zakładce Profil (ikona osoby u góry).",
+    "en": "You can change these details anytime in the Profile tab (person icon at the top)."
+  },
+  "onbPlanHowToUse": {
+    "pl": "Jak korzystać z aplikacji:",
+    "en": "How to use the app:"
+  },
+  "onbPlanTipMeals": {
+    "pl": "• Dodawaj posiłki – śledź, co jesz i ile kalorii spożywasz",
+    "en": "• Add meals – track what you eat and how many calories you take in"
+  },
+  "onbPlanTipWater": {
+    "pl": "• Pij wodę – ustaw przypomnienia w ustawieniach",
+    "en": "• Drink water – set reminders in settings"
+  },
+  "onbPlanTipWeight": {
+    "pl": "• Wpisuj wagę regularnie – widzisz postępy na wykresie",
+    "en": "• Log your weight regularly – see progress on the chart"
+  },
+  "onbPlanTipDashboard": {
+    "pl": "• Sprawdzaj dashboard – tam widzisz swój dzienny cel i postępy",
+    "en": "• Check the dashboard – see your daily goal and progress there"
+  },
+  "onbPlanMedicalNote": {
+    "pl": "Łatwa Forma nie jest urządzeniem medycznym i nie diagnozuje, nie leczy ani nie zapobiega chorobom. W sprawach zdrowia skonsultuj się z lekarzem lub dietetykiem.",
+    "en": "Łatwa Forma is not a medical device and does not diagnose, treat, or prevent disease. For health matters, talk to a doctor or dietitian."
+  },
+  "onbPlanStartButton": {
+    "pl": "Rozumiem, zaczynam!",
+    "en": "Got it, let’s start!"
+  },
+  "onbSaveProgressTitle": {
+    "pl": "Zapisz postępy",
+    "en": "Save your progress"
+  },
+  "onbSaveProgressBodyWithMeals": {
+    "pl": "Masz już {count} posiłków! Zaloguj się, aby nie stracić danych przy reinstalacji aplikacji.",
+    "en": "You already have {count} meals! Sign in so you don’t lose data if you reinstall the app.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbSaveProgressBodyEmpty": {
+    "pl": "Załóż konto, żeby Twoje posiłki, aktywności i waga były zapisane w chmurze i dostępne na każdym urządzeniu – nic nie zginie przy reinstalacji.",
+    "en": "Create an account so your meals, activities, and weight are saved in the cloud and available on every device – nothing is lost if you reinstall."
+  },
+  "onbChooseLoginMethod": {
+    "pl": "Wybierz sposób logowania:",
+    "en": "Choose a sign-in method:"
+  },
+  "onbLater": {
+    "pl": "Później",
+    "en": "Later"
+  },
+  "onbLinkingAccount": {
+    "pl": "Łączenie konta...",
+    "en": "Linking account..."
+  },
+  "onbAccountSavedSuccess": {
+    "pl": "Konto zapisane pomyślnie!",
+    "en": "Account saved successfully!"
+  },
+  "onbSaveWithEmailTitle": {
+    "pl": "Zapisz z emailem",
+    "en": "Save with email"
+  },
+  "onbEmailAlreadyRegistered": {
+    "pl": "E-mail już zarejestrowany",
+    "en": "Email already registered"
+  },
+  "onbClickBelowToLogin": {
+    "pl": "Kliknij poniżej, aby przejść do logowania:",
+    "en": "Tap below to go to sign-in:"
+  },
+  "onbSignOutAndSignIn": {
+    "pl": "Wyloguj i zaloguj się",
+    "en": "Sign out and sign in"
+  },
+  "onbGoBackTitle": {
+    "pl": "Cofnąć się?",
+    "en": "Go back?"
+  },
+  "onbGoBackBody": {
+    "pl": "Dane nie zostaną zapisane. Wrócisz do ekranu początkowego.",
+    "en": "Your data won’t be saved. You’ll return to the start screen."
+  },
+  "onbGoBackConfirm": {
+    "pl": "Tak, cofnij",
+    "en": "Yes, go back"
+  },
+  "onbBackTooltip": {
+    "pl": "Cofnij",
+    "en": "Back"
+  },
+  "onbCompleteData": {
+    "pl": "Uzupełnij dane",
+    "en": "Complete your details"
+  },
+  "onbGenderLabel": {
+    "pl": "Płeć *",
+    "en": "Sex *"
+  },
+  "onbGenderFemale": {
+    "pl": "Kobieta",
+    "en": "Female"
+  },
+  "onbGenderMale": {
+    "pl": "Mężczyzna",
+    "en": "Male"
+  },
+  "onbAgeLabel": {
+    "pl": "Wiek *",
+    "en": "Age *"
+  },
+  "onbYearsUnit": {
+    "pl": "lat",
+    "en": "yrs"
+  },
+  "onbHeightLabel": {
+    "pl": "Wzrost (cm) *",
+    "en": "Height (cm) *"
+  },
+  "onbCurrentWeightLabel": {
+    "pl": "Aktualna waga (kg) *",
+    "en": "Current weight (kg) *"
+  },
+  "onbTargetWeightLabel": {
+    "pl": "Waga docelowa (kg) *",
+    "en": "Target weight (kg) *"
+  },
+  "onbWeightDiff": {
+    "pl": "Różnica: {diff} kg",
+    "en": "Difference: {diff} kg",
+    "placeholders": {
+      "diff": {
+        "type": "String"
+      }
+    }
+  },
+  "onbWeightDiffMin": {
+    "pl": "Różnica między wagami musi wynosić co najmniej 1 kg",
+    "en": "The difference between weights must be at least 1 kg"
+  },
+  "onbActivityLabel": {
+    "pl": "Poziom aktywności *",
+    "en": "Activity level *"
+  },
+  "onbActivitySedentary": {
+    "pl": "Siedzący",
+    "en": "Sedentary"
+  },
+  "onbActivitySedentaryDesc": {
+    "pl": "Brak aktywności lub minimalna aktywność",
+    "en": "Little or no activity"
+  },
+  "onbActivityLight": {
+    "pl": "Lekka",
+    "en": "Light"
+  },
+  "onbActivityLightDesc": {
+    "pl": "Ćwiczenia 1-3 razy w tygodniu",
+    "en": "Exercise 1–3 times a week"
+  },
+  "onbActivityModerate": {
+    "pl": "Umiarkowana",
+    "en": "Moderate"
+  },
+  "onbActivityModerateDesc": {
+    "pl": "Ćwiczenia 3-5 razy w tygodniu",
+    "en": "Exercise 3–5 times a week"
+  },
+  "onbActivityIntense": {
+    "pl": "Intensywna",
+    "en": "Intense"
+  },
+  "onbActivityIntenseDesc": {
+    "pl": "Ćwiczenia 6-7 razy w tygodniu",
+    "en": "Exercise 6–7 times a week"
+  },
+  "onbActivityVeryIntense": {
+    "pl": "Bardzo intensywna",
+    "en": "Very intense"
+  },
+  "onbActivityVeryIntenseDesc": {
+    "pl": "Bardzo ciężka praca fizyczna lub treningi 2x dziennie",
+    "en": "Very hard physical work or training twice a day"
+  },
+  "onbSaveAndStart": {
+    "pl": "Zapisz i rozpocznij",
+    "en": "Save and start"
+  },
+  "onbGoalLose": {
+    "pl": "Chcę schudnąć.",
+    "en": "I want to lose weight."
+  },
+  "onbGoalGain": {
+    "pl": "Chcę przybrać na wadze.",
+    "en": "I want to gain weight."
+  },
+  "onbGoalMaintain": {
+    "pl": "Chcę utrzymać obecną wagę.",
+    "en": "I want to maintain my current weight."
+  },
+  "onbErrorCreatingAccount": {
+    "pl": "Błąd podczas tworzenia konta.",
+    "en": "Error creating account."
+  },
+  "onbErrorNetworkPermission": {
+    "pl": "Błąd uprawnień sieciowych.\n\nRozwiązanie:\n1. Zatrzymaj aplikację\n2. Uruchom ponownie: flutter run\n3. Jeśli problem nadal występuje, sprawdź czy anonimowa autoryzacja jest włączona w Supabase",
+    "en": "Network permission error.\n\nFix:\n1. Stop the app\n2. Run again: flutter run\n3. If it still fails, check that anonymous auth is enabled in Supabase"
+  },
+  "onbErrorAnonymousDisabled": {
+    "pl": "Anonimowa autoryzacja nie jest włączona w Supabase.\n\nPrzejdź do: Authentication → Providers → Anonymous → Enable",
+    "en": "Anonymous auth is not enabled in Supabase.\n\nGo to: Authentication → Providers → Anonymous → Enable"
+  },
+  "onbErrorInternet": {
+    "pl": "Błąd połączenia z internetem.\nSprawdź połączenie i spróbuj ponownie.",
+    "en": "Internet connection error.\nCheck your connection and try again."
+  },
+  "onbErrorInternetShort": {
+    "pl": "Błąd połączenia z internetem. Sprawdź połączenie i spróbuj ponownie.",
+    "en": "Internet connection error. Check your connection and try again."
+  },
+  "onbErrorSupabaseConfig": {
+    "pl": "Błąd konfiguracji Supabase.\nSprawdź klucze API w pliku .env",
+    "en": "Supabase configuration error.\nCheck the API keys in the .env file"
+  },
+  "onbErrorWithDetails": {
+    "pl": "Błąd: {details}",
+    "en": "Error: {details}",
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "onbErrorSaving": {
+    "pl": "Błąd podczas zapisywania",
+    "en": "Error while saving"
+  },
+  "onbErrorAuth": {
+    "pl": "Błąd autoryzacji. Sprawdź konfigurację Supabase.",
+    "en": "Authorization error. Check your Supabase configuration."
+  }
+}

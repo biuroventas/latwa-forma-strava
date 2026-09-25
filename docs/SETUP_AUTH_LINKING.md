@@ -45,6 +45,7 @@ Klienty e-mail otwierają link w wbudowanej przeglądarce, która nie obsługuje
    - W strukturze repo: `auth_redirect/index.html` → URL: `https://biuroventas.github.io/latwa-forma-strava/auth_redirect/`
 
 2. **W pliku .env** dodaj:
+
    ```
    EMAIL_AUTH_REDIRECT_URL=https://biuroventas.github.io/latwa-forma-strava/auth_redirect/
    ```

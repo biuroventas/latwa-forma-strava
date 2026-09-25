@@ -104,27 +104,25 @@ class SupabaseConfig {
           _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
         }
       } else {
-        // Najpierw opcjonalnie .env (może nie istnieć po sklonowaniu z gita)
+        // .env (lokalny debug) + env.production (AAB/IPA z assetów) – uzupełnij brakujące klucze.
         await dotenv.load(fileName: '.env', isOptional: true);
-        // Fallback: env.production (root lub assets) – żeby działało bez .env po clone
-        if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
+        _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
+        for (final path in ['env.production', 'assets/env.production']) {
           try {
-            await dotenv.load(fileName: 'env.production', isOptional: true);
-            if (dotenv.env['SUPABASE_URL']?.trim().isNotEmpty ?? false) {
-              _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
-              debugPrint('✅ env.production załadowany z głównego folderu');
+            await dotenv.load(
+              fileName: path,
+              isOptional: true,
+              mergeWith: Map<String, String>.from(_loadedEnv),
+            );
+            for (final e in dotenv.env.entries) {
+              final v = e.value.trim();
+              if (v.isEmpty) continue;
+              _loadedEnv.putIfAbsent(e.key, () => v);
+            }
+            if (_loadedEnv['SUPABASE_URL']?.isNotEmpty ?? false) {
+              debugPrint('✅ env z $path (mobile/desktop)');
             }
           } catch (_) {}
-        }
-        if (dotenv.env['SUPABASE_URL']?.trim().isEmpty ?? true) {
-          await dotenv.load(fileName: 'assets/env.production', isOptional: true);
-          if (dotenv.env['SUPABASE_URL']?.trim().isNotEmpty ?? false) {
-            _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
-            debugPrint('✅ env.production z assets');
-          }
-        }
-        if (_loadedEnv.isEmpty && dotenv.env.isNotEmpty) {
-          _loadedEnv.addAll(Map<String, String>.from(dotenv.env));
         }
         debugPrint('✅ env załadowany (desktop/mobile)');
       }

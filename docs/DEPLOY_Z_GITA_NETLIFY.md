@@ -9,6 +9,7 @@ Po konfiguracji każdy **push** do repozytorium zbuduje aplikację i wgra ją na
 1. Otwórz **terminal** w folderze projektu (Łatwa Forma).
 
 2. Inicjalizacja i pierwszy commit:
+
    ```bash
    git init
    git add .
@@ -18,11 +19,13 @@ Po konfiguracji każdy **push** do repozytorium zbuduje aplikację i wgra ją na
 3. Załóż repozytorium na **GitHub** (github.com → New repository). Nazwa np. `latwa-forma`. **Nie** dodawaj README ani .gitignore (masz je w projekcie).
 
 4. Podłącz projekt i wypchnij:
+
    ```bash
    git remote add origin https://github.com/TWOJ_LOGIN/latwa-forma.git
    git branch -M main
    git push -u origin main
    ```
+
    (Zamień `TWOJ_LOGIN` na swoją nazwę użytkownika GitHub.)
 
 ---

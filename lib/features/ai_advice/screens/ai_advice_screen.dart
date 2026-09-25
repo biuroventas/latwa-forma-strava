@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -8,6 +9,7 @@ import '../../../core/config/supabase_config.dart';
 import '../../../core/providers/subscription_provider.dart';
 import '../../../shared/services/openai_service.dart';
 import '../../../core/utils/error_handler.dart';
+import '../../../shared/widgets/health_disclaimer.dart';
 
 const _keyAiAdviceDate = 'ai_advice_date';
 const _keyAiAdviceCount = 'ai_advice_count';
@@ -100,6 +102,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
   Future<void> _askAi() async {
     final question = _questionController.text.trim();
     if (question.isEmpty) return;
+    final l10n = context.l10n;
     final hasAccess = ref.read(hasPremiumAccessProvider);
     final remaining = hasAccess ? _remainingPremium : _remainingFree;
     final limit = hasAccess ? AppConstants.aiAdvicePremiumDailyLimit : AppConstants.aiAdviceDailyLimit;
@@ -109,8 +112,8 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
           SnackBar(
             content: Text(
               hasAccess
-                  ? 'Wykorzystałeś dzisiejszy limit ($limit zapytań). Spróbuj jutro.'
-                  : 'Wykorzystałeś dzisiejszy limit ($limit zapytań). Spróbuj jutro lub przejdź na Premium.',
+                  ? l10n.moreAiLimitReachedPremium(limit: '$limit')
+                  : l10n.moreAiLimitReachedFree(limit: '$limit'),
             ),
           ),
         );
@@ -120,7 +123,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
     final useEdgeFunction = SupabaseConfig.isInitialized;
     if (!useEdgeFunction && (OpenAIService.apiKey == null || OpenAIService.apiKey!.isEmpty)) {
       if (mounted) {
-        ErrorHandler.showSnackBar(context, error: 'Porada AI wymaga połączenia z aplikacją (Supabase) lub klucza OpenAI w konfiguracji.');
+        ErrorHandler.showSnackBar(context, l10n: context.l10n, error: l10n.moreAiNeedsConnection);
       }
       return;
     }
@@ -131,7 +134,10 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
     });
 
     try {
-      final response = await _aiService.getAdvice(question);
+      final response = await _aiService.getAdvice(
+        question,
+        languageCode: Localizations.localeOf(context).languageCode,
+      );
       if (mounted) {
         if (response != null && response.isNotEmpty) {
           if (ref.read(hasPremiumAccessProvider)) {
@@ -153,20 +159,21 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
           });
         } else {
           setState(() => _isLoading = false);
-          ErrorHandler.showSnackBar(context, error: 'Nie udało się uzyskać odpowiedzi. Spróbuj ponownie.');
+          ErrorHandler.showSnackBar(context, l10n: context.l10n, error: l10n.moreAiNoResponse);
         }
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
         final message = e is Exception ? e.toString().replaceFirst(RegExp(r'^Exception:\s*'), '') : null;
-        ErrorHandler.showSnackBar(context, error: e, fallback: message);
+        ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e, fallback: message);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final hasAccess = ref.watch(hasPremiumAccessProvider);
     final remaining = hasAccess ? _remainingPremium : _remainingFree;
     final limit = hasAccess ? AppConstants.aiAdvicePremiumDailyLimit : AppConstants.aiAdviceDailyLimit;
@@ -174,7 +181,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Porada AI'),
+        title: Text(l10n.moreAiAdviceTitle),
       ),
       body: Column(
         children: [
@@ -192,7 +199,15 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Pozostało zapytań dziś: $remaining / $limit${hasAccess ? ' (Premium)' : ''}',
+                  hasAccess
+                      ? l10n.moreAiRemainingTodayPremium(
+                          remaining: '$remaining',
+                          limit: '$limit',
+                        )
+                      : l10n.moreAiRemainingToday(
+                          remaining: '$remaining',
+                          limit: '$limit',
+                        ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Theme.of(context).colorScheme.onSurface,
@@ -212,12 +227,14 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Zapytaj o poradę w zakresie diety, odżywiania lub aktywności fizycznej.',
+                      l10n.moreAiIntro,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w500,
                           ),
                     ),
+                    const SizedBox(height: 12),
+                    const HealthDisclaimer(compact: true),
                     const SizedBox(height: 16),
                     Focus(
                       onKeyEvent: (_, KeyEvent event) {
@@ -233,7 +250,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
                       child: TextField(
                         controller: _questionController,
                         decoration: InputDecoration(
-                          hintText: 'np. Ile białka potrzebuję przy treningu siłowym?',
+                          hintText: l10n.moreAiHint,
                           border: const OutlineInputBorder(),
                           filled: true,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -286,7 +303,7 @@ class _AiAdviceScreenState extends ConsumerState<AiAdviceScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'Odpowiedź',
+                                l10n.moreAiAnswer,
                                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).colorScheme.primary,

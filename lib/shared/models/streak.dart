@@ -1,3 +1,7 @@
+import 'package:latwa_forma/l10n/app_localizations.dart';
+
+import '../../core/providers/locale_provider.dart';
+
 class Streak {
   final String? id;
   final String userId;
@@ -50,15 +54,16 @@ class Streak {
   }
 
   String get displayName {
+    final l10n = lookupAppLocalizations(currentAppLocale());
     switch (streakType) {
       case 'meals':
-        return 'Posiłki';
+        return l10n.moreStreakMeals;
       case 'water':
-        return 'Woda';
+        return l10n.moreStreakWater;
       case 'activities':
-        return 'Aktywności';
+        return l10n.moreStreakActivities;
       case 'weight':
-        return 'Waga';
+        return l10n.moreStreakWeight;
       default:
         return streakType;
     }

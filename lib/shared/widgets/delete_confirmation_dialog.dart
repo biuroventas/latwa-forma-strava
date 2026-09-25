@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 
 /// Spójny dialog potwierdzenia usunięcia.
 class DeleteConfirmationDialog {
@@ -7,8 +8,9 @@ class DeleteConfirmationDialog {
     BuildContext context, {
     required String title,
     required String content,
-    String confirmLabel = 'Usuń',
+    String? confirmLabel,
   }) async {
+    final l10n = context.l10n;
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -17,12 +19,12 @@ class DeleteConfirmationDialog {
         actions: [
           TextButton(
             onPressed: () => ctx.pop(false),
-            child: const Text('Anuluj'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => ctx.pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(confirmLabel),
+            child: Text(confirmLabel ?? l10n.commonDelete),
           ),
         ],
       ),

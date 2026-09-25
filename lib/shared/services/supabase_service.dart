@@ -1,4 +1,5 @@
 import '../../core/config/supabase_config.dart';
+import '../../core/guest/guest_trial.dart';
 import '../models/user_profile.dart';
 import '../models/meal.dart';
 import '../models/activity.dart';
@@ -64,7 +65,7 @@ class SupabaseService {
   }) async {
     await _client.from('profiles').update({
       'subscription_tier': tier,
-      if (expiresAt != null) 'subscription_expires_at': expiresAt.toIso8601String(),
+      'subscription_expires_at': expiresAt?.toIso8601String(),
       'updated_at': DateTime.now().toIso8601String(),
     }).eq('user_id', userId);
   }
@@ -94,7 +95,28 @@ class SupabaseService {
     return (response as List).map((json) => Meal.fromJson(json)).toList();
   }
 
+  /// Ostatnie różne nazwy posiłków, od najnowszych. Służy do „dodaj ponownie”.
+  Future<List<Meal>> getRecentDistinctMeals(String userId, {int limit = 8}) async {
+    final response = await _client
+        .from('meals')
+        .select()
+        .eq('user_id', userId)
+        .order('created_at', ascending: false)
+        .limit(80);
+    final meals = (response as List).map((json) => Meal.fromJson(json)).toList();
+    final seen = <String>{};
+    final unique = <Meal>[];
+    for (final meal in meals) {
+      final key = meal.name.trim().toLowerCase();
+      if (key.isEmpty || !seen.add(key)) continue;
+      unique.add(meal);
+      if (unique.length >= limit) break;
+    }
+    return unique;
+  }
+
   Future<Meal> createMeal(Meal meal) async {
+    await GuestTrial.ensureCanWrite();
     final response = await _client
         .from('meals')
         .insert(meal.toJson())
@@ -140,6 +162,7 @@ class SupabaseService {
   }
 
   Future<Activity> createActivity(Activity activity) async {
+    await GuestTrial.ensureCanWrite();
     final response = await _client
         .from('activities')
         .insert(activity.toJson())
@@ -209,6 +232,7 @@ class SupabaseService {
   }
 
   Future<WaterLog> createWaterLog(WaterLog waterLog) async {
+    await GuestTrial.ensureCanWrite();
     final response = await _client
         .from('water_logs')
         .insert(waterLog.toJson())
@@ -270,6 +294,7 @@ class SupabaseService {
   }
 
   Future<WeightLog> createWeightLog(WeightLog weightLog) async {
+    await GuestTrial.ensureCanWrite();
     final response = await _client
         .from('weight_logs')
         .insert(weightLog.toJson())
@@ -308,6 +333,7 @@ class SupabaseService {
   }
 
   Future<BodyMeasurement> createBodyMeasurement(BodyMeasurement measurement) async {
+    await GuestTrial.ensureCanWrite();
     final response = await _client
         .from('body_measurements')
         .insert(measurement.toJson())

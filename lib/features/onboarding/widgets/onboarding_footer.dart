@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../legal/legal_document_screen.dart';
 import '../screens/easy_forma_onboarding.dart';
 
 /// Stopka z linkami i social – na webie używana w shellu (pełna szerokość ekranu).
@@ -17,6 +19,7 @@ class OnboardingFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final bool narrow = MediaQuery.sizeOf(context).width < 560;
     return Container(
       width: double.infinity,
@@ -56,10 +59,15 @@ class OnboardingFooter extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '© 2026 Łatwa Forma | VENTAS NORBERT WRÓBLEWSKI. Wszelkie prawa zastrzeżone.',
+            l10n.onbCopyrightFull(
+              company: AppConstants.companyName,
+              nip: AppConstants.companyNip,
+              address: AppConstants.companyAddress,
+            ),
             style: TextStyle(
               fontSize: 12,
               color: OnboardingTokens.grey,
+              height: 1.4,
             ),
             textAlign: TextAlign.center,
           ),
@@ -69,16 +77,17 @@ class OnboardingFooter extends StatelessWidget {
   }
 
   Widget _footerLinkRow(BuildContext context, {required bool wrap}) {
+    final l10n = context.l10n;
     final sep = Text(
       ' · ',
       style: TextStyle(fontSize: 13, color: OnboardingTokens.grey),
     );
     final links = [
-      _footerLink(context, 'Regulamin', AppConstants.termsUrl),
+      _footerLink(context, l10n.onbTerms, AppConstants.termsUrl),
       sep,
-      _footerLink(context, 'Polityka prywatności', AppConstants.privacyPolicyUrl),
+      _footerLink(context, l10n.onbPrivacyPolicy, AppConstants.privacyPolicyUrl),
       sep,
-      _footerLink(context, 'Kontakt', 'mailto:${AppConstants.contactEmail}'),
+      _footerLink(context, l10n.onbContact, 'mailto:${AppConstants.contactEmail}'),
     ];
     if (wrap) {
       return Wrap(
@@ -94,11 +103,12 @@ class OnboardingFooter extends StatelessWidget {
   }
 
   Widget _buildFooterSocial(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Śledź nas: ',
+          l10n.onbFollowUs,
           style: TextStyle(
             fontSize: 13,
             color: OnboardingTokens.grey,
@@ -112,8 +122,9 @@ class OnboardingFooter extends StatelessWidget {
   }
 
   Widget _socialIcon(BuildContext context, IconData icon, String tooltip, String? url) {
+    final l10n = context.l10n;
     return Tooltip(
-      message: url != null ? tooltip : '$tooltip – wkrótce',
+      message: url != null ? tooltip : l10n.onbSocialComingSoon(name: tooltip),
       child: IconButton(
         onPressed: url != null
             ? () => _openUrl(url)
@@ -131,7 +142,7 @@ class OnboardingFooter extends StatelessWidget {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () => _openUrl(url),
+        onTap: () => openLegalOrExternal(context, url),
         child: Text(
           label,
           style: TextStyle(

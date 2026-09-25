@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "This app needs camera access to scan product barcodes and analyze meal photos.";
+"NSPhotoLibraryAddUsageDescription" = "This app needs permission to save photos to your library.";
+"NSPhotoLibraryUsageDescription" = "This app needs photo library access so you can choose meal photos to analyze.";
+"NSUserNotificationsUsageDescription" = "This app needs notification permission to remind you about water and other goals.";

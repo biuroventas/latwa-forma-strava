@@ -98,7 +98,8 @@ class UserProfile {
       if (targetProteinG != null) 'target_protein_g': targetProteinG,
       if (targetFatG != null) 'target_fat_g': targetFatG,
       if (targetCarbsG != null) 'target_carbs_g': targetCarbsG,
-      if (targetDate != null) 'target_date': targetDate!.toIso8601String().split('T')[0],
+      // Jawne null czyści termin przy utrzymaniu wagi
+      'target_date': targetDate?.toIso8601String().split('T')[0],
       if (weeklyWeightChange != null) 'weekly_weight_change': weeklyWeightChange,
       if (waterGoalMl != null) 'water_goal_ml': waterGoalMl,
       'subscription_tier': subscriptionTier,

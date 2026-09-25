@@ -8,7 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/guest/guest_trial.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/services/garmin_service.dart';
 import '../../../shared/services/strava_service.dart';
@@ -54,7 +57,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (kIsWeb) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _handleWebStravaCallback();
-        _handleWebGarminCallback();
+        if (AppConstants.garminEnabled) _handleWebGarminCallback();
       });
     }
   }
@@ -92,7 +95,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (SupabaseConfig.currentUserOrNull == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Zaloguj się, aby dokończyć połączenie ze Strava')),
+          SnackBar(content: Text(context.l10n.moreLoginToFinishStrava)),
         );
       }
       return;
@@ -135,7 +138,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         done.complete();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Zaloguj się, aby dokończyć połączenie z Garmin')),
+            SnackBar(content: Text(context.l10n.moreLoginToFinishGarmin)),
           );
         }
       }
@@ -178,7 +181,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       if (code != null && code.isNotEmpty) _exchangeStravaCode(code);
       return;
     }
-    if (uri.host == 'garmin-callback') {
+    if (AppConstants.garminEnabled && uri.host == 'garmin-callback') {
       final code = uri.queryParameters['code'];
       if (code != null && code.isNotEmpty) _exchangeGarminCode(code);
       return;
@@ -207,25 +210,22 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       final imported = await _syncStrava(silent: true);
       if (!mounted) return;
       if (imported != null) {
-        SuccessMessage.show(
-          context,
-          imported > 0
-              ? 'Strava połączona. Zaimportowano $imported aktywności.'
-              : 'Strava połączona. Brak nowych aktywności do importu.',
-          duration: const Duration(seconds: 4),
+        SuccessMessage.show(context, imported > 0
+              ? context.l10n.moreStravaConnectedImported(count: imported)
+              : context.l10n.moreStravaConnectedNoNew, l10n: context.l10n, duration: const Duration(seconds: 4),
         );
       } else {
-        SuccessMessage.show(context, 'Strava połączona pomyślnie');
+        SuccessMessage.show(context, context.l10n.moreStravaConnectedSuccess, l10n: context.l10n);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Synchronizacja nie powiodła się. Kliknij „Synchronizuj aktywności” później.'),
+          SnackBar(
+            content: Text(context.l10n.moreStravaSyncFailedLater),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
+          SnackBar(content: Text(context.l10n.moreErrorWithDetails(error: e.toString()))),
         );
       }
     } finally {
@@ -236,12 +236,13 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
   Future<void> _exchangeGarminCode(String code) async {
     final userId = SupabaseConfig.auth.currentUser?.id;
     if (userId == null) return;
+    final l10n = context.l10n;
     final prefs = await SharedPreferences.getInstance();
     final verifier = prefs.getString(_garminVerifierKey);
     if (verifier == null || verifier.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sesja wygasła. Spróbuj ponownie połączyć Garmin.')),
+          SnackBar(content: Text(l10n.moreGarminSessionExpiredRetry)),
         );
       }
       return;
@@ -294,11 +295,9 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
           serverMsg = (err?['error'] ?? err?['message'] ?? '').toString();
         } catch (_) {}
         if (serverMsg.isNotEmpty) {
-          throw Exception('Sesja odrzucona: $serverMsg. Wyloguj się, zaloguj ponownie i spróbuj połączyć Garmin.');
+          throw Exception(l10n.moreGarminSessionRejected(message: serverMsg));
         }
-        throw Exception(
-          'Sesja wygasła. Wyloguj się i zaloguj ponownie do Łatwej Formy, potem kliknij „Połącz z Garmin Connect”.',
-        );
+        throw Exception(l10n.moreGarminSessionExpiredRelogin);
       }
       if (res.statusCode != 200) {
         final err = jsonDecode(res.body) as Map<String, dynamic>?;
@@ -338,7 +337,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         // Nie blokuj sukcesu – garmin_user_id można uzupełnić później przy sync
       }
       ref.invalidate(garminIntegrationProvider);
-      if (mounted) SuccessMessage.show(context, 'Połączono pomyślnie!');
+      if (mounted) SuccessMessage.show(context, context.l10n.moreConnectedSuccessfully, l10n: context.l10n);
     } catch (e) {
       if (mounted) {
         final msg = e.toString();
@@ -347,8 +346,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
           SnackBar(
             content: Text(
               isSessionError
-                  ? 'Sesja wygasła. Wyloguj się i zaloguj ponownie, potem połącz Garmin.'
-                  : 'Błąd Garmin: $e',
+                  ? context.l10n.moreGarminSessionExpiredShort
+                  : context.l10n.moreGarminError(error: e.toString()),
             ),
             duration: isSessionError ? const Duration(seconds: 5) : const Duration(seconds: 3),
           ),
@@ -367,10 +366,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (!_stravaService.isConfigured) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Dodaj STRAVA_CLIENT_ID i STRAVA_CLIENT_SECRET do pliku .env',
-            ),
+          SnackBar(
+            content: Text(context.l10n.moreStravaEnvMissing),
           ),
         );
       }
@@ -382,7 +379,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
+          SnackBar(content: Text(context.l10n.moreErrorWithDetails(error: e.toString()))),
         );
       }
     } finally {
@@ -394,10 +391,8 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (!_garminService.isConfigured) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Dodaj GARMIN_CLIENT_ID do env (po zatwierdzeniu programu).',
-            ),
+          SnackBar(
+            content: Text(context.l10n.moreGarminEnvMissing),
           ),
         );
       }
@@ -410,7 +405,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
+          SnackBar(content: Text(context.l10n.moreErrorWithDetails(error: e.toString()))),
         );
       }
     } finally {
@@ -427,12 +422,13 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (jwt == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Zaloguj się ponownie, aby uzupełnić dane Garmin.')),
+          SnackBar(content: Text(context.l10n.moreLoginAgainForGarmin)),
         );
       }
       return;
     }
     setState(() => _isEnsuringGarminUserId = true);
+    final l10n = context.l10n;
     try {
       final idRes = await http.get(
         Uri.parse('${SupabaseConfig.functionsBaseUrl}/garmin_user_id'),
@@ -440,10 +436,10 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       );
       if (idRes.statusCode != 200) {
         final err = jsonDecode(idRes.body) as Map<String, dynamic>?;
-        final msg = err?['error'] ?? err?['detail'] ?? 'Błąd ${idRes.statusCode}';
+        final msg = err?['error'] ?? err?['detail'] ?? l10n.moreErrorStatusCode(code: '${idRes.statusCode}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Nie udało się: $msg')),
+            SnackBar(content: Text(l10n.moreCouldNotComplete(message: '$msg'))),
           );
         }
         return;
@@ -453,7 +449,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       if (garminUserId == null || garminUserId.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Garmin nie zwrócił User ID. Spróbuj odłączyć i połączyć ponownie.')),
+            SnackBar(content: Text(context.l10n.moreGarminNoUserId)),
           );
         }
         return;
@@ -463,14 +459,15 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       if (mounted) {
         SuccessMessage.show(
           context,
-          'Dane do odbierania aktywności zapisane. Nowe treningi z Garmin Connect będą się pojawiać w aplikacji.',
+          context.l10n.moreGarminReceiveDataSaved,
+          l10n: context.l10n,
           duration: const Duration(seconds: 4),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
+          SnackBar(content: Text(context.l10n.moreErrorWithDetails(error: e.toString()))),
         );
       }
     } finally {
@@ -481,6 +478,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
   Future<void> _disconnectGarmin() async {
     final userId = SupabaseConfig.auth.currentUser?.id;
     if (userId == null) return;
+    final l10n = context.l10n;
     if (kIsWeb) {
       final session = SupabaseConfig.auth.currentSession;
       final jwt = session?.accessToken;
@@ -493,7 +491,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
             body: '{}',
           );
           if (res.statusCode != 200) {
-            String msg = 'Błąd odłączania: ${res.statusCode}';
+            String msg = l10n.moreGarminDisconnectErrorStatus(status: '${res.statusCode}');
             final body = res.body.trim();
             if (body.startsWith('{')) {
               try {
@@ -506,7 +504,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Nie udało się wywołać odłączenia u Garmin: $e')),
+              SnackBar(content: Text(l10n.moreGarminDisconnectFailed(error: e.toString()))),
             );
           }
           return;
@@ -534,14 +532,12 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
       await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Garmin Connect odłączony'),
-          content: const Text(
-            'Połączenie z Garmin Connect zostało usunięte. Nowe aktywności nie będą już dodawane automatycznie. Możesz połączyć ponownie w dowolnym momencie.',
-          ),
+          title: Text(ctx.l10n.moreGarminDisconnectedTitle),
+          content: Text(ctx.l10n.moreGarminDisconnectedBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('OK'),
+              child: Text(ctx.l10n.commonOk),
             ),
           ],
         ),
@@ -554,7 +550,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (userId == null) return;
     await _supabaseService.deleteStravaIntegration(userId);
     ref.invalidate(stravaIntegrationProvider);
-    if (mounted) SuccessMessage.show(context, 'Strava odłączona');
+    if (mounted) SuccessMessage.show(context, context.l10n.moreStravaDisconnected, l10n: context.l10n);
   }
 
   /// Zwraca liczbę zaimportowanych aktywności lub null przy błędzie.
@@ -567,7 +563,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
     if (integration == null) {
       if (!silent && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Najpierw połącz konto Strava')),
+          SnackBar(content: Text(context.l10n.moreConnectStravaFirst)),
         );
       }
       return null;
@@ -618,16 +614,18 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
         SuccessMessage.show(
           context,
           imported > 0
-              ? 'Zaimportowano $imported aktywności ze Strava'
-              : 'Brak nowych aktywności do importu',
+              ? context.l10n.moreImportedFromStrava(count: imported)
+              : context.l10n.moreNoNewActivities,
+          l10n: context.l10n,
           duration: const Duration(seconds: 3),
         );
       }
       return imported;
     } catch (e) {
+      if (e is GuestTrialEndedException) return 0;
       if (!silent && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd synchronizacji: $e')),
+          SnackBar(content: Text(context.l10n.moreSyncError(error: e.toString()))),
         );
       }
       return null;
@@ -642,7 +640,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Integracje'),
+        title: Text(context.l10n.moreIntegrationsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go(AppRoutes.profile),
@@ -681,7 +679,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Text(
-                              'Importuj wszystkie aktywności i spalone kalorie',
+                              context.l10n.moreStravaImportDesc,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -705,7 +703,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Połączona',
+                                  context.l10n.moreConnected,
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w600,
@@ -725,12 +723,12 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                       ),
                                     )
                                   : const Icon(Icons.sync),
-                              label: Text(_isSyncing ? 'Synchronizuję...' : 'Synchronizuj aktywności'),
+                              label: Text(_isSyncing ? context.l10n.moreSyncing : context.l10n.moreSyncActivities),
                             ),
                             const SizedBox(height: 8),
                             TextButton(
                               onPressed: _isConnecting ? null : _disconnectStrava,
-                              child: const Text('Odłącz Strava'),
+                              child: Text(context.l10n.moreDisconnectStrava),
                             ),
                           ],
                         );
@@ -745,7 +743,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               )
                             : const Icon(Icons.link),
                         label: Text(
-                          _isConnecting ? 'Łączę...' : 'Połącz ze Strava',
+                          _isConnecting ? context.l10n.moreConnecting : context.l10n.moreConnectStrava,
                         ),
                       );
                     },
@@ -755,12 +753,13 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                    error: (e, _) => Text('Błąd: $e'),
+                    error: (e, _) => Text(context.l10n.moreErrorWithDetails(error: e.toString())),
                   ),
                 ],
               ),
             ),
           ),
+          if (AppConstants.garminEnabled) ...[
           const SizedBox(height: 16),
           Card(
             child: Padding(
@@ -777,7 +776,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                           width: 48,
                           height: 48,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Icon(
+                          errorBuilder: (_, _, _) => Icon(
                             Icons.watch,
                             color: Colors.blue.shade800,
                             size: 48,
@@ -794,12 +793,12 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Text(
-                              'Aktywności z Garmin dodawane automatycznie po synchronizacji z Garmin Connect',
+                              context.l10n.moreGarminImportDesc,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Dane aktywności pochodzą z urządzeń Garmin.',
+                              context.l10n.morePdfGarminAttribution,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontStyle: FontStyle.italic,
                               ),
@@ -825,7 +824,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Połączona',
+                                  context.l10n.moreConnected,
                                   style: TextStyle(
                                     color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w600,
@@ -841,7 +840,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
-                                'Wszystkie nowe aktywności z Garmin Connect są importowane do aplikacji. To Ty decydujesz, którą wliczyć do bilansu.',
+                                context.l10n.moreGarminAutoImportInfo,
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
@@ -863,7 +862,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 8),
                                       child: Text(
-                                        'Żeby aktywności z Garmin pojawiały się w aplikacji, zapisz dane połączenia (ID Garmin).',
+                                        context.l10n.moreGarminNeedUserId,
                                         style: Theme.of(context).textTheme.bodySmall,
                                       ),
                                     ),
@@ -877,7 +876,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                                           )
                                         : const Icon(Icons.sync, size: 18),
                                     label: Text(
-                                      _isEnsuringGarminUserId ? 'Zapisuję...' : 'Uzupełnij dane do odbierania aktywności',
+                                      _isEnsuringGarminUserId ? context.l10n.moreSavingShort : context.l10n.moreCompleteActivityReceiveData,
                                     ),
                                   ),
                                 ],
@@ -886,7 +885,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                             const SizedBox(height: 12),
                             TextButton(
                               onPressed: _isConnectingGarmin ? null : _disconnectGarmin,
-                              child: const Text('Odłącz Garmin'),
+                              child: Text(context.l10n.moreDisconnectGarmin),
                             ),
                           ],
                         );
@@ -901,7 +900,7 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                               )
                             : const Icon(Icons.link),
                         label: Text(
-                          _isConnectingGarmin ? 'Łączę...' : 'Połącz z Garmin Connect',
+                          _isConnectingGarmin ? context.l10n.moreConnecting : context.l10n.moreConnectGarmin,
                         ),
                       );
                     },
@@ -911,12 +910,13 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                    error: (e, _) => Text('Błąd: $e'),
+                    error: (e, _) => Text(context.l10n.moreErrorWithDetails(error: e.toString())),
                   ),
                 ],
               ),
             ),
           ),
+          ],
         ],
       ),
     );

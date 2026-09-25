@@ -26,11 +26,13 @@ Jeśli chcesz, aby użytkownik mógł zalogować się bez klikania linku (np. gd
 W **Authentication** → **Email Templates** → **Magic Link** możesz podmienić całą treść na polską:
 
 **Temat (Subject):**
+
 ```
 Zaloguj się do Łatwa Forma
 ```
 
 **Treść (Message body):**
+
 ```
 Cześć!
 
@@ -59,11 +61,13 @@ Zapisz zmiany. Mail będzie po polsku i zawierał zarówno link, jak i kod.
 Edytor Supabase może wyświetlać treść jako jeden ciąg znaków. Możesz wstawić nowe linie na dwa sposoby:
 
 1. **Znak nowej linii** – wpisz `\n` (backslash + n) tam, gdzie ma być enter, np.:
+
    ```
    Cześć!\n\nOto Twój link...
    ```
 
 2. **Tagi HTML** – użyj `<br>` lub `<br/>`:
+
    ```
    Cześć!<br><br>Oto Twój link...
    ```
@@ -78,6 +82,7 @@ Gdy użytkownik wybiera „Kontynuuj z emailem” w „Zapisz postępy”, Supab
 
 - **Subject:** `Potwierdź swój adres e-mail – Łatwa Forma`
 - **Message body:**
+
 ```
 Cześć!
 
@@ -95,6 +100,7 @@ Kod (gdy czytasz maila na innym urządzeniu): {{ .Token }}
 
 - **Subject:** `Potwierdź nowy adres e-mail – Łatwa Forma`
 - **Message body:**
+
 ```
 Cześć!
 
@@ -112,6 +118,7 @@ Kod (gdy czytasz maila na innym urządzeniu): {{ .Token }}
 
 - **Subject:** `Zostałeś zaproszony do Łatwa Forma`
 - **Message body:**
+
 ```
 Cześć!
 
@@ -136,14 +143,17 @@ Kod (gdy czytasz maila na innym urządzeniu): {{ .Token }}
 **1. Wgraj funkcję na Supabase**
 
 Otwórz terminal w folderze projektu (tam gdzie jest plik `pubspec.yaml`) i wpisz:
+
 ```
 supabase functions deploy invite_user
 ```
+
 Jeśli nie masz Supabase CLI – zainstaluj go albo użyj Supabase Dashboard: Project Settings → Edge Functions → Deploy.
 
 **2. Adres przekierowania**
 
 Ten sam adres co dla magic link musi być w Supabase:
+
 - Supabase → Authentication → URL Configuration → Redirect URLs
 - Powinna być linia z adresem Twojej strony przekierowania (np. `https://biuroventas.github.io/latwa-forma-strava/auth_redirect/` przy GitHub Pages, lub **w produkcji** `https://latwaforma.pl/auth_redirect/` jeśli hostujesz tam auth_redirect).
 - Jeśli jej nie ma – dodaj ją i zapisz.
@@ -159,9 +169,11 @@ Ten sam adres co dla magic link musi być w Supabase:
 
 1. Otwórz folder z projektem **Łatwa Forma** na komputerze.
 2. Znajdź plik:
+
    ```
    web/auth_redirect/index.html
    ```
+
 3. Otwórz w przeglądarce stronę **GitHub** (github.com) i zaloguj się.
 4. Wejdź w repozytorium **latwa-forma-strava** (to samo, które używasz dla Strava).
 5. **Dodaj plik na GitHub**:
@@ -175,9 +187,11 @@ Ten sam adres co dla magic link musi być w Supabase:
    **Jeśli masz Git na komputerze**: możesz po prostu skopiować cały folder `web/auth_redirect/` do repozytorium latwa-forma-strava i zrobić commit + push.
 
 6. Po zapisaniu Twoja strona będzie pod adresem:
+
    ```
    https://biuroventas.github.io/latwa-forma-strava/auth_redirect/
    ```
+
    (Jeśli używasz innej nazwy użytkownika/repozytorium, zamień `biuroventas` i `latwa-forma-strava` na swoje).
 
 ---
@@ -186,9 +200,11 @@ Ten sam adres co dla magic link musi być w Supabase:
 
 1. W folderze projektu otwórz plik **.env** (np. w Notatniku albo Cursor).
 2. Sprawdź, czy jest tam linia:
+
    ```
    EMAIL_AUTH_REDIRECT_URL=https://biuroventas.github.io/latwa-forma-strava/auth_redirect/
    ```
+
 3. Jeśli jej nie ma — dodaj ją na końcu pliku.
 4. Jeśli używasz innego adresu GitHub Pages — wpisz tam swój adres.
 5. Zapisz plik.
@@ -202,9 +218,11 @@ Ten sam adres co dla magic link musi być w Supabase:
 3. W menu po lewej wybierz **Authentication**.
 4. Kliknij **URL Configuration**.
 5. W sekcji **Redirect URLs** dodaj nową linię:
+
    ```
    https://biuroventas.github.io/latwa-forma-strava/auth_redirect/
    ```
+
    (Użyj tego samego adresu co w kroku 2.)
 6. Kliknij **Save** / **Zapisz**.
 

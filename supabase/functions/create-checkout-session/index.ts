@@ -7,6 +7,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/// Aktywny kod w Stripe wskazuje kupony pierwszej płatności (metadata month_coupon / year_coupon).
+async function _couponForPromo(
+  stripe: Stripe,
+  code: string,
+  plan: "monthly" | "yearly" | "yearly_once",
+): Promise<string | null> {
+  const candidates = [...new Set([code, code.toUpperCase()])];
+  for (const candidate of candidates) {
+    const listed = await stripe.promotionCodes.list({ code: candidate, active: true, limit: 1 });
+    const promo = listed.data[0];
+    if (!promo) continue;
+    const monthCoupon = promo.metadata?.month_coupon?.trim();
+    const yearCoupon = promo.metadata?.year_coupon?.trim();
+    if (plan === "yearly") return yearCoupon || null;
+    if (plan === "monthly") return monthCoupon || null;
+  }
+  return null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -27,17 +46,19 @@ Deno.serve(async (req) => {
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
     const priceMonthly = Deno.env.get("STRIPE_PREMIUM_PRICE_MONTHLY");
     const priceYearly = Deno.env.get("STRIPE_PREMIUM_PRICE_YEARLY");
-    const priceYearlyOneTime = Deno.env.get("STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME"); // płatność jednorazowa za rok – BLIK
+    const priceYearlyOneTime = Deno.env.get("STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME"); // płatność jednorazowa za rok – tylko BLIK
     const priceFallback = Deno.env.get("STRIPE_PREMIUM_PRICE_ID"); // stara konfiguracja – jeden price
     // Domyślnie latwaforma.pl (web). Sekrety STRIPE_SUCCESS_URL / STRIPE_CANCEL_URL nadpisują.
     const successUrl = Deno.env.get("STRIPE_SUCCESS_URL") ?? "https://latwaforma.pl/#/premium-success";
     const cancelUrl = Deno.env.get("STRIPE_CANCEL_URL") ?? "https://latwaforma.pl/#/premium-cancel";
 
     let plan: "monthly" | "yearly" | "yearly_once" = "monthly";
+    let promoCode = "";
     try {
-      const body = await req.json() as { plan?: string } | null;
+      const body = await req.json() as { plan?: string; promoCode?: string } | null;
       if (body?.plan === "yearly_once") plan = "yearly_once";
       else if (body?.plan === "yearly") plan = "yearly";
+      promoCode = (body?.promoCode ?? "").trim();
     } catch {
       // brak body lub nie JSON – domyślnie monthly
     }
@@ -82,12 +103,31 @@ Deno.serve(async (req) => {
 
     const stripe = new Stripe(stripeSecretKey);
 
+    if (promoCode && isOneTimeYear) {
+      return new Response(
+        JSON.stringify({ error: "Ten kod nie działa przy płatności jednorazowej." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
+    if (promoCode) {
+      const couponId = await _couponForPromo(stripe, promoCode, plan);
+      if (!couponId) {
+        return new Response(
+          JSON.stringify({ error: "Nieprawidłowy kod." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      discounts = [{ coupon: couponId }];
+    }
+
     if (isOneTimeYear) {
-      // Płatność jednorazowa za rok – karta, BLIK, PayPal (BLIK w Stripe tylko przy mode: "payment").
+      // Płatność jednorazowa za rok – tylko BLIK (Stripe BLIK wymaga mode: "payment").
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         line_items: [{ price: stripePriceId, quantity: 1 }],
-        payment_method_types: ["card", "blik", "paypal"],
+        payment_method_types: ["blik"],
         success_url: successUrl,
         cancel_url: cancelUrl,
         client_reference_id: user.id,
@@ -103,6 +143,9 @@ Deno.serve(async (req) => {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: stripePriceId, quantity: 1 }],
+      // Tylko karta – Apple Pay / Google Pay wchodzą razem z card. Bez Klarny i BLIK.
+      payment_method_types: ["card"],
+      ...(discounts ? { discounts } : {}),
       success_url: successUrl,
       cancel_url: cancelUrl,
       client_reference_id: user.id,

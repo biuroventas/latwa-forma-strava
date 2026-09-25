@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../shared/models/activity.dart';
 import '../../../shared/models/favorite_activity.dart';
@@ -83,13 +84,13 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
     final canProceed = await checkPremiumOrNavigate(
       context,
       ref,
-      featureName: 'Szybkie dodawanie w aktywnościach',
+      featureName: context.l10n.trackFeatureQuickAddActivities,
     );
     if (!canProceed || !mounted) return;
     setState(() => _isLoading = true);
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
-      if (userId == null) throw Exception('Użytkownik nie jest zalogowany');
+      if (userId == null) throw Exception(context.l10n.trackUserNotLoggedIn);
 
       final effectiveDate = widget.date ?? DateTime.now();
       final createdAt = DateTime(
@@ -101,7 +102,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
       );
       final activity = Activity(
         userId: userId,
-        name: 'Spalone $kcal kcal',
+        name: context.l10n.trackBurnedKcalName(kcal: '$kcal'),
         caloriesBurned: kcal.toDouble(),
         durationMinutes: null,
         activityType: null,
@@ -115,10 +116,10 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
 
       if (mounted) {
         context.pop(true);
-        SuccessMessage.show(context, 'Dodano: $kcal kcal');
+        SuccessMessage.show(context, context.l10n.trackAddedKcal(kcal: '$kcal'), l10n: context.l10n);
       }
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -132,7 +133,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
       if (userId == null) {
-        throw Exception('Użytkownik nie jest zalogowany');
+        throw Exception(context.l10n.trackUserNotLoggedIn);
       }
 
       final service = SupabaseService();
@@ -142,7 +143,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
         final updatedActivity = Activity(
           id: widget.activity!.id,
           userId: userId,
-          name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
+          name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultActivityName : _nameController.text.trim(),
           caloriesBurned: double.parse(_caloriesController.text),
           durationMinutes: _durationController.text.isNotEmpty
               ? int.parse(_durationController.text)
@@ -155,7 +156,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
         if (mounted && _addToFavorites) {
           final fav = FavoriteActivity(
             userId: userId,
-            name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
+            name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultActivityName : _nameController.text.trim(),
             caloriesBurned: double.parse(_caloriesController.text),
             durationMinutes: _durationController.text.isNotEmpty ? int.tryParse(_durationController.text) : null,
             activityType: _activityType,
@@ -174,7 +175,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
         );
         final activity = Activity(
           userId: userId,
-          name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
+          name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultActivityName : _nameController.text.trim(),
           caloriesBurned: double.parse(_caloriesController.text),
           durationMinutes: _durationController.text.isNotEmpty
               ? int.parse(_durationController.text)
@@ -188,7 +189,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
         if (mounted && _addToFavorites) {
           final fav = FavoriteActivity(
             userId: userId,
-            name: _nameController.text.trim().isEmpty ? AppConstants.defaultActivityName : _nameController.text.trim(),
+            name: _nameController.text.trim().isEmpty ? context.l10n.trackDefaultActivityName : _nameController.text.trim(),
             caloriesBurned: double.parse(_caloriesController.text),
             durationMinutes: _durationController.text.isNotEmpty ? int.tryParse(_durationController.text) : null,
             activityType: _activityType,
@@ -199,13 +200,10 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
 
       if (mounted) {
         context.pop(true);
-        SuccessMessage.show(
-          context,
-          _addToFavorites ? 'Aktywność zapisana i dodana do ulubionych!' : 'Aktywność dodana pomyślnie!',
-        );
+        SuccessMessage.show(context, _addToFavorites ? context.l10n.trackActivitySavedAndFavorited : context.l10n.trackActivityAddedSuccess, l10n: context.l10n);
       }
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -215,9 +213,10 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.activity != null ? 'Edytuj aktywność' : 'Dodaj aktywność'),
+        title: Text(widget.activity != null ? context.l10n.trackEditActivity : context.l10n.trackAddActivity),
       ),
       body: LoadingOverlay(
         isLoading: _isLoading,
@@ -241,7 +240,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
                         children: [
                           Icon(Icons.local_fire_department, size: 18, color: Colors.orange.shade700),
                           const SizedBox(width: 6),
-                          Text('Szybkie dodawanie', style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          Text(context.l10n.trackQuickAdd, style: Theme.of(context).textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Colors.orange.shade800,
                           )),
@@ -277,27 +276,27 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             ],
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nazwa aktywności (opcjonalnie)',
-                hintText: 'Puste = "Aktywność bez nazwy"',
+              decoration: InputDecoration(
+                labelText: l10n.trackActivityNameOptional,
+                hintText: l10n.trackHintEmptyDefaultActivityName,
               ),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _caloriesController,
-              decoration: const InputDecoration(
-                labelText: 'Spalone kalorie (kcal)',
+              decoration: InputDecoration(
+                labelText: l10n.trackBurnedCalories,
                 hintText: '0',
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Podaj liczbę spalonych kalorii';
+                  return l10n.trackEnterBurnedCalories;
                 }
                 final calories = double.tryParse(value);
                 if (calories == null || calories < 0) {
-                  return 'Podaj poprawną liczbę kalorii';
+                  return l10n.trackEnterValidCalories;
                 }
                 return null;
               },
@@ -305,8 +304,8 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _durationController,
-              decoration: const InputDecoration(
-                labelText: 'Czas trwania (minuty) - opcjonalnie',
+              decoration: InputDecoration(
+                labelText: l10n.trackDurationMinutesOptional,
                 hintText: '0',
               ),
               keyboardType: TextInputType.number,
@@ -314,18 +313,18 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _activityType,
-              decoration: const InputDecoration(
-                labelText: 'Typ aktywności - opcjonalnie',
+              initialValue: _activityType,
+              decoration: InputDecoration(
+                labelText: l10n.trackActivityTypeOptional,
               ),
               items: [
                 const DropdownMenuItem(value: null, child: Text('—')),
-                const DropdownMenuItem(value: 'RUNNING', child: Text('Bieg')),
-                const DropdownMenuItem(value: 'CYCLING', child: Text('Kolarstwo')),
-                const DropdownMenuItem(value: 'WALKING', child: Text('Chodzenie')),
-                const DropdownMenuItem(value: 'SWIMMING', child: Text('Pływanie')),
-                const DropdownMenuItem(value: 'HIKING', child: Text('Wędrówka')),
-                const DropdownMenuItem(value: 'OTHER', child: Text('Inna')),
+                DropdownMenuItem(value: 'RUNNING', child: Text(l10n.trackActivityTypeRun)),
+                DropdownMenuItem(value: 'CYCLING', child: Text(l10n.trackActivityTypeCycling)),
+                DropdownMenuItem(value: 'WALKING', child: Text(l10n.trackActivityTypeWalk)),
+                DropdownMenuItem(value: 'SWIMMING', child: Text(l10n.trackActivityTypeSwim)),
+                DropdownMenuItem(value: 'HIKING', child: Text(l10n.trackActivityTypeHike)),
+                DropdownMenuItem(value: 'OTHER', child: Text(l10n.trackActivityTypeOther)),
                 if (_activityType != null &&
                     _activityType!.isNotEmpty &&
                     !const ['RUNNING', 'CYCLING', 'WALKING', 'SWIMMING', 'HIKING', 'OTHER'].contains(_activityType))
@@ -341,8 +340,8 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
               onChanged: (value) {
                 setState(() => _addToFavorites = value ?? false);
               },
-              title: const Text('Dodaj do ulubionych'),
-              subtitle: const Text('Będziesz mógł szybko dodać tę aktywność później'),
+              title: Text(l10n.trackAddToFavorites),
+              subtitle: Text(l10n.trackAddToFavoritesActivitySubtitle),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
             ),
@@ -355,7 +354,7 @@ class _AddActivityScreenState extends ConsumerState<AddActivityScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(
-                        widget.activity != null ? 'Zaktualizuj aktywność' : 'Zapisz aktywność',
+                        widget.activity != null ? l10n.trackUpdateActivity : l10n.trackSaveActivity,
                         style: const TextStyle(fontSize: 16),
                       ),
               ),

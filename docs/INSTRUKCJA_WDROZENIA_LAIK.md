@@ -7,7 +7,7 @@ Instrukcja w **dokładnej kolejności**. Każdy krok mówi: **gdzie wejść**, *
 ## Stan wdrożenia (aktualny)
 
 | Co | Status |
-|----|--------|
+| --- | --- |
 | **Domena latwaforma.pl** | W OVH (transfer w toku lub zakończony) |
 | **Hosting** | **OVH** hosting-perso (latwafe.cluster121.hosting.ovh.net) – **gotowy** |
 | **Landing na OVH** | **Wgrany** – 5 plików w katalogu **www** (index.html, polityka-prywatnosci.html, regulamin.html, privacy.html, terms.html). Instrukcja: **docs/INSTRUKCJA_WGRANIA_STRONY_OVH_LAIK.md**. |
@@ -186,9 +186,11 @@ Tu wgrywasz **aplikację Flutter** (to, co widać po zbudowaniu „strony” z p
 1. Otwórz **terminal** (w Cursor: Terminal → New Terminal, albo Terminal na Macu / Wiersz poleceń na Windows).
 2. Przejdź do folderu projektu (np. wpisz: `cd "Ścieżka/do/Latwa_Forma"` – swoją ścieżkę).
 3. Wpisz komendę i naciśnij Enter:
+
    ```bash
    flutter build web
    ```
+
 4. Poczekaj, aż build się skończy. Powinien pojawić się folder **build/web** w projekcie.
 
 ## Krok 6.2. Założenie konta Vercel i nowy projekt
@@ -207,6 +209,7 @@ Tu wgrywasz **aplikację Flutter** (to, co widać po zbudowaniu „strony” z p
 4. **Install Command:** wpisz: `flutter pub get` (albo zostaw puste, jeśli build sam zainstaluje zależności – na Vercel może być potrzebna instalacja Flutter SDK; wtedy często używa się np. **„Deploy from local”** z gotowym folderem **build/web**).
 
 **Uwaga:** Vercel domyślnie **nie ma** Fluttera. Dlatego często stosuje się jedną z opcji:
+
 - **Opcja A:** Build lokalnie (`flutter build web`), a potem w Vercel: **„Import”** i wybierz **„Upload”** – wgrywasz **zawartość** folderu **build/web** (wszystkie pliki z środka) do Vercel (np. przeciągając folder).
 - **Opcja B:** Użyć **Netlify** lub **Firebase Hosting** – Netlify ma „Deploy from folder”; Firebase wymaga `firebase deploy` z folderu `build/web`.
 
@@ -223,11 +226,13 @@ Dla **najprostszego** flow „dla laika” opiszemy **Opcję A z Vercel (upload)
 ## Krok 6.5. Podpięcie domeny app.latwaforma.pl
 
 **Jeśli używasz Vercel:**
+
 1. W projekcie Vercel wejdź w **Settings** → **Domains**.
 2. Kliknij **„Add”** i wpisz: **app.latwaforma.pl**.
 3. Vercel pokaże, co ustawić w DNS (np. **CNAME** dla **app** z wartością typu `cname.vercel-dns.com`). **Skopiuj** dokładnie tę wartość.
 
 **Jeśli używasz Netlify:**
+
 1. **Domain settings** → **Add custom domain** → wpisz **app.latwaforma.pl**.
 2. Netlify wskaże rekord **CNAME**: np. **app** → `nazwa-twojej-strony.netlify.app`. Skopiuj.
 
@@ -285,7 +290,7 @@ Jeśli używasz **Stripe Dashboard** do tych pól – zmień je tam na powyższe
 # Podsumowanie kolejności
 
 | Nr | Działanie |
-|----|-----------|
+| --- | --- |
 | 1 | Wykup domeny latwaforma.pl w OVH |
 | 2 | Hosting OVH (już masz). Założenie skrzynek contact@ i norbert.wroblewski@latwaforma.pl w OVH |
 | 3 | W OVH: sprawdzenie/ustawienie DNS – rekordy A (latwaforma.pl, www), MX, TXT (SPF, DKIM, DMARC) |

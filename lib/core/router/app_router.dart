@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../core/auth/auth_callback_handler.dart';
 import '../../core/config/supabase_config.dart';
 import '../../core/providers/auth_state_provider.dart';
+import '../utils/store_screenshot_seed.dart';
 import '../../shared/widgets/app_background.dart';
 import '../../shared/widgets/offline_banner.dart';
+import '../../shared/widgets/main_tab_shell.dart';
 import '../../shared/models/user_profile.dart';
 import '../../shared/models/favorite_meal.dart';
 import '../../shared/models/meal.dart';
@@ -40,6 +42,7 @@ import '../../features/integrations/screens/integrations_screen.dart';
 import '../../features/ai_advice/screens/ai_advice_screen.dart';
 import '../../features/subscription/screens/premium_screen.dart';
 import '../../features/subscription/screens/premium_success_screen.dart';
+import '../../features/subscription/screens/premium_cancel_screen.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -72,6 +75,56 @@ class AppRoutes {
   static const aiAdvice = '/ai-advice';
   static const premium = '/premium';
   static const premiumSuccess = '/premium-success';
+  static const premiumCancel = '/premium-cancel';
+}
+
+/// Extra dla flow posiłków: `DateTime`, `String` (query), mapa produktu
+/// albo mapa `{date, query, product}`.
+DateTime? extraDate(Object? extra) {
+  if (extra is DateTime) return extra;
+  if (extra is Map) {
+    final d = extra['date'];
+    if (d is DateTime) return d;
+  }
+  return null;
+}
+
+String? extraQuery(Object? extra) {
+  if (extra is String) return extra;
+  if (extra is Map) return extra['query'] as String?;
+  return null;
+}
+
+Map<String, dynamic>? extraProduct(Object? extra) {
+  if (extra is! Map) return null;
+  final nested = extra['product'];
+  if (nested is Map<String, dynamic>) return nested;
+  if (nested is Map) return Map<String, dynamic>.from(nested);
+  if (extra.containsKey('name') ||
+      extra.containsKey('calories') ||
+      extra.containsKey('barcode')) {
+    return Map<String, dynamic>.from(extra);
+  }
+  return null;
+}
+
+Object? mealFlowExtra({
+  DateTime? date,
+  String? query,
+  Map<String, dynamic>? product,
+}) {
+  final hasQuery = query != null;
+  final hasProduct = product != null;
+  final hasDate = date != null;
+  if (hasQuery && !hasProduct && !hasDate) return query;
+  if (hasProduct && !hasQuery && !hasDate) return product;
+  if (hasDate && !hasQuery && !hasProduct) return date;
+  if (!hasQuery && !hasProduct && !hasDate) return null;
+  return {
+    if (hasDate) 'date': date,
+    if (hasQuery) 'query': query,
+    if (hasProduct) 'product': product,
+  };
 }
 
 /// Strona bez animacji – natychmiastowa zamiana (eliminuje „scinanie” przy wszystkich przejściach).
@@ -85,11 +138,15 @@ CustomTransitionPage _noTransitionPage(GoRouterState state, Widget child) {
   );
 }
 
+final appNavigatorKey = GlobalKey<NavigatorState>();
+
 GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
   final notifier = authNotifier ?? AuthStateNotifier();
 
   return GoRouter(
-    initialLocation: AppRoutes.welcome,
+    navigatorKey: appNavigatorKey,
+    initialLocation:
+        kStoreScreenshots ? AppRoutes.splash : AppRoutes.welcome,
     debugLogDiagnostics: true,
     refreshListenable: notifier,
     redirect: (context, state) {
@@ -107,9 +164,9 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
         }
         final user = SupabaseConfig.currentUserOrNull;
         final isWelcome = state.matchedLocation == AppRoutes.welcome;
-        final isLoggedIn = user != null && !(user.isAnonymous);
 
-        if (isLoggedIn && isWelcome) {
+        // Sesja zwykła i anonimowa: nie wracać na start, dopóki token jest na urządzeniu.
+        if (user != null && isWelcome) {
           return AppRoutes.splash;
         }
         return null;
@@ -166,27 +223,76 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
             PlanLoadingScreen(
               targetCalories: extra?['targetCalories'] as double?,
               targetDate: extra?['targetDate'] as DateTime?,
+              goal: extra?['goal'] as String?,
             ),
           );
         },
       ),
-      GoRoute(
-        path: AppRoutes.dashboard,
-        pageBuilder: (_, s) => _noTransitionPage(s, const DashboardScreen()),
-      ),
-      GoRoute(
-        path: AppRoutes.meals,
-        pageBuilder: (c, state) {
-          final date = state.extra as DateTime? ?? DateTime.now();
-          return _noTransitionPage(state, MealsListScreen(date: date));
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainTabShell(navigationShell: navigationShell);
         },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.dashboard,
+                pageBuilder: (_, s) =>
+                    _noTransitionPage(s, const DashboardScreen()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.meals,
+                pageBuilder: (c, state) {
+                  final date = state.extra as DateTime? ?? DateTime.now();
+                  return _noTransitionPage(state, MealsListScreen(date: date));
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.water,
+                pageBuilder: (c, state) {
+                  final date = state.extra as DateTime? ?? DateTime.now();
+                  return _noTransitionPage(
+                    state,
+                    WaterTrackingScreen(initialDate: date),
+                  );
+                },
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                pageBuilder: (_, state) =>
+                    _noTransitionPage(state, const ProfileScreen()),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.mealsAdd,
         pageBuilder: (c, state) {
           final extra = state.extra;
-          final meal = extra is Meal ? extra : null;
-          final date = extra is DateTime ? extra : null;
+          Meal? meal;
+          DateTime? date;
+          if (extra is Meal) {
+            meal = extra;
+            date = extra.createdAt;
+          } else if (extra is DateTime) {
+            date = extra;
+          } else if (extra is Map) {
+            meal = extra['meal'] as Meal?;
+            date = extra['date'] as DateTime? ?? meal?.createdAt;
+          }
           return _noTransitionPage(state, AddMealScreen(meal: meal, date: date));
         },
       ),
@@ -207,13 +313,6 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
         },
       ),
       GoRoute(
-        path: AppRoutes.water,
-        pageBuilder: (c, state) {
-          final date = state.extra as DateTime? ?? DateTime.now();
-          return _noTransitionPage(state, WaterTrackingScreen(initialDate: date));
-        },
-      ),
-      GoRoute(
         path: AppRoutes.weight,
         pageBuilder: (_, state) => _noTransitionPage(state, const WeightTrackingScreen()),
       ),
@@ -222,16 +321,16 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
         pageBuilder: (_, state) => _noTransitionPage(state, const BodyMeasurementsScreen()),
       ),
       GoRoute(
-        path: AppRoutes.profile,
-        pageBuilder: (_, state) => _noTransitionPage(state, const ProfileScreen()),
-      ),
-      GoRoute(
         path: AppRoutes.premium,
         pageBuilder: (_, state) => _noTransitionPage(state, const PremiumScreen()),
       ),
       GoRoute(
         path: AppRoutes.premiumSuccess,
         pageBuilder: (_, state) => _noTransitionPage(state, const PremiumSuccessScreen()),
+      ),
+      GoRoute(
+        path: AppRoutes.premiumCancel,
+        pageBuilder: (_, state) => _noTransitionPage(state, const PremiumCancelScreen()),
       ),
       GoRoute(
         path: AppRoutes.export,
@@ -277,26 +376,49 @@ GoRouter createAppRouter([AuthStateNotifier? authNotifier]) {
       ),
       GoRoute(
         path: AppRoutes.ingredientsMeal,
-        pageBuilder: (_, state) => _noTransitionPage(state, const IngredientsMealScreen()),
+        pageBuilder: (_, state) => _noTransitionPage(
+          state,
+          IngredientsMealScreen(date: extraDate(state.extra)),
+        ),
       ),
       GoRoute(
         path: AppRoutes.barcodeScanner,
-        pageBuilder: (_, state) => _noTransitionPage(state, const BarcodeScannerScreen()),
+        pageBuilder: (_, state) => _noTransitionPage(
+          state,
+          BarcodeScannerScreen(date: extraDate(state.extra)),
+        ),
       ),
       GoRoute(
         path: AppRoutes.productSearch,
-        pageBuilder: (_, state) => _noTransitionPage(state, const ProductSearchScreen()),
+        pageBuilder: (_, state) {
+          return _noTransitionPage(
+            state,
+            ProductSearchScreen(
+              initialQuery: extraQuery(state.extra),
+              date: extraDate(state.extra),
+            ),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.barcodeProduct,
         pageBuilder: (c, state) {
-          final product = state.extra as Map<String, dynamic>;
-          return _noTransitionPage(state, BarcodeProductScreen(product: product));
+          final product = extraProduct(state.extra) ?? const <String, dynamic>{};
+          return _noTransitionPage(
+            state,
+            BarcodeProductScreen(
+              product: product,
+              date: extraDate(state.extra),
+            ),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.aiPhoto,
-        pageBuilder: (_, state) => _noTransitionPage(state, const AIPhotoScreen()),
+        pageBuilder: (_, state) => _noTransitionPage(
+          state,
+          AIPhotoScreen(date: extraDate(state.extra)),
+        ),
       ),
       GoRoute(
         path: AppRoutes.editFavorite,

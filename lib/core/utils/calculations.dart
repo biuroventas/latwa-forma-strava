@@ -152,30 +152,31 @@ class Calculations {
     };
   }
 
-  /// Oblicza szacowany termin osiągnięcia celu
-  static DateTime calculateTargetDate({
+  /// Szacowany termin osiągnięcia celu. `null` = utrzymanie wagi (brak terminu).
+  static DateTime? calculateTargetDate({
     required double currentWeight,
     required double targetWeight,
     required String goal,
   }) {
+    if (goal == AppConstants.goalMaintain) {
+      return null;
+    }
+
     final difference = (targetWeight - currentWeight).abs();
-    
+    if (difference < 0.5) {
+      return null;
+    }
+
     double weeklyChange;
     switch (goal) {
       case AppConstants.goalWeightLoss:
-        weeklyChange = 0.5; // 0.5 kg/tydzień dla utraty wagi
+        weeklyChange = 0.5;
         break;
       case AppConstants.goalWeightGain:
-        weeklyChange = 0.25; // 0.25 kg/tydzień dla przybrania wagi
+        weeklyChange = 0.25;
         break;
-      case AppConstants.goalMaintain:
       default:
-        // Dla utrzymania wagi, termin jest bardzo odległy (np. 1 rok)
-        return DateTime.now().add(const Duration(days: 365));
-    }
-
-    if (weeklyChange == 0) {
-      return DateTime.now().add(const Duration(days: 365));
+        return null;
     }
 
     final weeksNeeded = (difference / weeklyChange).ceil();

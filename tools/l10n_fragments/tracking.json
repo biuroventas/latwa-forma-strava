@@ -1,0 +1,1781 @@
+{
+  "trackPremium": {
+    "pl": "Premium",
+    "en": "Premium"
+  },
+  "trackStatistics": {
+    "pl": "Statystyki",
+    "en": "Statistics"
+  },
+  "trackGoalsAndChallenges": {
+    "pl": "Cele i wyzwania",
+    "en": "Goals & challenges"
+  },
+  "trackProfile": {
+    "pl": "Profil",
+    "en": "Profile"
+  },
+  "trackSessionExpired": {
+    "pl": "Sesja wygasła. Zaloguj się ponownie.",
+    "en": "Session expired. Please sign in again."
+  },
+  "trackLoadDataFailed": {
+    "pl": "Nie udało się załadować danych. Sprawdź połączenie internetowe i naciśnij „Spróbuj ponownie”.",
+    "en": "Couldn't load data. Check your internet connection and tap “Try again”."
+  },
+  "trackErrorWithDetails": {
+    "pl": "Błąd: {error}",
+    "en": "Error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSignIn": {
+    "pl": "Zaloguj się",
+    "en": "Sign in"
+  },
+  "trackFeatureEatingOut": {
+    "pl": "Posiłek „na mieście”",
+    "en": "Eating out meal"
+  },
+  "trackShareCaloriesText": {
+    "pl": "📊 Łatwa Forma – Kalorie {date}",
+    "en": "📊 Łatwa Forma – Calories {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackShareError": {
+    "pl": "Błąd udostępniania: {error}",
+    "en": "Sharing error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesOverview": {
+    "pl": "Przegląd kalorii",
+    "en": "Calorie overview"
+  },
+  "trackSelectDate": {
+    "pl": "Wybierz datę",
+    "en": "Select date"
+  },
+  "trackShare": {
+    "pl": "Udostępnij",
+    "en": "Share"
+  },
+  "trackFeatureShareSummary": {
+    "pl": "Udostępnianie podsumowania",
+    "en": "Share summary"
+  },
+  "trackEarlierWeek": {
+    "pl": "Wcześniejszy tydzień",
+    "en": "Previous week"
+  },
+  "trackFeatureBrowseHistory": {
+    "pl": "Przeglądanie historii innych dni",
+    "en": "Browse other days' history"
+  },
+  "trackLaterWeek": {
+    "pl": "Późniejszy tydzień",
+    "en": "Next week"
+  },
+  "trackShowingDataFrom": {
+    "pl": "Wyświetlane dane z {date}",
+    "en": "Showing data from {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackConsumed": {
+    "pl": "Spożyte",
+    "en": "Consumed"
+  },
+  "trackTodayTarget": {
+    "pl": "Cel na dziś",
+    "en": "Today's goal"
+  },
+  "trackSurplusKcal": {
+    "pl": "Nadwyżka: {kcal} kcal",
+    "en": "Surplus: {kcal} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackProtein": {
+    "pl": "Białko",
+    "en": "Protein"
+  },
+  "trackFat": {
+    "pl": "Tłuszcze",
+    "en": "Fat"
+  },
+  "trackCarbs": {
+    "pl": "Węglowodany",
+    "en": "Carbs"
+  },
+  "trackCarbsShort": {
+    "pl": "Węgle",
+    "en": "Carbs"
+  },
+  "trackIncludingSaturated": {
+    "pl": "w tym nasycone",
+    "en": "incl. saturated"
+  },
+  "trackIncludingSugars": {
+    "pl": "w tym cukry",
+    "en": "incl. sugars"
+  },
+  "trackFiber": {
+    "pl": "błonnik",
+    "en": "fiber"
+  },
+  "trackFiberLabel": {
+    "pl": "Błonnik",
+    "en": "Fiber"
+  },
+  "trackSalt": {
+    "pl": "Sól",
+    "en": "Salt"
+  },
+  "trackFeatureAiMealAnalysis": {
+    "pl": "Analiza AI posiłku",
+    "en": "AI meal analysis"
+  },
+  "trackAiPhotoAnalysisTooltip": {
+    "pl": "Analiza AI ze zdjęcia",
+    "en": "AI photo analysis"
+  },
+  "trackNoResults": {
+    "pl": "Brak wyników",
+    "en": "No results"
+  },
+  "trackWater": {
+    "pl": "Woda",
+    "en": "Water"
+  },
+  "trackWaterMotivation": {
+    "pl": "Człowiek nie wielbłąd, pić musi! 💧",
+    "en": "You're not a camel — drink up! 💧"
+  },
+  "trackActivitiesToday": {
+    "pl": "Aktywności dzisiaj",
+    "en": "Activities today"
+  },
+  "trackActivitiesOnDate": {
+    "pl": "Aktywności – {date}",
+    "en": "Activities – {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoActivities": {
+    "pl": "Brak aktywności",
+    "en": "No activities"
+  },
+  "trackAndMoreCount": {
+    "pl": "... i {count} więcej",
+    "en": "... and {count} more",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealsToday": {
+    "pl": "Posiłki dzisiaj",
+    "en": "Meals today"
+  },
+  "trackMealsOnDate": {
+    "pl": "Posiłki – {date}",
+    "en": "Meals – {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoMeals": {
+    "pl": "Brak posiłków",
+    "en": "No meals"
+  },
+  "trackDayMon": {
+    "pl": "Pon",
+    "en": "Mon"
+  },
+  "trackDayTue": {
+    "pl": "Wt",
+    "en": "Tue"
+  },
+  "trackDayWed": {
+    "pl": "Śr",
+    "en": "Wed"
+  },
+  "trackDayThu": {
+    "pl": "Czw",
+    "en": "Thu"
+  },
+  "trackDayFri": {
+    "pl": "Pt",
+    "en": "Fri"
+  },
+  "trackDaySat": {
+    "pl": "Sob",
+    "en": "Sat"
+  },
+  "trackDaySun": {
+    "pl": "Nie",
+    "en": "Sun"
+  },
+  "trackAdd": {
+    "pl": "Dodaj",
+    "en": "Add"
+  },
+  "trackMeal": {
+    "pl": "Posiłek",
+    "en": "Meal"
+  },
+  "trackEatingOut": {
+    "pl": "Jedzenie na mieście",
+    "en": "Eating out"
+  },
+  "trackActivity": {
+    "pl": "Aktywność",
+    "en": "Activity"
+  },
+  "trackWeight": {
+    "pl": "Waga",
+    "en": "Weight"
+  },
+  "trackMeasurements": {
+    "pl": "Pomiary",
+    "en": "Measurements"
+  },
+  "trackFavorites": {
+    "pl": "Ulubione",
+    "en": "Favorites"
+  },
+  "trackUserNotLoggedIn": {
+    "pl": "Użytkownik nie jest zalogowany",
+    "en": "User is not signed in"
+  },
+  "trackMealSavedAndFavorited": {
+    "pl": "Posiłek zapisany i dodany do ulubionych!",
+    "en": "Meal saved and added to favorites!"
+  },
+  "trackMealAddedSuccess": {
+    "pl": "Posiłek dodany pomyślnie!",
+    "en": "Meal added successfully!"
+  },
+  "trackFeatureIngredientsMeal": {
+    "pl": "Posiłek ze składników",
+    "en": "Meal from ingredients"
+  },
+  "trackOptionEatingOut": {
+    "pl": "Na mieście",
+    "en": "Eating out"
+  },
+  "trackOptionAiAnalysis": {
+    "pl": "Analiza AI",
+    "en": "AI analysis"
+  },
+  "trackOptionIngredients": {
+    "pl": "Składniki",
+    "en": "Ingredients"
+  },
+  "trackOptionBarcode": {
+    "pl": "Kod kreskowy",
+    "en": "Barcode"
+  },
+  "trackOptionSearchProduct": {
+    "pl": "Wyszukaj produkt",
+    "en": "Search product"
+  },
+  "trackOptionFavorites": {
+    "pl": "Ulubione",
+    "en": "Favorites"
+  },
+  "trackEditMeal": {
+    "pl": "Edytuj posiłek",
+    "en": "Edit meal"
+  },
+  "trackAddMeal": {
+    "pl": "Dodaj posiłek",
+    "en": "Add meal"
+  },
+  "trackMealNameOptional": {
+    "pl": "Nazwa posiłku (opcjonalnie)",
+    "en": "Meal name (optional)"
+  },
+  "trackHintEmptyDefaultName": {
+    "pl": "Puste = \"Bez nazwy\"",
+    "en": "Leave empty = \"Untitled\""
+  },
+  "trackDefaultMealName": {
+    "pl": "Bez nazwy",
+    "en": "Untitled"
+  },
+  "trackHintCaloriesFromMacros": {
+    "pl": "Puste = policzy z makroskładników",
+    "en": "Leave empty = calculated from macros"
+  },
+  "trackEnterCaloriesOrMacros": {
+    "pl": "Podaj liczbę kalorii lub uzupełnij makroskładniki",
+    "en": "Enter calories or fill in the macros"
+  },
+  "trackProteinG": {
+    "pl": "Białko (g)",
+    "en": "Protein (g)"
+  },
+  "trackFatG": {
+    "pl": "Tłuszcze (g)",
+    "en": "Fat (g)"
+  },
+  "trackCarbsG": {
+    "pl": "Węglowodany (g)",
+    "en": "Carbs (g)"
+  },
+  "trackFiberG": {
+    "pl": "Błonnik (g)",
+    "en": "Fiber (g)"
+  },
+  "trackSaltG": {
+    "pl": "Sól (g)",
+    "en": "Salt (g)"
+  },
+  "trackMealTypeOptional": {
+    "pl": "Typ posiłku - opcjonalnie",
+    "en": "Meal type – optional"
+  },
+  "trackBreakfast": {
+    "pl": "Śniadanie",
+    "en": "Breakfast"
+  },
+  "trackLunch": {
+    "pl": "Obiad",
+    "en": "Lunch"
+  },
+  "trackDinner": {
+    "pl": "Kolacja",
+    "en": "Dinner"
+  },
+  "trackSnack": {
+    "pl": "Przekąska",
+    "en": "Snack"
+  },
+  "trackAddToFavorites": {
+    "pl": "Dodaj do ulubionych",
+    "en": "Add to favorites"
+  },
+  "trackAddToFavoritesMealSubtitle": {
+    "pl": "Będziesz mógł szybko dodać ten posiłek później",
+    "en": "You can quickly add this meal later"
+  },
+  "trackUpdateMeal": {
+    "pl": "Zaktualizuj posiłek",
+    "en": "Update meal"
+  },
+  "trackSaveMeal": {
+    "pl": "Zapisz posiłek",
+    "en": "Save meal"
+  },
+  "trackCalories": {
+    "pl": "Kalorie",
+    "en": "Calories"
+  },
+  "trackCameraUnavailableTitle": {
+    "pl": "Kamera niedostępna",
+    "en": "Camera unavailable"
+  },
+  "trackCameraUnavailableBody": {
+    "pl": "Kamera nie jest dostępna na tym urządzeniu (np. na symulatorze).\n\nUżyj przycisku „Z galerii”, aby wybrać zdjęcie z galerii.",
+    "en": "The camera is not available on this device (e.g. on a simulator).\n\nUse “From gallery” to pick a photo from your gallery."
+  },
+  "trackFromGallery": {
+    "pl": "Z galerii",
+    "en": "From gallery"
+  },
+  "trackPickImageError": {
+    "pl": "Błąd wyboru zdjęcia: {error}",
+    "en": "Error picking image: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAnalysisFailedOpenAi": {
+    "pl": "Nie udało się przeanalizować zdjęcia. Sprawdź czy klucz OpenAI API jest ustawiony.",
+    "en": "Couldn't analyze the photo. Check that the OpenAI API key is set."
+  },
+  "trackAnalysisError": {
+    "pl": "Błąd analizy: {error}",
+    "en": "Analysis error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAiPhotoTitle": {
+    "pl": "Analiza zdjęcia AI",
+    "en": "AI photo analysis"
+  },
+  "trackTakeMealPhoto": {
+    "pl": "Zrób zdjęcie posiłku",
+    "en": "Take a meal photo"
+  },
+  "trackAiPhotoDescription": {
+    "pl": "AI przeanalizuje zdjęcie i oszacuje wartości odżywcze. Zdjęcie jest wysyłane do dostawcy AI (OpenAI) wyłącznie w tym celu – nie zapisujemy galerii zdjęć. Szacunki są orientacyjne i nie stanowią porady medycznej.",
+    "en": "AI will analyze the photo and estimate nutrition. The image is sent to the AI provider (OpenAI) only for this purpose – we do not save a photo gallery. Estimates are approximate and are not medical advice."
+  },
+  "trackSimulatorCameraHint": {
+    "pl": "Na symulatorze kamera nie działa – wybierz zdjęcie z galerii.",
+    "en": "The camera doesn't work on a simulator – pick a photo from the gallery."
+  },
+  "trackTakePhoto": {
+    "pl": "Zrób zdjęcie",
+    "en": "Take photo"
+  },
+  "trackAnalyzingPhoto": {
+    "pl": "Analizowanie zdjęcia...",
+    "en": "Analyzing photo..."
+  },
+  "trackMayTakeAMoment": {
+    "pl": "To może chwilę potrwać",
+    "en": "This may take a moment"
+  },
+  "trackProductNotFound": {
+    "pl": "Produkt o kodzie {code} nie został znaleziony w bazie produktów.",
+    "en": "No product with code {code} was found in the product database.",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "trackFetchProductFailed": {
+    "pl": "Nie udało się pobrać danych produktu: {error}",
+    "en": "Couldn't fetch product data: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackBarcodeScannerTitle": {
+    "pl": "Skaner kodów kreskowych",
+    "en": "Barcode scanner"
+  },
+  "trackSimulatorEnterCode": {
+    "pl": "Na symulatorze wprowadź kod ręcznie",
+    "en": "On a simulator, enter the code manually"
+  },
+  "trackEnterProductCode": {
+    "pl": "Wprowadź kod produktu",
+    "en": "Enter product code"
+  },
+  "trackSearchProduct": {
+    "pl": "Szukaj produktu",
+    "en": "Search product"
+  },
+  "trackScannerUnavailable": {
+    "pl": "Skaner niedostępny - użyj symulatora lub urządzenia fizycznego",
+    "en": "Scanner unavailable – use the simulator or a physical device"
+  },
+  "trackPointAtBarcode": {
+    "pl": "Wskaż kod kreskowy produktu",
+    "en": "Point at the product barcode"
+  },
+  "trackBarcodePrivacy": {
+    "pl": "Dane zostaną pobrane z bazy produktów. Kamera służy wyłącznie do odczytu kodu – zdjęcia nie zapisujemy ani nie wysyłamy.",
+    "en": "Data will be fetched from the product database. The camera is only used to read the code – we do not save or send photos."
+  },
+  "trackScanBarcode": {
+    "pl": "Skanuj kod kreskowy",
+    "en": "Scan barcode"
+  },
+  "trackAddProduct": {
+    "pl": "Dodaj produkt",
+    "en": "Add product"
+  },
+  "trackEnterProductWeight": {
+    "pl": "Podaj wagę produktu",
+    "en": "Enter the product weight"
+  },
+  "trackNutritionPer100g": {
+    "pl": "Wartości odżywcze (na 100g):",
+    "en": "Nutrition (per 100g):"
+  },
+  "trackWeightHintExample": {
+    "pl": "np. 75.5",
+    "en": "e.g. 75.5"
+  },
+  "trackWeightHelper": {
+    "pl": "Ile gramów produktu zjadasz?",
+    "en": "How many grams are you eating?"
+  },
+  "trackEditBeforeSave": {
+    "pl": "Edytuj przed zapisem",
+    "en": "Edit before saving"
+  },
+  "trackPer100g": {
+    "pl": "{label}/100g",
+    "en": "{label}/100g",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWeightG": {
+    "pl": "Waga (g)",
+    "en": "Weight (g)"
+  },
+  "trackSearchProductTitle": {
+    "pl": "Wyszukaj produkt",
+    "en": "Search product"
+  },
+  "trackSearchProductHint": {
+    "pl": "Nazwa produktu, np. mleko, nutella…",
+    "en": "Product name, e.g. milk, nutella…"
+  },
+  "trackEnterProductName": {
+    "pl": "Wpisz nazwę produktu",
+    "en": "Enter a product name"
+  },
+  "trackSearchProductSubtitle": {
+    "pl": "Korzystamy z bazy Open Food Facts. Wyniki pojawią się po wpisaniu min. kilku liter.",
+    "en": "We use the Open Food Facts database. Results appear after you type a few letters."
+  },
+  "trackNoResultsTryBarcode": {
+    "pl": "Spróbuj innej nazwy lub zeskanuj kod kreskowy produktu.",
+    "en": "Try another name or scan the product barcode."
+  },
+  "trackBackToDashboard": {
+    "pl": "Wróć do dashboardu",
+    "en": "Back to dashboard"
+  },
+  "trackMealsDateTitle": {
+    "pl": "Posiłki - {date}",
+    "en": "Meals - {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackFavoriteMealsTooltip": {
+    "pl": "Ulubione posiłki",
+    "en": "Favorite meals"
+  },
+  "trackNoMealsForDay": {
+    "pl": "Brak posiłków na ten dzień",
+    "en": "No meals for this day"
+  },
+  "trackUsePlusToAddMeal": {
+    "pl": "Użyj przycisku + aby dodać posiłek",
+    "en": "Use the + button to add a meal"
+  },
+  "trackDeleteMealTitle": {
+    "pl": "Usuń posiłek",
+    "en": "Delete meal"
+  },
+  "trackDeleteMealConfirm": {
+    "pl": "Czy na pewno chcesz usunąć \"{name}\"?",
+    "en": "Are you sure you want to delete \"{name}\"?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealDeleted": {
+    "pl": "Posiłek usunięty",
+    "en": "Meal deleted"
+  },
+  "trackAddAtLeastOneIngredient": {
+    "pl": "Dodaj przynajmniej jeden składnik",
+    "en": "Add at least one ingredient"
+  },
+  "trackMealFromIngredientsTitle": {
+    "pl": "Posiłek ze składników",
+    "en": "Meal from ingredients"
+  },
+  "trackTotalWeightG": {
+    "pl": "Całkowita waga: {weight} g",
+    "en": "Total weight: {weight} g",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "trackIngredientsCount": {
+    "pl": "Składniki ({count})",
+    "en": "Ingredients ({count})",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddIngredient": {
+    "pl": "Dodaj składnik",
+    "en": "Add ingredient"
+  },
+  "trackNoIngredients": {
+    "pl": "Brak składników",
+    "en": "No ingredients"
+  },
+  "trackAddIngredientsHint": {
+    "pl": "Dodaj składniki, aby zbudować posiłek",
+    "en": "Add ingredients to build a meal"
+  },
+  "trackEditIngredient": {
+    "pl": "Edytuj składnik",
+    "en": "Edit ingredient"
+  },
+  "trackIngredientNameOptional": {
+    "pl": "Nazwa składnika (opcjonalnie)",
+    "en": "Ingredient name (optional)"
+  },
+  "trackAmountG": {
+    "pl": "Ilość (g)",
+    "en": "Amount (g)"
+  },
+  "trackEnterAmount": {
+    "pl": "Podaj ilość",
+    "en": "Enter an amount"
+  },
+  "trackEnterValidAmount": {
+    "pl": "Podaj poprawną ilość",
+    "en": "Enter a valid amount"
+  },
+  "trackEnterCaloriesOrFillMacros": {
+    "pl": "Podaj kalorie lub uzupełnij makroskładniki",
+    "en": "Enter calories or fill in the macros"
+  },
+  "trackProteinPer100g": {
+    "pl": "Białko (g/100g)",
+    "en": "Protein (g/100g)"
+  },
+  "trackFatPer100g": {
+    "pl": "Tłuszcze (g/100g)",
+    "en": "Fat (g/100g)"
+  },
+  "trackCarbsPer100g": {
+    "pl": "Węglowodany (g/100g)",
+    "en": "Carbs (g/100g)"
+  },
+  "trackEatingOutTitle": {
+    "pl": "🍽️ Jem na mieście",
+    "en": "🍽️ Eating out"
+  },
+  "trackEatingOutSubtitle": {
+    "pl": "Wybierz co jadłeś (szacunki kalorii):",
+    "en": "Choose what you ate (calorie estimates):"
+  },
+  "trackPortionLabel": {
+    "pl": "Porcja: {label}",
+    "en": "Portion: {label}",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesCount": {
+    "pl": "Ilość kawałków: {count}",
+    "en": "Number of slices: {count}",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesUnit": {
+    "pl": "{count} szt.",
+    "en": "{count} pcs",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalPerSlice": {
+    "pl": "kcal na kawałek:",
+    "en": "kcal per slice:"
+  },
+  "trackKcalPerPieceLabel": {
+    "pl": "{kcal} kcal/szt.",
+    "en": "{kcal} kcal/pc",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalLabel": {
+    "pl": "{kcal} kcal",
+    "en": "{kcal} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalTimesSlices": {
+    "pl": "{kcal} × {slices} = {total} kcal",
+    "en": "{kcal} × {slices} = {total} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "slices": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSaving": {
+    "pl": "Zapisywanie…",
+    "en": "Saving…"
+  },
+  "trackAddToDiary": {
+    "pl": "Dodaj do dziennika",
+    "en": "Add to diary"
+  },
+  "trackSelectMealAbove": {
+    "pl": "Wybierz posiłek powyżej",
+    "en": "Select a meal above"
+  },
+  "trackEatingOutTip": {
+    "pl": "Jeśli reszta dnia była lekka – to OK. Nie stresuj się.",
+    "en": "If the rest of your day was light — that's OK. Don't stress."
+  },
+  "trackMealNameEatingOutSlices": {
+    "pl": "{name} ({slices} szt.) (na mieście)",
+    "en": "{name} ({slices} pcs) (eating out)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "slices": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealNameEatingOut": {
+    "pl": "{name} (na mieście)",
+    "en": "{name} (eating out)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddedEatingOut": {
+    "pl": "Dodano: {name}{slicesPart} (~{kcal} kcal)",
+    "en": "Added: {name}{slicesPart} (~{kcal} kcal)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "slicesPart": {
+        "type": "String"
+      },
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesPart": {
+    "pl": " ({slices} szt.)",
+    "en": " ({slices} pcs)",
+    "placeholders": {
+      "slices": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEatingOutPizza": {
+    "pl": "Pizza",
+    "en": "Pizza"
+  },
+  "trackEatingOutPizzaLabel": {
+    "pl": "~250–450 kcal / kawałek",
+    "en": "~250–450 kcal / slice"
+  },
+  "trackEatingOutKebab": {
+    "pl": "Kebab",
+    "en": "Kebab"
+  },
+  "trackEatingOutKebabLabel": {
+    "pl": "~600–900 kcal",
+    "en": "~600–900 kcal"
+  },
+  "trackEatingOutBurger": {
+    "pl": "Burger (ogólnie)",
+    "en": "Burger (general)"
+  },
+  "trackEatingOutBurgerLabel": {
+    "pl": "~500–800 kcal",
+    "en": "~500–800 kcal"
+  },
+  "trackEatingOutChinese": {
+    "pl": "Chińczyk",
+    "en": "Chinese takeout"
+  },
+  "trackEatingOutChineseLabel": {
+    "pl": "~500–900 kcal",
+    "en": "~500–900 kcal"
+  },
+  "trackEatingOutMcdCheeseburger": {
+    "pl": "McDonald's – Cheeseburger",
+    "en": "McDonald's – Cheeseburger"
+  },
+  "trackEatingOutMcdCheeseburgerLabel": {
+    "pl": "~300 kcal",
+    "en": "~300 kcal"
+  },
+  "trackEatingOutMcd2ForYou": {
+    "pl": "McDonald's – 2forYou (Cheeseburger + frytki)",
+    "en": "McDonald's – 2forYou (Cheeseburger + fries)"
+  },
+  "trackEatingOutMcd2ForYouLabel": {
+    "pl": "~530 kcal",
+    "en": "~530 kcal"
+  },
+  "trackEatingOutMcdBigMac": {
+    "pl": "McDonald's – Big Mac",
+    "en": "McDonald's – Big Mac"
+  },
+  "trackEatingOutMcdBigMacLabel": {
+    "pl": "~590 kcal",
+    "en": "~590 kcal"
+  },
+  "trackEatingOutMcdMcDouble": {
+    "pl": "McDonald's – McDouble",
+    "en": "McDonald's – McDouble"
+  },
+  "trackEatingOutMcdMcDoubleLabel": {
+    "pl": "~400 kcal",
+    "en": "~400 kcal"
+  },
+  "trackEatingOutMcdSmallFries": {
+    "pl": "McDonald's – małe frytki",
+    "en": "McDonald's – small fries"
+  },
+  "trackEatingOutMcdSmallFriesLabel": {
+    "pl": "~230 kcal",
+    "en": "~230 kcal"
+  },
+  "trackEatingOutMcdMediumFries": {
+    "pl": "McDonald's – średnie frytki",
+    "en": "McDonald's – medium fries"
+  },
+  "trackEatingOutMcdMediumFriesLabel": {
+    "pl": "~340 kcal",
+    "en": "~340 kcal"
+  },
+  "trackEatingOutKfcDrumstick": {
+    "pl": "KFC – udko/nóżka",
+    "en": "KFC – drumstick"
+  },
+  "trackEatingOutKfcDrumstickLabel": {
+    "pl": "~200 kcal / szt.",
+    "en": "~200 kcal / pc"
+  },
+  "trackEatingOutKfcTenders": {
+    "pl": "KFC – Strips / Tenders",
+    "en": "KFC – Strips / Tenders"
+  },
+  "trackEatingOutKfcTendersLabel": {
+    "pl": "~400–600 kcal",
+    "en": "~400–600 kcal"
+  },
+  "trackEatingOutSubway6": {
+    "pl": "Subway – 6'' sub",
+    "en": "Subway – 6'' sub"
+  },
+  "trackEatingOutSubway6Label": {
+    "pl": "~300–500 kcal",
+    "en": "~300–500 kcal"
+  },
+  "trackEatingOutSubwayFootlong": {
+    "pl": "Subway – Footlong",
+    "en": "Subway – Footlong"
+  },
+  "trackEatingOutSubwayFootlongLabel": {
+    "pl": "~600–900 kcal",
+    "en": "~600–900 kcal"
+  },
+  "trackActivitiesDateTitle": {
+    "pl": "Aktywności - {date}",
+    "en": "Activities - {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoActivitiesForDay": {
+    "pl": "Brak aktywności na ten dzień",
+    "en": "No activities for this day"
+  },
+  "trackAddFirstActivity": {
+    "pl": "Dodaj pierwszą aktywność",
+    "en": "Add your first activity"
+  },
+  "trackDaySummary": {
+    "pl": "Podsumowanie dnia",
+    "en": "Day summary"
+  },
+  "trackBurned": {
+    "pl": "Spalone",
+    "en": "Burned"
+  },
+  "trackTime": {
+    "pl": "Czas",
+    "en": "Time"
+  },
+  "trackGarminActivitiesNote": {
+    "pl": "Dane aktywności pochodzą z urządzeń Garmin.",
+    "en": "Activity data comes from Garmin devices."
+  },
+  "trackDeleteActivityTitle": {
+    "pl": "Usuń aktywność",
+    "en": "Delete activity"
+  },
+  "trackDeleteActivityConfirm": {
+    "pl": "Czy na pewno chcesz usunąć \"{name}\"?",
+    "en": "Are you sure you want to delete \"{name}\"?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityDeleted": {
+    "pl": "Aktywność usunięta",
+    "en": "Activity deleted"
+  },
+  "trackExcludeFromBalance": {
+    "pl": "Nie licz w bilansie (spalone)",
+    "en": "Don't count in balance (burned)"
+  },
+  "trackActivityExcludedFromBalance": {
+    "pl": "Aktywność wyłączona z bilansu",
+    "en": "Activity excluded from balance"
+  },
+  "trackActivityIncludedInBalance": {
+    "pl": "Aktywność wliczana do bilansu",
+    "en": "Activity included in balance"
+  },
+  "trackOtherActivities": {
+    "pl": "Pozostałe aktywności.",
+    "en": "Other activities."
+  },
+  "trackActivityTypeOther": {
+    "pl": "Inna",
+    "en": "Other"
+  },
+  "trackActivityTypeLow": {
+    "pl": "Niska",
+    "en": "Low"
+  },
+  "trackActivityTypeModerate": {
+    "pl": "Umiarkowana",
+    "en": "Moderate"
+  },
+  "trackActivityTypeHigh": {
+    "pl": "Wysoka",
+    "en": "High"
+  },
+  "trackActivityTypeVeryHigh": {
+    "pl": "Bardzo wysoka",
+    "en": "Very high"
+  },
+  "trackActivityTypeRun": {
+    "pl": "Bieg",
+    "en": "Running"
+  },
+  "trackActivityTypeCycling": {
+    "pl": "Kolarstwo",
+    "en": "Cycling"
+  },
+  "trackActivityTypeSwim": {
+    "pl": "Pływanie",
+    "en": "Swimming"
+  },
+  "trackActivityTypeWalk": {
+    "pl": "Chodzenie",
+    "en": "Walking"
+  },
+  "trackActivityTypeHike": {
+    "pl": "Wędrówka",
+    "en": "Hiking"
+  },
+  "trackActivityTypeRow": {
+    "pl": "Wioślarstwo",
+    "en": "Rowing"
+  },
+  "trackActivityTypeTennis": {
+    "pl": "Tenis",
+    "en": "Tennis"
+  },
+  "trackActivityTypeYoga": {
+    "pl": "Joga",
+    "en": "Yoga"
+  },
+  "trackActivityTypeTraining": {
+    "pl": "Trening",
+    "en": "Training"
+  },
+  "trackFeatureQuickAddActivities": {
+    "pl": "Szybkie dodawanie w aktywnościach",
+    "en": "Quick add in activities"
+  },
+  "trackActivitySavedAndFavorited": {
+    "pl": "Aktywność zapisana i dodana do ulubionych!",
+    "en": "Activity saved and added to favorites!"
+  },
+  "trackActivityAddedSuccess": {
+    "pl": "Aktywność dodana pomyślnie!",
+    "en": "Activity added successfully!"
+  },
+  "trackEditActivity": {
+    "pl": "Edytuj aktywność",
+    "en": "Edit activity"
+  },
+  "trackAddActivity": {
+    "pl": "Dodaj aktywność",
+    "en": "Add activity"
+  },
+  "trackQuickAdd": {
+    "pl": "Szybkie dodawanie",
+    "en": "Quick add"
+  },
+  "trackActivityNameOptional": {
+    "pl": "Nazwa aktywności (opcjonalnie)",
+    "en": "Activity name (optional)"
+  },
+  "trackHintEmptyDefaultActivityName": {
+    "pl": "Puste = \"Aktywność bez nazwy\"",
+    "en": "Leave empty = \"Untitled activity\""
+  },
+  "trackDefaultActivityName": {
+    "pl": "Aktywność bez nazwy",
+    "en": "Untitled activity"
+  },
+  "trackEnterBurnedCalories": {
+    "pl": "Podaj liczbę spalonych kalorii",
+    "en": "Enter calories burned"
+  },
+  "trackEnterValidCalories": {
+    "pl": "Podaj poprawną liczbę kalorii",
+    "en": "Enter a valid calorie amount"
+  },
+  "trackActivityTypeOptional": {
+    "pl": "Typ aktywności - opcjonalnie",
+    "en": "Activity type – optional"
+  },
+  "trackAddToFavoritesActivitySubtitle": {
+    "pl": "Będziesz mógł szybko dodać tę aktywność później",
+    "en": "You can quickly add this activity later"
+  },
+  "trackUpdateActivity": {
+    "pl": "Zaktualizuj aktywność",
+    "en": "Update activity"
+  },
+  "trackSaveActivity": {
+    "pl": "Zapisz aktywność",
+    "en": "Save activity"
+  },
+  "trackDurationMinutes": {
+    "pl": "Czas (min)",
+    "en": "Duration (min)"
+  },
+  "trackBurnedCalories": {
+    "pl": "Spalone kalorie",
+    "en": "Calories burned"
+  },
+  "trackAddedWaterMl": {
+    "pl": "Dodano {amount} ml wody",
+    "en": "Added {amount} ml of water",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddWaterError": {
+    "pl": "Błąd podczas dodawania wody: {error}",
+    "en": "Error adding water: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackUpdatedAmountMl": {
+    "pl": "Zaktualizowano: {amount} ml",
+    "en": "Updated: {amount} ml",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackUpdateError": {
+    "pl": "Błąd podczas aktualizacji: {error}",
+    "en": "Error updating: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDeleteEntryTitle": {
+    "pl": "Usuń wpis",
+    "en": "Delete entry"
+  },
+  "trackDeleteWaterConfirm": {
+    "pl": "Czy na pewno chcesz usunąć wpis {amount} ml?",
+    "en": "Are you sure you want to delete the {amount} ml entry?",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEntryDeleted": {
+    "pl": "Wpis usunięty",
+    "en": "Entry deleted"
+  },
+  "trackDeleteError": {
+    "pl": "Błąd podczas usuwania: {error}",
+    "en": "Error deleting: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEditAmount": {
+    "pl": "Edytuj ilość",
+    "en": "Edit amount"
+  },
+  "trackAmountMl": {
+    "pl": "Ilość (ml)",
+    "en": "Amount (ml)"
+  },
+  "trackAmountMlHintRange": {
+    "pl": "1–5000 ml",
+    "en": "1–5000 ml"
+  },
+  "trackAmountMustBeRange": {
+    "pl": "Ilość musi być od 1 do 5000 ml",
+    "en": "Amount must be between 1 and 5000 ml"
+  },
+  "trackAddWater": {
+    "pl": "Dodaj wodę",
+    "en": "Add water"
+  },
+  "trackAmountMlHintExample": {
+    "pl": "np. 250",
+    "en": "e.g. 250"
+  },
+  "trackMaxAmountPerEntry": {
+    "pl": "Maksymalna ilość to 5000 ml na wpis",
+    "en": "Maximum is 5000 ml per entry"
+  },
+  "trackEnterAmountRange": {
+    "pl": "Podaj ilość od 1 do 5000 ml",
+    "en": "Enter an amount from 1 to 5000 ml"
+  },
+  "trackDailyWaterGoal": {
+    "pl": "Cel dzienny picia wody",
+    "en": "Daily water goal"
+  },
+  "trackGoalHintExample": {
+    "pl": "np. 2000",
+    "en": "e.g. 2000"
+  },
+  "trackGoalMustBeRange": {
+    "pl": "Podaj wartość od 500 do 10000 ml",
+    "en": "Enter a value from 500 to 10000 ml"
+  },
+  "trackWaterGoalUpdated": {
+    "pl": "Cel wody zaktualizowany",
+    "en": "Water goal updated"
+  },
+  "trackChangeDailyWaterGoal": {
+    "pl": "Zmień cel dzienny picia wody",
+    "en": "Change daily water goal"
+  },
+  "trackEveryDropCounts": {
+    "pl": "Każda kropla się liczy!",
+    "en": "Every drop counts!"
+  },
+  "trackCustomAmount": {
+    "pl": "Własna",
+    "en": "Custom"
+  },
+  "trackWaterHistoryHint": {
+    "pl": "Przegląd – edycja i usuwanie możliwe. Dodawanie tylko na dzisiaj.",
+    "en": "Overview – you can edit and delete. Adding only for today."
+  },
+  "trackNoEntries": {
+    "pl": "Brak wpisów",
+    "en": "No entries"
+  },
+  "trackEdit": {
+    "pl": "Edytuj",
+    "en": "Edit"
+  },
+  "trackAmountMlLabel": {
+    "pl": "{amount} ml",
+    "en": "{amount} ml",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDailyGoal": {
+    "pl": "Cel dzienny",
+    "en": "Daily goal"
+  },
+  "trackEnterWeight": {
+    "pl": "Podaj wagę",
+    "en": "Enter weight"
+  },
+  "trackEnterValidWeight": {
+    "pl": "Podaj poprawną wagę (30-300 kg)",
+    "en": "Enter a valid weight (30–300 kg)"
+  },
+  "trackWeightSaved": {
+    "pl": "Waga zapisana pomyślnie!",
+    "en": "Weight saved successfully!"
+  },
+  "trackWeightMotivation": {
+    "pl": "Regularne pomiary pomagają trzymać cel. Każdy wpis przybliża Cię do wymarzonej formy!",
+    "en": "Regular weigh-ins help you stay on track. Every entry brings you closer to your goal!"
+  },
+  "trackPickMeasurementDate": {
+    "pl": "Wybierz datę pomiaru",
+    "en": "Select measurement date"
+  },
+  "trackMeasurementSavedWithDate": {
+    "pl": "Pomiar zostanie zapisany z wybraną datą",
+    "en": "The measurement will be saved with the selected date"
+  },
+  "trackSaveWeight": {
+    "pl": "Zapisz wagę",
+    "en": "Save weight"
+  },
+  "trackDeleteMeasurementTitle": {
+    "pl": "Usuń pomiar",
+    "en": "Delete measurement"
+  },
+  "trackDeleteWeightConfirm": {
+    "pl": "Czy na pewno chcesz usunąć pomiar {weight} kg?",
+    "en": "Are you sure you want to delete the {weight} kg measurement?",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasurementDeleted": {
+    "pl": "Pomiar usunięty",
+    "en": "Measurement deleted"
+  },
+  "trackNoWeightMeasurements": {
+    "pl": "Brak pomiarów wagi",
+    "en": "No weight measurements"
+  },
+  "trackAddFirstMeasurementHint": {
+    "pl": "Dodaj pierwszy pomiar, aby zobaczyć historię",
+    "en": "Add your first measurement to see history"
+  },
+  "trackNoDataToDisplay": {
+    "pl": "Brak danych do wyświetlenia",
+    "en": "No data to display"
+  },
+  "trackWeightKg": {
+    "pl": "Waga (kg)",
+    "en": "Weight (kg)"
+  },
+  "trackHistory": {
+    "pl": "Historia",
+    "en": "History"
+  },
+  "trackEnterMeasurementValue": {
+    "pl": "Podaj wartość pomiaru",
+    "en": "Enter the measurement value"
+  },
+  "trackEnterValidPositiveValue": {
+    "pl": "Podaj poprawną wartość (większą od 0)",
+    "en": "Enter a valid value (greater than 0)"
+  },
+  "trackEnterCustomTypeName": {
+    "pl": "Wpisz nazwę własnego typu pomiaru (np. biceps)",
+    "en": "Enter a custom measurement type name (e.g. biceps)"
+  },
+  "trackMeasurementSaved": {
+    "pl": "Pomiar zapisany pomyślnie!",
+    "en": "Measurement saved successfully!"
+  },
+  "trackBodyMeasurementsTitle": {
+    "pl": "Pomiary ciała",
+    "en": "Body measurements"
+  },
+  "trackBodyMeasurementsMotivation": {
+    "pl": "Śledź wymiary regularnie — każdy pomiar to dowód Twojego postępu i krok do wymarzonej sylwetki!",
+    "en": "Track your measurements regularly — each one is proof of your progress and a step toward your dream physique!"
+  },
+  "trackMeasurementType": {
+    "pl": "Typ pomiaru",
+    "en": "Measurement type"
+  },
+  "trackCustomTypeHint": {
+    "pl": "np. Biceps, Brzuch",
+    "en": "e.g. Biceps, Waist"
+  },
+  "trackCustomTypeName": {
+    "pl": "Nazwa własnego typu",
+    "en": "Custom type name"
+  },
+  "trackValueCm": {
+    "pl": "Wartość (cm)",
+    "en": "Value (cm)"
+  },
+  "trackValueHintExample": {
+    "pl": "np. 85.5",
+    "en": "e.g. 85.5"
+  },
+  "trackSaveMeasurement": {
+    "pl": "Zapisz pomiar",
+    "en": "Save measurement"
+  },
+  "trackMeasurementHistory": {
+    "pl": "Historia pomiarów - {label}",
+    "en": "Measurement history - {label}",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDeleteBodyMeasurementConfirm": {
+    "pl": "Czy na pewno chcesz usunąć pomiar {value} cm?",
+    "en": "Are you sure you want to delete the {value} cm measurement?",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoMeasurements": {
+    "pl": "Brak pomiarów",
+    "en": "No measurements"
+  },
+  "trackTypeWaist": {
+    "pl": "Talia",
+    "en": "Waist"
+  },
+  "trackTypeHips": {
+    "pl": "Biodra",
+    "en": "Hips"
+  },
+  "trackTypeChest": {
+    "pl": "Klatka piersiowa",
+    "en": "Chest"
+  },
+  "trackTypeArm": {
+    "pl": "Ramię",
+    "en": "Arm"
+  },
+  "trackTypeThigh": {
+    "pl": "Udo",
+    "en": "Thigh"
+  },
+  "trackTypeCustom": {
+    "pl": "Własny",
+    "en": "Custom"
+  },
+  "trackNoFavorites": {
+    "pl": "Brak ulubionych",
+    "en": "No favorites"
+  },
+  "trackNoFavoritesSubtitle": {
+    "pl": "Dodaj posiłki lub aktywności do ulubionych przy ich zapisywaniu",
+    "en": "Add meals or activities to favorites when saving them"
+  },
+  "trackFavoriteMeals": {
+    "pl": "Ulubione posiłki",
+    "en": "Favorite meals"
+  },
+  "trackNoFavoriteMeals": {
+    "pl": "Brak ulubionych posiłków",
+    "en": "No favorite meals"
+  },
+  "trackFavoriteActivities": {
+    "pl": "Ulubione aktywności",
+    "en": "Favorite activities"
+  },
+  "trackNoFavoriteActivities": {
+    "pl": "Brak ulubionych aktywności",
+    "en": "No favorite activities"
+  },
+  "trackAddToMealsOnDate": {
+    "pl": "Dodaj do posiłków {date}",
+    "en": "Add to meals on {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddToTodaysMeals": {
+    "pl": "Dodaj do dzisiejszych posiłków",
+    "en": "Add to today's meals"
+  },
+  "trackRemoveFromFavorites": {
+    "pl": "Usuń z ulubionych",
+    "en": "Remove from favorites"
+  },
+  "trackAddToActivitiesOnDate": {
+    "pl": "Dodaj do aktywności {date}",
+    "en": "Add to activities on {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddToTodaysActivities": {
+    "pl": "Dodaj do dzisiejszych aktywności",
+    "en": "Add to today's activities"
+  },
+  "trackMealAddedToMealsOnDate": {
+    "pl": "{name} dodany do posiłków {date}",
+    "en": "{name} added to meals on {date}",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealAddedToTodaysMeals": {
+    "pl": "{name} dodany do dzisiejszych posiłków",
+    "en": "{name} added to today's meals",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityAddedToActivitiesOnDate": {
+    "pl": "{name} dodana do aktywności {date}",
+    "en": "{name} added to activities on {date}",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityAddedToTodaysActivities": {
+    "pl": "{name} dodana do dzisiejszych aktywności",
+    "en": "{name} added to today's activities",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackRemoveFromFavoritesConfirm": {
+    "pl": "Czy na pewno chcesz usunąć \"{name}\" z ulubionych?",
+    "en": "Are you sure you want to remove \"{name}\" from favorites?",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackRemovedFromFavorites": {
+    "pl": "Usunięto z ulubionych",
+    "en": "Removed from favorites"
+  },
+  "trackEditFavoriteMeal": {
+    "pl": "Edytuj ulubiony posiłek",
+    "en": "Edit favorite meal"
+  },
+  "trackFavoriteMealUpdated": {
+    "pl": "Zaktualizowano ulubiony posiłek",
+    "en": "Favorite meal updated"
+  },
+  "trackRecalculateFromIngredients": {
+    "pl": "Przelicz z składników",
+    "en": "Recalculate from ingredients"
+  },
+  "trackMinutesLabel": {
+    "pl": "{minutes} min",
+    "en": "{minutes} min",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesKcal": {
+    "pl": "Kalorie (kcal)",
+    "en": "Calories (kcal)"
+  },
+  "trackIncludingSaturatedG": {
+    "pl": "w tym nasycone (g)",
+    "en": "incl. saturated (g)"
+  },
+  "trackIncludingSugarsG": {
+    "pl": "w tym cukry (g)",
+    "en": "incl. sugars (g)"
+  },
+  "trackWeightGOptional": {
+    "pl": "Waga (g) - opcjonalnie",
+    "en": "Weight (g) – optional"
+  },
+  "trackGoalMl": {
+    "pl": "Cel (ml)",
+    "en": "Goal (ml)"
+  },
+  "trackWaterTitle": {
+    "pl": "Woda",
+    "en": "Water"
+  },
+  "trackOfGoal": {
+    "pl": "{current} / {goal} ml",
+    "en": "{current} / {goal} ml",
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSearchShort": {
+    "pl": "Wyszukaj",
+    "en": "Search"
+  },
+  "trackWaterToday": {
+    "pl": "Woda – Dzisiaj",
+    "en": "Water – Today"
+  },
+  "trackWaterOnDate": {
+    "pl": "Woda – {date}",
+    "en": "Water – {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackHydrationBasics": {
+    "pl": "Nawodnienie to podstawa formy.",
+    "en": "Hydration is the foundation of fitness."
+  },
+  "trackSugar": {
+    "pl": "Cukry",
+    "en": "Sugars"
+  },
+  "trackSaturatedFat": {
+    "pl": "Nasycone",
+    "en": "Saturated"
+  },
+  "trackProduct": {
+    "pl": "Produkt",
+    "en": "Product"
+  },
+  "trackMealMacrosLine": {
+    "pl": "{kcal} kcal • B: {protein}g • T: {fat}g • W: {carbs}g",
+    "en": "{kcal} kcal • P: {protein}g • F: {fat}g • C: {carbs}g",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "protein": {
+        "type": "String"
+      },
+      "fat": {
+        "type": "String"
+      },
+      "carbs": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAnalysisResults": {
+    "pl": "Wyniki analizy",
+    "en": "Analysis results"
+  },
+  "trackName": {
+    "pl": "Nazwa",
+    "en": "Name"
+  },
+  "trackProductNotFoundTitle": {
+    "pl": "Nie znaleziono produktu",
+    "en": "Product not found"
+  },
+  "trackBarcodeLabel": {
+    "pl": "Kod kreskowy",
+    "en": "Barcode"
+  },
+  "trackFetchingProductData": {
+    "pl": "Pobieranie danych produktu...",
+    "en": "Fetching product data..."
+  },
+  "trackBrand": {
+    "pl": "Marka: {brand}",
+    "en": "Brand: {brand}",
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWeightGRequired": {
+    "pl": "Waga (g) *",
+    "en": "Weight (g) *"
+  },
+  "trackYourPortion": {
+    "pl": "Twoja porcja:",
+    "en": "Your portion:"
+  },
+  "trackMacroAbbrevProtein": {
+    "pl": "B",
+    "en": "P"
+  },
+  "trackMacroAbbrevFat": {
+    "pl": "T",
+    "en": "F"
+  },
+  "trackMacroAbbrevCarbs": {
+    "pl": "W",
+    "en": "C"
+  },
+  "trackAddedKcal": {
+    "pl": "Dodano: {kcal} kcal",
+    "en": "Added: {kcal} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesPer100g": {
+    "pl": "Kalorie (kcal/100g)",
+    "en": "Calories (kcal/100g)"
+  },
+  "trackDashToday": {
+    "pl": "Dzisiaj",
+    "en": "Today"
+  },
+  "trackNoDate": {
+    "pl": "Brak daty",
+    "en": "No date"
+  },
+  "trackEntries": {
+    "pl": "Wpisy",
+    "en": "Entries"
+  },
+  "trackWeightHistory": {
+    "pl": "Historia wagi",
+    "en": "Weight history"
+  },
+  "trackMeasurementName": {
+    "pl": "Nazwa pomiaru",
+    "en": "Measurement name"
+  },
+  "trackChoose": {
+    "pl": "Wybierz",
+    "en": "Choose"
+  },
+  "trackDurationMinutesOptional": {
+    "pl": "Czas trwania (minuty) - opcjonalnie",
+    "en": "Duration (minutes) – optional"
+  },
+  "trackMax5000Helper": {
+    "pl": "Maksymalnie 5000 ml na jeden wpis",
+    "en": "Maximum 5000 ml per entry"
+  },
+  "trackRecommendedMin2l": {
+    "pl": "Zalecane jest min. 2l",
+    "en": "At least 2 L recommended"
+  },
+  "trackSummary": {
+    "pl": "Podsumowanie",
+    "en": "Summary"
+  },
+  "trackBurnedKcalName": {
+    "pl": "Spalone {kcal} kcal",
+    "en": "Burned {kcal} kcal",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasurementDate": {
+    "pl": "Data pomiaru",
+    "en": "Measurement date"
+  },
+  "trackKcalBurned": {
+    "pl": "{kcal} kcal spalone",
+    "en": "{kcal} kcal burned",
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMacrosInPremium": {
+    "pl": "Makro – w Premium",
+    "en": "Macros – in Premium"
+  },
+  "trackSearchProductEllipsis": {
+    "pl": "Szukaj produktu…",
+    "en": "Search product…"
+  },
+  "trackMacros": {
+    "pl": "Makro",
+    "en": "Macros"
+  },
+  "trackRecentMeasurements": {
+    "pl": "Ostatnie pomiary",
+    "en": "Recent measurements"
+  }
+}

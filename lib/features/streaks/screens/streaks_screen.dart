@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../shared/models/streak.dart';
 import '../../../shared/services/supabase_service.dart';
@@ -18,11 +19,12 @@ class StreaksScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final streaksAsync = ref.watch(streaksProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Serie'),
+        title: Text(l10n.moreStreaksTitle),
       ),
       body: streaksAsync.when(
         data: (streaks) {
@@ -38,12 +40,12 @@ class StreaksScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Brak serii',
+                    l10n.moreNoStreaks,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Zacznij śledzić swoje nawyki, aby zobaczyć serie',
+                    l10n.moreNoStreaksHint,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.grey.shade600,
                         ),
@@ -69,11 +71,11 @@ class StreaksScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Błąd: $error'),
+              Text(l10n.moreErrorWithDetails(error: error.toString())),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(streaksProvider),
-                child: const Text('Spróbuj ponownie'),
+                child: Text(l10n.commonRetry),
               ),
             ],
           ),
@@ -82,7 +84,23 @@ class StreaksScreen extends ConsumerWidget {
     );
   }
 
+  String _streakDisplayName(AppLocalizations l10n, String type) {
+    switch (type) {
+      case AppConstants.streakMeals:
+        return l10n.moreStreakMeals;
+      case AppConstants.streakWater:
+        return l10n.moreWater;
+      case AppConstants.streakActivities:
+        return l10n.moreStreakActivities;
+      case AppConstants.streakWeight:
+        return l10n.moreStreakWeight;
+      default:
+        return type;
+    }
+  }
+
   Widget _buildStreakCard(BuildContext context, Streak streak) {
+    final l10n = context.l10n;
     final icon = _getStreakIcon(streak.streakType);
     final color = _getStreakColor(streak.streakType);
 
@@ -117,14 +135,14 @@ class StreaksScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        streak.displayName,
+                        _streakDisplayName(l10n, streak.streakType),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                       ),
                       if (streak.lastDate != null)
                         Text(
-                          'Ostatni raz: ${_formatDate(streak.lastDate!)}',
+                          l10n.moreLastTime(date: _formatDate(streak.lastDate!)),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: Colors.grey.shade600,
                               ),
@@ -140,13 +158,13 @@ class StreaksScreen extends ConsumerWidget {
               children: [
                 _buildStreakStat(
                   context,
-                  'Aktualna seria',
+                  l10n.moreCurrentStreak,
                   '${streak.currentStreak}',
                   streak.currentStreak > 0 ? Colors.orange : Colors.grey,
                 ),
                 _buildStreakStat(
                   context,
-                  'Najdłuższa seria',
+                  l10n.moreLongestStreak,
                   '${streak.longestStreak}',
                   Colors.blue,
                 ),

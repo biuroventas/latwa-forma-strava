@@ -1,0 +1,249 @@
+SemanticsNode#0
+ │ Rect.fromLTRB(0.0, 0.0, 1206.0, 2622.0)
+ │
+ └─SemanticsNode#1
+   │ Rect.fromLTRB(0.0, 0.0, 402.0, 874.0) scaled by 3.0x
+   │ textDirection: ltr
+   │ sortKey: OrdinalSortKey#8f4ea(order: 0.0)
+   │
+   └─SemanticsNode#2
+     │ Rect.fromLTRB(0.0, 0.0, 402.0, 874.0)
+     │ flags: scopesRoute
+     │
+     └─SemanticsNode#3
+       │ Rect.fromLTRB(0.0, 0.0, 402.0, 874.0)
+       │ sortKey: OrdinalSortKey#8f4ea(order: 0.0)
+       │
+       └─SemanticsNode#4
+         │ Rect.fromLTRB(0.0, 0.0, 402.0, 874.0)
+         │ flags: scopesRoute
+         │
+         ├─SemanticsNode#5
+         │ │ Rect.fromLTRB(0.0, 62.0, 402.0, 840.0)
+         │ │ actions: scrollToOffset, scrollUp
+         │ │ flags: hasImplicitScrolling
+         │ │ scrollExtentMin: 0.0
+         │ │ scrollPosition: 0.0
+         │ │ scrollExtentMax: 823.0
+         │ │
+         │ ├─SemanticsNode#6
+         │ │   Rect.fromLTRB(78.0, 28.0, 324.0, 274.0)
+         │ │   flags: isImage
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#7
+         │ │   Rect.fromLTRB(62.0, 298.0, 374.0, 348.0)
+         │ │   label: "plan kalorii dopasowany do Ciebie"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#8
+         │ │   Rect.fromLTRB(97.8, 360.0, 338.2, 385.0)
+         │ │   label: "śledzenie wagi i postępów"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#9
+         │ │   Rect.fromLTRB(129.9, 397.0, 306.1, 422.0)
+         │ │   label: "prosty plan do celu"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#10
+         │ │   Rect.fromLTRB(174.9, 434.0, 261.1, 459.0)
+         │ │   label: "pomoc AI"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#11
+         │ │   Rect.fromLTRB(56.0, 694.0, 346.0, 750.0)
+         │ │   actions: tap
+         │ │   flags: isButton, hasEnabledState, isEnabled, isImage, isFocusable
+         │ │   label: "Zaloguj się lub załóż konto"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#12
+         │ │   Rect.fromLTRB(56.0, 764.0, 346.0, 778.0)
+         │ │   actions: tap
+         │ │   flags: isButton, hasEnabledState, isEnabled, isFocusable
+         │ │   label: "Zacznij bez konta"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#13
+         │ │   Rect.fromLTRB(34.4, 941.0, 367.6, 967.0)
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: "FAQ – najczęściej zadawane pytania"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#14
+         │ │   Rect.fromLTRB(28.0, 980.0, 374.0, 1044.0)
+         │ │   actions: tap
+         │ │   flags: hasEnabledState, isEnabled, isHidden, isFocusable,
+         │ │     hasSelectedState
+         │ │   HIDDEN
+         │ │   label: "Czy aplikacja jest darmowa?"
+         │ │   hint:
+         │ │     "Zwinięto
+         │ │      kliknij dwukrotnie, aby rozwinąć"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#15
+         │ │   Rect.fromLTRB(28.0, 1046.0, 374.0, 1110.0)
+         │ │   actions: tap
+         │ │   flags: hasEnabledState, isEnabled, isHidden, isFocusable,
+         │ │     hasSelectedState
+         │ │   HIDDEN
+         │ │   label: "Jak działa licznik kalorii ze zdjęcia?"
+         │ │   hint:
+         │ │     "Zwinięto
+         │ │      kliknij dwukrotnie, aby rozwinąć"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#16
+         │ │   Rect.fromLTRB(28.0, 1112.0, 374.0, 1178.0)
+         │ │   actions: tap
+         │ │   flags: hasEnabledState, isEnabled, isHidden, isFocusable,
+         │ │     hasSelectedState
+         │ │   HIDDEN
+         │ │   label: "Jak aplikacja liczy mój dzienny limit kalorii?"
+         │ │   hint:
+         │ │     "Zwinięto
+         │ │      kliknij dwukrotnie, aby rozwinąć"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#17
+         │ │   Rect.fromLTRB(28.0, 1180.0, 374.0, 1244.0)
+         │ │   actions: tap
+         │ │   flags: hasEnabledState, isEnabled, isHidden, isFocusable,
+         │ │     hasSelectedState
+         │ │   HIDDEN
+         │ │   label: "Co to jest „Zacznij bez konta”?"
+         │ │   hint:
+         │ │     "Zwinięto
+         │ │      kliknij dwukrotnie, aby rozwinąć"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#18
+         │ │   Rect.fromLTRB(28.0, 1246.0, 374.0, 1310.0)
+         │ │   actions: tap
+         │ │   flags: hasEnabledState, isEnabled, isHidden, isFocusable,
+         │ │     hasSelectedState
+         │ │   HIDDEN
+         │ │   label: "Czy mogę połączyć Strava lub Garmin?"
+         │ │   hint:
+         │ │     "Zwinięto
+         │ │      kliknij dwukrotnie, aby rozwinąć"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#19
+         │ │   Rect.fromLTRB(28.0, 1319.0, 374.0, 1367.0)
+         │ │   actions: tap
+         │ │   flags: isButton, hasEnabledState, isEnabled, isHidden,
+         │ │     isFocusable
+         │ │   HIDDEN
+         │ │   label: "Zobacz więcej pytań (6)"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#20
+         │ │   Rect.fromLTRB(66.1, 1419.0, 132.2, 1438.0)
+         │ │   actions: tap
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: "Regulamin"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#21
+         │ │   Rect.fromLTRB(132.2, 1419.0, 144.1, 1438.0)
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: " · "
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#22
+         │ │   Rect.fromLTRB(144.1, 1419.0, 275.2, 1438.0)
+         │ │   actions: tap
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: "Polityka prywatności"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#23
+         │ │   Rect.fromLTRB(275.2, 1419.0, 287.1, 1438.0)
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: " · "
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#24
+         │ │   Rect.fromLTRB(287.1, 1419.0, 335.9, 1438.0)
+         │ │   actions: tap
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: "Kontakt"
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#25
+         │ │   Rect.fromLTRB(116.3, 1468.5, 185.7, 1487.5)
+         │ │   flags: isHidden
+         │ │   HIDDEN
+         │ │   label: "Śledź nas: "
+         │ │   textDirection: ltr
+         │ │
+         │ ├─SemanticsNode#26
+         │ │ │ Rect.fromLTRB(185.7, 1454.0, 233.7, 1502.0)
+         │ │ │ flags: isHidden
+         │ │ │ HIDDEN
+         │ │ │ traversalParentIdentifier: _OverlayPortalState#f8ce0
+         │ │ │ tooltip: "Facebook – wkrótce"
+         │ │ │ textDirection: ltr
+         │ │ │
+         │ │ └─SemanticsNode#27
+         │ │     Rect.fromLTRB(0.0, 0.0, 48.0, 48.0)
+         │ │     flags: isButton, hasEnabledState, isHidden
+         │ │     HIDDEN
+         │ │
+         │ ├─SemanticsNode#28
+         │ │ │ Rect.fromLTRB(237.7, 1454.0, 285.7, 1502.0)
+         │ │ │ flags: isHidden
+         │ │ │ HIDDEN
+         │ │ │ traversalParentIdentifier: _OverlayPortalState#72f35
+         │ │ │ tooltip: "Instagram – wkrótce"
+         │ │ │ textDirection: ltr
+         │ │ │
+         │ │ └─SemanticsNode#29
+         │ │     Rect.fromLTRB(0.0, 0.0, 48.0, 48.0)
+         │ │     flags: isButton, hasEnabledState, isHidden
+         │ │     HIDDEN
+         │ │
+         │ └─SemanticsNode#30
+         │     Rect.fromLTRB(35.1, 1539.0, 366.9, 1573.0)
+         │     flags: isHidden
+         │     HIDDEN
+         │     label:
+         │       "© 2026 Łatwa Forma | VENTAS NORBERT WRÓBLEWSKI
+         │       NIP 728-284-53-14"
+         │     textDirection: ltr
+         │
+         ├─SemanticsNode#31
+         │   Rect.fromLTRB(16.0, 744.0, 386.0, 778.0)
+         │   label: "Przetwarzamy dane osobowe zgodnie z naszą polityką
+         │     prywatności. Korzystając z aplikacji, akceptujesz jej warunki."
+         │   textDirection: ltr
+         │
+         ├─SemanticsNode#32
+         │   Rect.fromLTRB(26.8, 788.0, 192.7, 828.0)
+         │   actions: tap
+         │   flags: isButton, hasEnabledState, isEnabled, isFocusable
+         │   label: "Polityka prywatności"
+         │   textDirection: ltr
+         │
+         ├─SemanticsNode#33
+         │   Rect.fromLTRB(200.7, 788.0, 274.7, 828.0)
+         │   actions: tap
+         │   flags: isButton, hasEnabledState, isEnabled, isFocusable
+         │   label: "Odrzuć"
+         │   textDirection: ltr
+         │
+         └─SemanticsNode#34
+             Rect.fromLTRB(282.7, 788.0, 375.2, 828.0)
+             actions: tap
+             flags: isButton, hasEnabledState, isEnabled, isFocusable
+             label: "Akceptuję"
+             textDirection: ltr

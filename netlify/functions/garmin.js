@@ -37,7 +37,22 @@ function estimateCalories(activityType, durationMinutes) {
   return Math.round(met * 70 * (minutes / 60)); // ~70 kg domyślnie
 }
 
-/** Jedna aktywność z push Garmin → rekord do tabeli activities. Zapisujemy activity_type z Garmin (np. RUNNING). */
+/** Gdy push nie zawiera activityType, wnioskuj z activityName (np. "Morning Run" → RUNNING). */
+function inferActivityTypeFromName(activityName) {
+  if (!activityName || typeof activityName !== 'string') return null;
+  const n = activityName.toLowerCase();
+  if (n.includes('run') && !n.includes('cycling')) return 'RUNNING';
+  if (n.includes('cycl') || n.includes('bike') || n.includes('kolar')) return 'CYCLING';
+  if (n.includes('swim') || n.includes('pływ')) return 'SWIMMING';
+  if (n.includes('walk') || n.includes('chod')) return 'WALKING';
+  if (n.includes('hike') || n.includes('wędrów')) return 'HIKING';
+  if (n.includes('yoga') || n.includes('pilates')) return 'YOGA';
+  if (n.includes('strength') || n.includes('sił') || n.includes('trening')) return 'STRENGTH_TRAINING';
+  if (n.includes('row') || n.includes('wioślar')) return 'ROWING';
+  return null;
+}
+
+/** Jedna aktywność z push Garmin → rekord do tabeli activities. Zapisujemy activity_type z Garmin (np. RUNNING) lub z nazwy. */
 function toActivityRow(ourUserId, a) {
   const startTimeInSeconds = a.startTimeInSeconds ?? a.startTimeGmt ?? 0;
   const durationSec = a.durationInSeconds ?? a.activeDurationInSeconds ?? 0;
@@ -48,10 +63,12 @@ function toActivityRow(ourUserId, a) {
     : new Date().toISOString();
   const name = (a.activityName || a.activityType || 'Aktywność (Garmin)').trim();
   const displayName = (name && name.length > 0) ? `${name} (Garmin)` : 'Aktywność (Garmin)';
+  // Activity API: activityType może nie być w pushu – fallback z activityName (np. "Morning Run" → RUNNING)
+  const rawType = (a.activityType ?? a.activity_type ?? '').toString().trim().substring(0, 100) || null;
+  const activityType = rawType || inferActivityTypeFromName(a.activityName || name) || null;
   // Activity API spec: activeKilocalories (integer); fallback: calories, potem szacunek
-  const rawCalories = a.activeKilocalories ?? a.calories ?? estimateCalories(a.activityType, durationMinutes ?? 30);
+  const rawCalories = a.activeKilocalories ?? a.calories ?? estimateCalories(activityType, durationMinutes ?? 30);
   const calories_burned = Math.max(1, Math.round(Number(rawCalories) || 0)); // CHECK: >= 0, u nas min 1
-  const activityType = (a.activityType || '').toString().trim().substring(0, 100) || null;
   return {
     user_id: ourUserId,
     name: displayName,

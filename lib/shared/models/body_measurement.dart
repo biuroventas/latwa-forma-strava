@@ -1,3 +1,7 @@
+import 'package:latwa_forma/l10n/app_localizations.dart';
+
+import '../../core/providers/locale_provider.dart';
+
 class BodyMeasurement {
   final String? id;
   final String userId;
@@ -34,17 +38,18 @@ class BodyMeasurement {
   }
 
   String get displayName {
+    final l10n = lookupAppLocalizations(currentAppLocale());
     switch (measurementType) {
       case 'waist':
-        return 'Talia';
+        return l10n.trackTypeWaist;
       case 'hips':
-        return 'Biodra';
+        return l10n.trackTypeHips;
       case 'chest':
-        return 'Klatka piersiowa';
+        return l10n.trackTypeChest;
       case 'arm':
-        return 'Ramię';
+        return l10n.trackTypeArm;
       case 'thigh':
-        return 'Udo';
+        return l10n.trackTypeThigh;
       default:
         return measurementType;
     }

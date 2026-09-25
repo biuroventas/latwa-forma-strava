@@ -103,10 +103,10 @@ Gdy po kliknięciu „Zaloguj przez Google” wracasz na stronę Supabase i widz
 ## Najczęstsze przyczyny 500 w tym flow
 
 | Co widać w logach Auth (Supabase) | Co zrobić |
-|-----------------------------------|-----------|
-| `invalid_client` / błąd klienta   | Sprawdź, czy w Supabase wklejony jest Client ID i **Client secret** z klienta **Web application** (kroki 2–3). |
-| `redirect_uri_mismatch`          | W Google w **Authorized redirect URIs** musi być dokładnie `https://TWOJ_REF.supabase.co/auth/v1/callback`. |
-| Błąd wymiany tokena / exchange    | Zwykle zły Client secret albo inny klient (np. Android zamiast Web). |
-| Brak wpisu / błąd wewnętrzny      | Spróbuj na chwilę wyłączyć i ponownie włączyć provider Google w Supabase; jeśli nie pomoże – wsparcie Supabase z fragmentem logu. |
+| --- | --- |
+| `invalid_client` / błąd klienta | Sprawdź, czy w Supabase wklejony jest Client ID i **Client secret** z klienta **Web application** (kroki 2–3). |
+| `redirect_uri_mismatch` | W Google w **Authorized redirect URIs** musi być dokładnie `https://TWOJ_REF.supabase.co/auth/v1/callback`. |
+| Błąd wymiany tokena / exchange | Zwykle zły Client secret albo inny klient (np. Android zamiast Web). |
+| Brak wpisu / błąd wewnętrzny | Spróbuj na chwilę wyłączyć i ponownie włączyć provider Google w Supabase; jeśli nie pomoże – wsparcie Supabase z fragmentem logu. |
 
 Jeśli po przejściu listy błąd 500 nadal się pojawia, **koniecznie** zrób krok 1 i wklej tutaj **dokładny komunikat z logów Auth** – wtedy można wskazać konkretną przyczynę.

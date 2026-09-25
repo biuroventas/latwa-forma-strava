@@ -1,0 +1,98 @@
+{
+  "identifier" : "LatwaFormaSubscriptions",
+  "nonRenewingSubscriptions" : [
+    {
+      "displayPrice" : "194,99",
+      "familyShareable" : false,
+      "internalID" : "premium_yearly_once_internal",
+      "localizations" : [
+        {
+          "description" : "Pełny dostęp Premium na 12 miesięcy, bez automatycznego odnawiania",
+          "displayName" : "Premium rok jednorazowo",
+          "locale" : "pl_PL"
+        }
+      ],
+      "productID" : "premium_yearly_once",
+      "referenceName" : "Premium Yearly Once",
+      "type" : "NonRenewingSubscription"
+    }
+  ],
+  "products" : [
+
+  ],
+  "subscriptionGroups" : [
+    {
+      "id" : "21470001",
+      "localizations" : [
+        {
+          "description" : "Łatwa Forma Premium",
+          "displayName" : "Premium",
+          "locale" : "pl_PL"
+        }
+      ],
+      "name" : "Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "69,99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "premium_monthly_internal",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Pełny dostęp Premium – rozliczenie co miesiąc",
+              "displayName" : "Premium miesięcznie",
+              "locale" : "pl_PL"
+            }
+          ],
+          "productID" : "premium_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Premium Monthly",
+          "subscriptionGroupID" : "21470001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "194,99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "premium_yearly_internal",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Pełny dostęp Premium – rozliczenie co rok",
+              "displayName" : "Premium rocznie",
+              "locale" : "pl_PL"
+            }
+          ],
+          "productID" : "premium_yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Premium Yearly",
+          "subscriptionGroupID" : "21470001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

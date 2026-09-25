@@ -1,6 +1,7 @@
 # Instrukcja konfiguracji Supabase
 
 ## ✅ Krok 1: Plik .env - GOTOWE
+
 Plik `.env` został już utworzony z Twoimi kluczami API.
 
 ## 📋 Krok 2: Utwórz tabele w bazie danych
@@ -35,6 +36,7 @@ Plik `.env` został już utworzony z Twoimi kluczami API.
 ### Opcja B: Przez Supabase CLI (dla zaawansowanych)
 
 Jeśli masz zainstalowany Supabase CLI:
+
 ```bash
 supabase db push
 ```
@@ -42,6 +44,7 @@ supabase db push
 ## ✅ Krok 3: Sprawdź konfigurację
 
 Uruchom aplikację:
+
 ```bash
 flutter run
 ```
@@ -51,14 +54,17 @@ Jeśli wszystko działa poprawnie, powinieneś zobaczyć ekran powitalny aplikac
 ## 🔍 Rozwiązywanie problemów
 
 ### Błąd: "Supabase URL and Anon Key must be provided"
+
 - Sprawdź, czy plik `.env` istnieje w głównym folderze projektu
 - Sprawdź, czy klucze są poprawne (bez dodatkowych spacji)
 
 ### Błąd: "relation does not exist"
+
 - Upewnij się, że wykonałeś oba pliki SQL (schema.sql i rls_policies.sql)
 - Sprawdź w Table Editor, czy tabele istnieją
 
 ### Błąd połączenia z Supabase
+
 - Sprawdź, czy projekt Supabase jest aktywny
 - Sprawdź, czy klucze API są poprawne w pliku .env
 

@@ -32,7 +32,7 @@ Cel: mieć bazę produktów **co najmniej tak dobrą jak Fitatu**, a w dłuższe
 **Gdzie pobrać (eksporty aktualizowane co noc):**
 
 | Źródło | Format | Uwagi |
-|--------|--------|--------|
+| --- | --- | --- |
 | `https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz` | JSONL (gzip) | Jedna linia = jeden produkt (JSON). Najwygodniejsze do streamowania i importu do Supabase. |
 | `https://static.openfoodfacts.org/data/openfoodfacts-mongodbdump.gz` | MongoDB dump | Pełna baza; do odtworzenia MongoDB, ewentualnie konwersja do CSV/JSONL. |
 | Hugging Face: `openfoodfacts/openfoodfacts-jsonl-export` | JSONL | Ten sam zestaw danych, alternatywne mirror. |
@@ -45,9 +45,9 @@ Cel: mieć bazę produktów **co najmniej tak dobrą jak Fitatu**, a w dłuższe
 
 **Flow po imporcie:**
 
-1. Tabela w Supabase (np. `products`) z polami: `barcode`, `name`, `name_pl`, `brand`, `calories_per_100g`, `protein_g`, `fat_g`, `carbs_g`, `image_url`, `source='off'`, itd.
-2. W aplikacji: **wyszukiwanie** najpierw w Supabase (full-text lub `ilike`), bez limitów. Skan kodu → szukaj po `barcode` w Supabase; jeśli brak – fallback na żywo do OFF API (limit tylko przy braku w Twojej bazie).
-3. Opcjonalnie: przy każdym udanym pobraniu z OFF (skan lub search) dopisywać produkt do Supabase jako cache – baza rośnie „organicznie”.
+1. Tabela `products` (w **Supabase** lub w **Turso** – zalecane, duży darmowy limit) z polami: `barcode`, `name`, `name_pl`, `brand`, `calories_per_100g`, `protein_g`, `fat_g`, `carbs_g`, `image_url`, `source='off'`, itd.
+2. W aplikacji: **ProductService** najpierw pyta **Turso** (gdy ustawione `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN`), potem Supabase (tabela `products`), na końcu OFF API.
+3. Import: `scripts/import_off_products/` – **run-turso.js** (Turso) lub **run.js** (Supabase). Instrukcja w README w tym katalogu.
 
 **Podsumowanie:** import OFF do własnej bazy jest dozwolony i usuwa problem limitu zapytań; najprościej zacząć od JSONL + skrypt filtrujący (np. tylko z wartościami odżywczymi / tylko Polska) i importu do Supabase.
 
@@ -114,7 +114,7 @@ Cel: mieć bazę produktów **co najmniej tak dobrą jak Fitatu**, a w dłuższe
 ## 4. Funkcje aplikacji pod kątem bazy produktów (cel: jak Fitatu lub lepiej)
 
 | Funkcja | Fitatu | Latwa Forma (docelowo) |
-|--------|--------|-------------------------|
+| --- | --- | --- |
 | Skanowanie kodu | Tak | Tak (OFF) |
 | Wyszukiwanie po nazwie | Tak | Tak (OFF + własna baza) |
 | Baza „polska” / duża | Własna, 91% rynku | OFF + import PL + restauracje + crowdsourcing |

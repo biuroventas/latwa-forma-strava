@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/utils/success_message.dart';
 import '../../../core/utils/error_handler.dart';
 import '../../../core/config/supabase_config.dart';
@@ -42,6 +43,7 @@ class _EatingOutContentState extends State<_EatingOutContent> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return DraggableScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.4,
@@ -59,7 +61,7 @@ class _EatingOutContentState extends State<_EatingOutContent> {
               Row(
                 children: [
                   Text(
-                    '🍽️ Jem na mieście',
+                    l10n.trackEatingOutTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -68,7 +70,7 @@ class _EatingOutContentState extends State<_EatingOutContent> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Wybierz co jadłeś (szacunki kalorii):',
+                l10n.trackEatingOutSubtitle,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade700,
                     ),
@@ -78,13 +80,13 @@ class _EatingOutContentState extends State<_EatingOutContent> {
               const SizedBox(height: 24),
               if (_selectedOption != null) ...[
                 Text(
-                  'Porcja: ${_selectedOption!.label}',
+                  l10n.trackPortionLabel(label: _selectedOption!.localizedLabel(l10n)),
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 const SizedBox(height: 8),
                 if (_selectedOption!.supportsSlices) ...[
                   Text(
-                    'Ilość kawałków: $_pizzaSlices',
+                    l10n.trackSlicesCount(count: '$_pizzaSlices'),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   Slider(
@@ -92,11 +94,11 @@ class _EatingOutContentState extends State<_EatingOutContent> {
                     min: 1,
                     max: 8,
                     divisions: 7,
-                    label: '$_pizzaSlices szt.',
+                    label: l10n.trackSlicesUnit(count: '$_pizzaSlices'),
                     onChanged: (v) => setState(() => _pizzaSlices = v.round()),
                   ),
                   Text(
-                    'kcal na kawałek:',
+                    l10n.trackKcalPerSlice,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -105,13 +107,19 @@ class _EatingOutContentState extends State<_EatingOutContent> {
                   min: _selectedOption!.minKcal.toDouble(),
                   max: _selectedOption!.maxKcal.toDouble(),
                   divisions: ((_selectedOption!.maxKcal - _selectedOption!.minKcal) ~/ 50).clamp(1, 20),
-                  label: _selectedOption!.supportsSlices ? '$_selectedKcal kcal/szt.' : '$_selectedKcal kcal',
+                  label: _selectedOption!.supportsSlices
+                      ? l10n.trackKcalPerPieceLabel(kcal: '$_selectedKcal')
+                      : l10n.trackKcalLabel(kcal: '$_selectedKcal'),
                   onChanged: (v) => setState(() => _selectedKcal = v.round()),
                 ),
                 Text(
                   _selectedOption!.supportsSlices
-                      ? '$_selectedKcal × $_pizzaSlices = $_totalKcal kcal'
-                      : '$_selectedKcal kcal',
+                      ? l10n.trackKcalTimesSlices(
+                          kcal: '$_selectedKcal',
+                          slices: '$_pizzaSlices',
+                          total: '$_totalKcal',
+                        )
+                      : l10n.trackKcalLabel(kcal: '$_selectedKcal'),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
@@ -135,10 +143,10 @@ class _EatingOutContentState extends State<_EatingOutContent> {
                       : Icon(_selectedOption != null ? Icons.add_circle : Icons.touch_app),
                   label: Text(
                     _isSaving
-                        ? 'Zapisywanie…'
+                        ? l10n.trackSaving
                         : _selectedOption != null
-                            ? 'Dodaj do dziennika'
-                            : 'Wybierz posiłek powyżej',
+                            ? l10n.trackAddToDiary
+                            : l10n.trackSelectMealAbove,
                   ),
                 ),
               ),
@@ -157,7 +165,7 @@ class _EatingOutContentState extends State<_EatingOutContent> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Jeśli reszta dnia była lekka – to OK. Nie stresuj się.',
+                        l10n.trackEatingOutTip,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.green.shade900,
                             ),
@@ -174,6 +182,7 @@ class _EatingOutContentState extends State<_EatingOutContent> {
   }
 
   Widget _buildOptionTile(BuildContext context, EatingOutOption opt) {
+    final l10n = context.l10n;
     final isSelected = _selectedOption?.id == opt.id;
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -202,13 +211,13 @@ class _EatingOutContentState extends State<_EatingOutContent> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      opt.name,
+                      opt.localizedName(l10n),
                       style: TextStyle(
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                       ),
                     ),
                     Text(
-                      opt.label,
+                      opt.localizedLabel(l10n),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.grey.shade600,
                           ),
@@ -257,10 +266,12 @@ class _EatingOutContentState extends State<_EatingOutContent> {
     int totalKcal,
   ) async {
     setState(() => _isSaving = true);
+    final l10n = context.l10n;
+    final displayName = option.localizedName(l10n);
 
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
-      if (userId == null) throw Exception('Użytkownik nie jest zalogowany');
+      if (userId == null) throw Exception(l10n.trackUserNotLoggedIn);
 
       final macros = option.getEstimatedMacros(slices: slices);
       final createdAt = DateTime(
@@ -272,8 +283,8 @@ class _EatingOutContentState extends State<_EatingOutContent> {
       );
 
       final mealName = option.supportsSlices
-          ? '${option.name} ($slices szt.) (na mieście)'
-          : '${option.name} (na mieście)';
+          ? l10n.trackMealNameEatingOutSlices(name: displayName, slices: '$slices')
+          : l10n.trackMealNameEatingOut(name: displayName);
 
       final meal = Meal(
         userId: userId,
@@ -298,14 +309,15 @@ class _EatingOutContentState extends State<_EatingOutContent> {
 
       if (context.mounted) {
         context.pop(true);
-        SuccessMessage.show(
-          context,
-          'Dodano: ${option.name}${option.supportsSlices ? ' ($slices szt.)' : ''} (~$totalKcal kcal)',
-          duration: const Duration(seconds: 2),
+        SuccessMessage.show(context, l10n.trackAddedEatingOut(
+            name: displayName,
+            slicesPart: option.supportsSlices ? l10n.trackSlicesPart(slices: '$slices') : '',
+            kcal: '$totalKcal',
+          ), l10n: context.l10n, duration: const Duration(seconds: 2),
         );
       }
     } catch (e) {
-      if (context.mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (context.mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -367,7 +379,7 @@ class _QuickAddStepper extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               child: Text(
-                'Dodaj',
+                context.l10n.trackAdd,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.primary,

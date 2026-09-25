@@ -1,0 +1,2399 @@
+{
+  "@@locale": "uk",
+  "language": "Мова",
+  "appTitle": "Łatwa Forma",
+  "navToday": "Сьогодні",
+  "navMeals": "Страви",
+  "navWater": "Вода",
+  "navProfile": "Я",
+  "commonOk": "OK",
+  "commonCancel": "Скасувати",
+  "commonSave": "Зберегти",
+  "commonDelete": "Видалити",
+  "commonClose": "Закрити",
+  "commonRetry": "Спробувати знову",
+  "commonWarning": "Увага",
+  "commonError": "Помилка",
+  "commonBack": "Назад",
+  "commonYes": "Так",
+  "commonNo": "Ні",
+  "commonContinue": "Далі",
+  "healthDisclaimer": "Łatwa Forma не є медичним пристроєм і не діагностує, не лікує, не запобігає та не виліковує жодної хвороби чи стану здоров’я. Розрахунки калорій, макронутрієнтів і поради ШІ мають орієнтовний характер. У питаннях здоров’я звернися до лікаря або дієтолога.",
+  "onbContinueApple": "Продовжити з Apple",
+  "onbContinueGoogle": "Продовжити з Google",
+  "onbContinueWithEmail": "Продовжити з ел. поштою",
+  "onbStartWithoutAccount": "Почати без акаунта",
+  "onbCreateAccount": "Створити акаунт",
+  "onbCreateAccountEmail": "Створити акаунт через ел. пошту",
+  "onbEnterCodeLink": "У мене вже є код із листа — ввести його",
+  "onbAlreadyHaveCode": "У мене вже є код із листа",
+  "onbLegalPrefix": "Користуючись застосунком, ти приймаєш ",
+  "onbTerms": "Умови",
+  "onbLegalAnd": " і ",
+  "onbPrivacyPolicyAccusative": "Політику конфіденційності",
+  "onbLegalPeriod": ".",
+  "onbPrivacyPolicy": "Політика конфіденційності",
+  "onbContact": "Контакт",
+  "onbFollowUs": "Стеж за нами: ",
+  "onbSocialComingSoon": "{name} — незабаром",
+  "@onbSocialComingSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCopyrightFull": "© 2026 Łatwa Forma | {company}\nNIP {nip} · {address}",
+  "@onbCopyrightFull": {
+    "placeholders": {
+      "company": {
+        "type": "String"
+      },
+      "nip": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCopyrightShort": "© 2026 Łatwa Forma | {company}\nNIP {nip}",
+  "@onbCopyrightShort": {
+    "placeholders": {
+      "company": {
+        "type": "String"
+      },
+      "nip": {
+        "type": "String"
+      }
+    }
+  },
+  "onbFeatureCaloriesTitle": "Калорії та макро під тебе",
+  "onbFeatureCaloriesDesc": "Денний ліміт і макро під твою ціль",
+  "onbFeatureWeightTitle": "Вага та прогрес",
+  "onbFeatureWeightDesc": "Вага і зміни в одному місці",
+  "onbFeaturePlanTitle": "Простий план до цілі",
+  "onbFeaturePlanDesc": "Зрозумілий шлях до твоєї ваги",
+  "onbFeatureAiTitle": "Допомога ШІ",
+  "onbFeatureAiDesc": "Поради та страва зі світлини",
+  "onbFeatureProductsTitle": "База продуктів",
+  "onbFeatureProductsDesc": "Шукай і скануй штрихкод",
+  "onbBenefitCalories": "план калорій під тебе",
+  "onbBenefitWeight": "відстеження ваги та прогресу",
+  "onbBenefitPlan": "простий план до цілі",
+  "onbBenefitAi": "допомога ШІ",
+  "onbLoginOrRegister": "Увійди або створи акаунт",
+  "onbLoginOrCreateShort": "Увійти або створити акаунт",
+  "onbLoginSheetBody": "Маєш акаунт? Увійди. Новий користувач? Створи акаунт — твої дані буде збережено.",
+  "onbFaqTitle": "FAQ — часті запитання",
+  "onbFaqShowLess": "Показати менше",
+  "onbFaqShowMore": "Більше запитань ({count})",
+  "@onbFaqShowMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbFaqFreeQ": "Чи застосунок безкоштовний?",
+  "onbFaqFreeA": "Так. Łatwa Forma безкоштовна для щоденного користування: калорії, страви, вага, вода й активність. Частина функцій (наприклад, аналіз ШІ зі світлини, розширена статистика) доступна в плані Premium.",
+  "onbFaqPhotoQ": "Як працює лічильник калорій зі світлини?",
+  "onbFaqPhotoA": "На екрані додавання страви обери «Аналіз ШІ». Зроби світлину страви або вибери її з галереї. Застосунок надсилає світлину моделі ШІ, яка розпізнає страву й оцінює калорії та макронутрієнти (білки, жири, вуглеводи). Потім їх можна виправити й зберегти. Функція потребує Premium.",
+  "onbFaqLimitQ": "Як застосунок рахує мій денний ліміт калорій?",
+  "onbFaqLimitA": "На основі профілю (вік, стать, вага, зріст, рівень активності) ми рахуємо BMR (формула Гарріса–Бенедикта), а потім TDEE. Залежно від цілі (схуднення, підтримка, набір) підлаштовуємо ліміт калорій і макро.",
+  "onbFaqNoAccountQ": "Що таке «Почати без акаунта»?",
+  "onbFaqNoAccountA": "Можна користуватися застосунком без входу. Дані зберігаються локально. Пізніше їх можна зв’язати з акаунтом (Apple, Google або ел. пошта), щоб мати резервну копію і синхронізацію між пристроями.",
+  "onbFaqStravaQ": "Чи можна підключити Strava або Garmin?",
+  "onbFaqStravaA": "Так, Strava. У налаштуваннях (Профіль → Інтеграції) можна з’єднати акаунт зі Strava. Імпортовані активності враховуються в балансі калорій (спалені kcal). Garmin Connect з’явиться після запуску інтеграції.",
+  "onbFaqPremiumQ": "Що дає Premium?",
+  "onbFaqPremiumA": "Зокрема аналіз страви зі світлини (ШІ), розширену статистику, експорт даних і вищий ліміт порад ШІ. У застосунку з магазину оплата йде через Google Play / App Store; на сайті latwaforma.pl — через Stripe.",
+  "onbFaqGoalQ": "Як змінити ціль (схуднення / підтримка / набір)?",
+  "onbFaqGoalA": "У Профілі вкажи цільову вагу. На цій основі застосунок пропонує ціль і денний ліміт; макро можна також змінити вручну в налаштуваннях профілю.",
+  "onbFaqAddMealQ": "Як додати страву?",
+  "onbFaqAddMealA": "З головного екрана або вкладки «Страви» обери «Додати страву». Можна ввести дані вручну, відсканувати штрихкод (Open Food Facts) або скористатися аналізом ШІ зі світлини (Premium).",
+  "onbFaqDataQ": "Де зберігаються мої дані?",
+  "onbFaqDataA": "Дані зберігаються на серверах у Європі (Supabase). Якщо обрати «Почати без акаунта», дані локальні, доки ти не з’єднаєш їх з акаунтом.",
+  "onbFaqDeleteQ": "Як видалити акаунт і дані?",
+  "onbFaqDeleteA": "У застосунку: Профіль → Видалити акаунт. Можна також подати заявку на latwaforma.pl/usun-konto.html. Після підтвердження акаунт і пов’язані дані видаляються (це не заморожування акаунта). Підписку в Google Play / App Store скасуй окремо в магазині. Якщо є проблема: contact@latwaforma.pl.",
+  "onbFaqMedicalQ": "Чи це медичний застосунок?",
+  "onbFaqMedicalA": "Ні. Łatwa Forma не є медичним пристроєм і не діагностує, не лікує та не запобігає хворобам. Розрахунки й поради ШІ орієнтовні. У питаннях здоров’я звернися до лікаря або дієтолога.",
+  "onbSendingLinkAndCode": "Надсилаємо посилання і код...",
+  "onbSignedIn": "Вхід виконано",
+  "onbSignedInSuccess": "Вхід успішний!",
+  "onbSignedInDataSaved": "Ти увійшов. Твої дані збережено.",
+  "onbAccountLinked": "Акаунт з’єднано",
+  "onbEmailLinkedSuccess": "Твою адресу ел. пошти з’єднано з акаунтом. Тепер можна входити цією поштою.",
+  "onbEnterEmailTitle": "Вкажи адресу ел. пошти",
+  "onbEnterEmailWhichAddress": "На яку адресу ми надіслали посилання і код? Вкажи її, а потім введи код.",
+  "onbEmailAddressLabel": "Адреса ел. пошти",
+  "onbEmailAddressLabelAlt": "Адреса ел. пошти",
+  "onbEmailAddressHint": "напр. jan@example.com",
+  "onbCheckInbox": "Перевір пошту",
+  "onbEnterCodeFromEmailTitle": "Введи код із листа",
+  "onbEnterCodeFromEmailLabel": "Введи код із листа:",
+  "onbEmailCodeLabel": "Код із листа",
+  "onbEmailCodeHint": "напр. 123456",
+  "onbSentLinkAndCode": "Ми надіслали посилання і код на {email}. Перевір пошту (також папку Спам) — можна натиснути посилання в листі або ввести код нижче.",
+  "@onbSentLinkAndCode": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbEnterCodeReceived": "Введи нижче код, який ти отримав на адресу {email}.",
+  "@onbEnterCodeReceived": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCodeSentTo": "Код надіслано на: {email}",
+  "@onbCodeSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCodeSentEnterBelow": "Ми надіслали код на {email}. Введи його нижче.",
+  "@onbCodeSentEnterBelow": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "onbResend": "Надіслати знову",
+  "onbSignIn": "Увійти",
+  "onbConfirmCode": "Підтвердити код",
+  "onbSuccess": "Успіх",
+  "onbSendLinkAndCode": "Надіслати посилання і код",
+  "onbEmailSignupBody": "Вкажи адресу ел. пошти. Ми надішлемо посилання і код, якими ти завершиш створення акаунта.",
+  "onbEnterEmailRequired": "Вкажи адресу ел. пошти",
+  "onbIntroTitle": "Розкажи трохи про себе",
+  "onbIntroBody": "Покажемо, скільки їсти щодня,\nщоб досягти своєї цілі.",
+  "onbIntroDuration": "Займе менше хвилини",
+  "onbIntroStart": "Почати",
+  "onbAnonErrorTitle": "Не вдалося почати без акаунта",
+  "onbAnonErrorNoConfig": "Застосунок не має з’єднання з сервером (немає конфігурації у збірці).",
+  "onbAnonErrorTimeout": "Сервер не відповів вчасно. Перевір інтернет або спробуй пізніше.",
+  "onbAnonErrorFailed": "З’єднання з сервером не вдалося. Ти можеш:",
+  "onbAnonErrorTipDomain": "• Переконайся, що ти на адресі latwaforma.pl.",
+  "onbAnonErrorTipRefresh": "• Онови сторінку (F5) і спробуй знову.",
+  "onbAnonErrorTipLogin": "• Або увійди через Apple, Google чи ел. пошту — кнопка вгорі.",
+  "onbOpenLatwaForma": "Відкрити latwaforma.pl",
+  "onbSplashNoServerConfig": "Немає з’єднання з сервером. Перевір конфігурацію (.env) та інтернет.",
+  "onbSplashNoConnection": "Немає з’єднання. Перевір інтернет і спробуй знову.",
+  "onbSplashLoginFailed": "Не вдалося увійти. Заповни профіль або спробуй увійти знову.",
+  "onbSplashGoogleFailed": "Вхід через Google не вдався. Увійди знову в цій самій вкладці.",
+  "onbSplashAbort": "Перервати",
+  "onbPlanThanks": "Дякуємо!",
+  "onbPlanGotIt": "Готово!",
+  "onbPlanStepData": "Дані",
+  "onbPlanStepCalc": "Розрахунок",
+  "onbPlanStepMacro": "Макро",
+  "onbPlanStepDone": "Готово",
+  "onbPlanStatusAnalyzing": "Аналізуємо твої дані…",
+  "onbPlanStatusCalories": "Рахуємо калорії…",
+  "onbPlanStatusMacro": "Макро…",
+  "onbPlanStatusAlmost": "Майже готово…",
+  "onbPlanReadyTitle": "Твій план готовий!",
+  "onbPlanWhatDone": "Що зроблено:",
+  "onbPlanCaloriesComputed": "• На основі зросту, ваги, віку та рівня активності ми розрахували твоє денне споживання калорій.",
+  "onbPlanCaloriesComputedWithValue": "• На основі зросту, ваги, віку та рівня активності ми розрахували твоє денне споживання калорій: {calories} kcal.",
+  "@onbPlanCaloriesComputedWithValue": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanTargetDate": "• Орієнтовна дата досягнення цілі: {date}",
+  "@onbPlanTargetDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onbPlanChangeInProfile": "Ці дані можна будь-коли змінити у вкладці Профіль (іконка людини вгорі).",
+  "onbPlanHowToUse": "Як користуватися застосунком:",
+  "onbPlanTipMeals": "• Додавай страви — стеж, що їси і скільки калорій споживаєш",
+  "onbPlanTipWater": "• Пий воду — увімкни нагадування в налаштуваннях",
+  "onbPlanTipWeight": "• Записуй вагу регулярно — прогрес видно на графіку",
+  "onbPlanTipDashboard": "• Перевіряй головний екран — там денна ціль і прогрес",
+  "onbPlanMedicalNote": "Łatwa Forma не є медичним пристроєм і не діагностує, не лікує та не запобігає хворобам. У питаннях здоров’я звернися до лікаря або дієтолога.",
+  "onbPlanStartButton": "Зрозуміло, починаю!",
+  "onbSaveProgressTitle": "Збережи прогрес",
+  "onbSaveProgressBodyWithMeals": "У тебе вже {count} страв! Увійди, щоб не втратити дані після перевстановлення застосунку.",
+  "@onbSaveProgressBodyWithMeals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbSaveProgressBodyEmpty": "Створи акаунт, щоб страви, активності та вага зберігалися в хмарі й були доступні на кожному пристрої — нічого не зникне після перевстановлення.",
+  "onbChooseLoginMethod": "Обери спосіб входу:",
+  "onbLater": "Пізніше",
+  "guestTrialDaysLeft": "Без облікового запису: залишилось {days} дн.",
+  "@guestTrialDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "guestTrialOneDay": "Без облікового запису: залишився 1 день",
+  "guestTrialLastDay": "Без облікового запису: останній день. Від завтра нові записи потребують облікового запису.",
+  "guestTrialCardBody": "З’єднайте обліковий запис, щоб дані лишилися при зміні телефона.",
+  "guestTrialEndedTitle": "Період без облікового запису минув",
+  "guestTrialEndedBody": "Можна переглядати збережені прийоми їжі, воду і вагу. Щоб додавати далі, з’єднайте обліковий запис — дані залишаться.",
+  "guestTrialViewOnly": "Лише перегляд",
+  "onbLinkingAccount": "З’єднуємо акаунт...",
+  "onbAccountSavedSuccess": "Акаунт успішно збережено!",
+  "onbSaveWithEmailTitle": "Зберегти через ел. пошту",
+  "onbEmailAlreadyRegistered": "Ел. пошта вже зареєстрована",
+  "onbClickBelowToLogin": "Натисни нижче, щоб перейти до входу:",
+  "onbSignOutAndSignIn": "Вийти і увійти",
+  "onbGoBackTitle": "Повернутися?",
+  "onbGoBackBody": "Дані не буде збережено. Ти повернешся на початковий екран.",
+  "onbGoBackConfirm": "Так, назад",
+  "onbBackTooltip": "Назад",
+  "onbCompleteData": "Заповни дані",
+  "onbGenderLabel": "Стать *",
+  "onbGenderFemale": "Жінка",
+  "onbGenderMale": "Чоловік",
+  "onbAgeLabel": "Вік *",
+  "onbYearsUnit": "р.",
+  "onbHeightLabel": "Зріст (см) *",
+  "onbCurrentWeightLabel": "Поточна вага (кг) *",
+  "onbTargetWeightLabel": "Цільова вага (кг) *",
+  "onbWeightDiff": "Різниця: {diff} кг",
+  "@onbWeightDiff": {
+    "placeholders": {
+      "diff": {
+        "type": "String"
+      }
+    }
+  },
+  "onbWeightDiffMin": "Різниця між вагами має бути щонайменше 1 кг",
+  "onbActivityLabel": "Рівень активності *",
+  "onbActivitySedentary": "Сидячий",
+  "onbActivitySedentaryDesc": "Немає активності або мінімальна активність",
+  "onbActivityLight": "Легка",
+  "onbActivityLightDesc": "Тренування 1–3 рази на тиждень",
+  "onbActivityModerate": "Помірна",
+  "onbActivityModerateDesc": "Тренування 3–5 разів на тиждень",
+  "onbActivityIntense": "Інтенсивна",
+  "onbActivityIntenseDesc": "Тренування 6–7 разів на тиждень",
+  "onbActivityVeryIntense": "Дуже інтенсивна",
+  "onbActivityVeryIntenseDesc": "Дуже важка фізична робота або тренування двічі на день",
+  "onbSaveAndStart": "Зберегти і почати",
+  "onbGoalLose": "Хочу схуднути.",
+  "onbGoalGain": "Хочу набрати вагу.",
+  "onbGoalMaintain": "Хочу зберегти поточну вагу.",
+  "onbGoalUnchangedSameWeight": "Ціль не змінилась. Цільова вага не відрізняється від поточної, тож план — утримувати вагу.",
+  "onbErrorCreatingAccount": "Помилка під час створення акаунта.",
+  "onbErrorNetworkPermission": "Помилка мережевих дозволів.\n\nРішення:\n1. Зупини застосунок\n2. Запусти знову: flutter run\n3. Якщо проблема лишається, перевір, чи в Supabase увімкнено анонімну авторизацію",
+  "onbErrorAnonymousDisabled": "Анонімну авторизацію не ввімкнено в Supabase.\n\nПерейди до: Authentication → Providers → Anonymous → Enable",
+  "onbErrorInternet": "Помилка з’єднання з інтернетом.\nПеревір з’єднання і спробуй знову.",
+  "onbErrorInternetShort": "Помилка з’єднання з інтернетом. Перевір з’єднання і спробуй знову.",
+  "onbErrorSupabaseConfig": "Помилка конфігурації Supabase.\nПеревір ключі API у файлі .env",
+  "onbErrorWithDetails": "Помилка: {details}",
+  "@onbErrorWithDetails": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
+  "onbErrorSaving": "Помилка під час збереження",
+  "onbErrorAuth": "Помилка авторизації. Перевір конфігурацію Supabase.",
+  "moreStatisticsTitle": "Статистика",
+  "moreStreaksTooltip": "Серії",
+  "moreWeeklySummary": "Тижневий підсумок",
+  "moreShareTooltip": "Поділитися",
+  "moreShareWeeklyStatsFeature": "Надсилання тижневої статистики",
+  "moreShareWeeklySummaryText": "📊 Łatwa Forma – Тижневий підсумок",
+  "moreShareError": "Помилка надсилання: {error}",
+  "@moreShareError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAvgDailyCalories": "Середні денні калорії",
+  "moreTotalCaloriesWeek": "Усього калорій (тиждень)",
+  "moreBurnedCaloriesWeek": "Спалені калорії (тиждень)",
+  "moreWaterWeek": "Вода (тиждень)",
+  "moreCaloriesDuringWeek": "Калорії протягом тижня",
+  "moreMacrosWeek": "Макро (тиждень)",
+  "moreProtein": "Білки",
+  "moreFat": "Жири",
+  "moreCarbs": "Вугл.",
+  "moreCarbsFull": "Вуглеводи",
+  "moreGoalVerification": "Перевірка цілі",
+  "moreGoalVerificationHint": "Записуй страви і вагу щодня протягом тижня. Застосунок перевірить твою ціль і запропонує правки, якщо реальна потреба відрізняється від калькулятора.",
+  "moreProgressDaysWithData": "Прогрес: {days}/7 днів із даними",
+  "@moreProgressDaysWithData": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "moreBasedOnLast7Days": "На основі останніх 7 днів:",
+  "moreAvgCaloriesPerDayBullet": "• У середньому: ~{calories} kcal/день",
+  "@moreAvgCaloriesPerDayBullet": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightStable": "стабільна",
+  "moreWeightIncrease": "зростання (+{kg} кг)",
+  "@moreWeightIncrease": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightDecrease": "зниження ({kg} кг)",
+  "@moreWeightDecrease": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightBullet": "• Вага: {change}",
+  "@moreWeightBullet": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSaving": "Збереження…",
+  "moreApplyCorrectedGoal": "Застосувати виправлену ціль",
+  "moreGoalAligned": "Даних достатньо. Твоя поточна ціль відповідає тренду — корекція не потрібна.",
+  "moreRealTdee": "Реальна потреба: ~{calories} kcal",
+  "@moreRealTdee": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGoalUpdated": "Ціль оновлено до ~{calories} kcal",
+  "@moreGoalUpdated": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreErrorWithDetails": "Помилка: {error}",
+  "@moreErrorWithDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGoalHistoryReason": "Перевірка на основі даних за останній тиждень",
+  "moreDayMon": "Пн",
+  "moreDayTue": "Вт",
+  "moreDayWed": "Ср",
+  "moreDayThu": "Чт",
+  "moreDayFri": "Пт",
+  "moreDaySat": "Сб",
+  "moreDaySun": "Нд",
+  "moreSuggestionWeightLossFlat": "Вага стабільна при ~{avg} kcal. Твоя реальна потреба — ~{real} kcal. Хочеш схуднути? Спробуй ~{corr} kcal.",
+  "@moreSuggestionWeightLossFlat": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightLossDown": "Ти худнеш при ~{avg} kcal. Реальний TDEE: ~{real} kcal. Запропонована ціль: ~{corr} kcal.",
+  "@moreSuggestionWeightLossDown": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightGainFlat": "Вага стабільна при ~{avg} kcal. Твоя реальна потреба — ~{real} kcal. Хочеш набрати? Спробуй ~{corr} kcal.",
+  "@moreSuggestionWeightGainFlat": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightGainUp": "Ти набираєш при ~{avg} kcal. Реальний TDEE: ~{real} kcal. Запропонована ціль: ~{corr} kcal.",
+  "@moreSuggestionWeightGainUp": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionMaintain": "Реальна потреба: ~{real} kcal (калькулятор: {calc} kcal). Ціль: ~{corr} kcal.",
+  "@moreSuggestionMaintain": {
+    "placeholders": {
+      "real": {
+        "type": "String"
+      },
+      "calc": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreBmiCalculatorTitle": "Калькулятор BMI",
+  "moreYourBmi": "Твій BMI",
+  "moreCalculatedBasedOn": "Розраховано на основі:",
+  "moreCurrentWeightBullet": "• Поточна вага: {weight} кг",
+  "@moreCurrentWeightBullet": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "moreHeightBullet": "• Зріст: {height} см",
+  "@moreHeightBullet": {
+    "placeholders": {
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "moreNormalBmiRangeHint": "Щоб бути в нормі (BMI 18,5–24,9), тримайся ваги від {minKg} до {maxKg} кг.",
+  "@moreNormalBmiRangeHint": {
+    "placeholders": {
+      "minKg": {
+        "type": "String"
+      },
+      "maxKg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCompleteProfileForBmi": "Заповни профіль (вага і зріст), щоб побачити свій BMI",
+  "moreBmiScale": "Шкала BMI",
+  "moreBmiUnderweight": "Недостатня вага",
+  "moreBmiNormal": "Норма",
+  "moreBmiOverweight": "Надмірна вага",
+  "moreBmiObesity1": "Ожиріння I ступеня",
+  "moreBmiObesity2": "Ожиріння II ступеня",
+  "moreBmiObesity3": "Ожиріння III ступеня",
+  "moreBmiFormulaTitle": "Формула BMI",
+  "moreBmiFormula": "BMI = вага (кг) / зріст (м)²",
+  "moreBmiExplanation": "BMI — це індекс маси тіла, який допомагає оцінити, чи вага відповідає зросту.",
+  "moreExportTitle": "Експорт даних",
+  "moreExportDescription": "Експортуй дані у файл CSV (повний список) або PDF (звіт за останні 30 днів). Відкриється вікно надсилання.",
+  "moreExporting": "Експорт...",
+  "moreExportToCsv": "Експортувати в CSV",
+  "moreExportToPdfPremium": "Експортувати в PDF (Premium)",
+  "moreExportPdfFeature": "Експорт у PDF",
+  "moreUserNotLoggedIn": "Користувач не увійшов",
+  "moreCsvCopiedClipboard": "Дані скопійовано в буфер. Встав у Блокнот або Excel і збережи як .csv",
+  "moreCsvFileReady": "Файл CSV готовий. Його можна зберегти або надіслати.",
+  "moreCsvClipboardFallback": "Дані експортовано в буфер (CSV). Встав їх, наприклад, у Нотатки і збережи як файл .csv",
+  "moreCsvClipboardShort": "Дані експортовано в буфер (CSV).",
+  "moreExportFailed": "Не вдалося експортувати. Перевір з’єднання і спробуй знову.",
+  "moreExportShareText": "Експорт даних Łatwa Forma",
+  "moreExportShareSubject": "Дані Łatwa Forma - {date}",
+  "@moreExportShareSubject": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfReportShareText": "Звіт Łatwa Forma",
+  "morePdfReportShareSubject": "Звіт Łatwa Forma - {date}",
+  "@morePdfReportShareSubject": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfDownloaded": "PDF завантажено. Перевір папку Завантаження.",
+  "morePdfShareOrDownloadFailed": "Не вдалося надіслати чи завантажити PDF. Спробуй у браузері Chrome або експортуй у CSV.",
+  "morePdfShareFailed": "Не вдалося надіслати PDF. Спробуй експортувати в CSV.",
+  "morePdfFileReady": "Файл PDF готовий. Його можна зберегти або надіслати.",
+  "morePdfExportFailedWithHint": "Експорт PDF не вдався ({hint}). Спробуй CSV.",
+  "@morePdfExportFailedWithHint": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfExportFailed": "Експорт PDF не вдався. Спробуй знову або експортуй у CSV.",
+  "moreCsvSectionProfile": "=== ПРОФІЛЬ ===",
+  "moreCsvHeaderTypeNameValue": "Тип,Назва,Значення",
+  "moreCsvProfile": "Профіль",
+  "moreCsvGender": "Стать",
+  "moreGenderMale": "Чоловік",
+  "moreGenderFemale": "Жінка",
+  "moreGenderOther": "Інша",
+  "moreCsvAge": "Вік",
+  "moreCsvAgeYears": "{age} р.",
+  "@moreCsvAgeYears": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCsvHeight": "Зріст",
+  "moreCsvCurrentWeight": "Поточна вага",
+  "moreCsvTargetWeight": "Цільова вага",
+  "moreCsvGoal": "Ціль",
+  "moreGoalWeightLoss": "Схуднення",
+  "moreGoalWeightGain": "Набір ваги",
+  "moreGoalMaintain": "Підтримка",
+  "moreGoalMaintainWeight": "Підтримка ваги",
+  "moreCsvCalorieGoal": "Ціль калорій",
+  "moreCsvProteinG": "Білки (г)",
+  "moreCsvFatG": "Жири (г)",
+  "moreCsvCarbsG": "Вуглеводи (г)",
+  "moreCsvTargetDate": "Орієнтовна дата досягнення цілі",
+  "moreCsvSectionDiary": "=== ДАНІ ЩОДЕННИКА ===",
+  "moreCsvGarminNote": "# Дані активності можуть містити дані з пристроїв Garmin.",
+  "moreCsvHeaderDiary": "Тип,Назва,Значення,Дата,Джерело даних",
+  "moreCsvMeal": "Страва",
+  "moreCsvActivity": "Активність",
+  "moreCsvWeight": "Вага",
+  "morePdfReportTitle": "Łatwa Forma – Звіт",
+  "morePdfPageFooter": "Сторінка {page} з {pages} • Створено {date}",
+  "@morePdfPageFooter": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "pages": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfProfileSummary": "Підсумок профілю",
+  "morePdfProfileLine1": "Стать: {gender} • Вік: {age} р. • Зріст: {height} см",
+  "@morePdfProfileLine1": {
+    "placeholders": {
+      "gender": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfProfileLine2": "Вага: {weight} кг • Ціль: {target} кг • Ціль калорій: {calories} kcal",
+  "@morePdfProfileLine2": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      },
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfGoalWeightLoss": "Ціль: схуднення",
+  "morePdfGoalWeightGain": "Ціль: набір ваги",
+  "morePdfGoalMaintain": "Ціль: підтримка ваги",
+  "morePdfNoProfile": "Немає профілю",
+  "morePdfMealsLast30": "Останні 30 днів — страви",
+  "morePdfNoMeals": "Немає страв",
+  "morePdfDate": "Дата",
+  "morePdfName": "Назва",
+  "morePdfActivitiesLast30": "Останні 30 днів — активності",
+  "morePdfNoActivities": "Немає активностей",
+  "morePdfGarminAttribution": "Дані активності походять із пристроїв Garmin.",
+  "morePdfWeightHistory": "Історія ваги",
+  "morePdfNoMeasurements": "Немає вимірів",
+  "morePdfWeightKg": "Вага (кг)",
+  "moreNotificationsTitle": "Сповіщення",
+  "moreWaterReminders": "Нагадування про воду",
+  "moreMealReminders": "Нагадування про страви",
+  "moreAdd": "Додати",
+  "moreMealBreakfast": "Сніданок",
+  "moreMealLunch": "Обід",
+  "moreMealDinner": "Вечеря",
+  "moreMealSnack": "Перекус",
+  "moreMealDefault": "Страва",
+  "moreNewMealReminder": "Нове нагадування про страву",
+  "moreMealNameLabel": "Назва страви",
+  "moreMealNameHint": "напр. Другий сніданок, полуденок",
+  "moreEditReminder": "Редагувати нагадування",
+  "moreNotifWaterTitle": "Не забудь про воду! 💧",
+  "moreNotifWaterBody": "Час на склянку води",
+  "moreNotifWaterChannel": "Нагадування про воду",
+  "moreNotifWaterChannelDesc": "Нагадування пити воду",
+  "moreNotifMealTitle": "Час на {label}! 🍽️",
+  "@moreNotifMealTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "moreNotifMealBody": "Не забудь записати страву",
+  "moreNotifMealChannel": "Нагадування про страви",
+  "moreNotifMealChannelDesc": "Нагадування записати страви",
+  "moreIntegrationsTitle": "Інтеграції",
+  "moreLoginToFinishStrava": "Увійди, щоб завершити з’єднання зі Strava",
+  "moreLoginToFinishGarmin": "Увійди, щоб завершити з’єднання з Garmin",
+  "moreStravaConnectedImported": "Strava з’єднано. Імпортовано активностей: {count}.",
+  "@moreStravaConnectedImported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreStravaConnectedNoNew": "Strava з’єднано. Немає нових активностей для імпорту.",
+  "moreStravaConnectedSuccess": "Strava успішно з’єднано",
+  "moreStravaSyncFailedLater": "Синхронізація не вдалася. Натисни «Синхронізувати активності» пізніше.",
+  "moreGarminSessionExpiredRetry": "Сесія закінчилася. Спробуй знову з’єднати Garmin.",
+  "moreGarminSessionRejected": "Сесію відхилено: {message}. Вийди, увійди знову і спробуй з’єднати Garmin.",
+  "@moreGarminSessionRejected": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminSessionExpiredRelogin": "Сесія закінчилася. Вийди і знову увійди в Łatwa Forma, потім натисни «З’єднати з Garmin Connect».",
+  "moreConnectedSuccessfully": "Успішно з’єднано!",
+  "moreGarminSessionExpiredShort": "Сесія закінчилася. Вийди і увійди знову, потім з’єднай Garmin.",
+  "moreGarminError": "Помилка Garmin: {error}",
+  "@moreGarminError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStravaEnvMissing": "Додай STRAVA_CLIENT_ID і STRAVA_CLIENT_SECRET до файлу .env",
+  "moreGarminEnvMissing": "Додай GARMIN_CLIENT_ID до env (після схвалення програми).",
+  "moreLoginAgainForGarmin": "Увійди знову, щоб доповнити дані Garmin.",
+  "moreCouldNotComplete": "Не вдалося: {message}",
+  "@moreCouldNotComplete": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminNoUserId": "Garmin не повернув User ID. Спробуй від’єднати і з’єднати знову.",
+  "moreGarminReceiveDataSaved": "Дані для отримання активностей збережено. Нові тренування з Garmin Connect з’являтимуться в застосунку.",
+  "moreGarminDisconnectFailed": "Не вдалося викликати від’єднання в Garmin: {error}",
+  "@moreGarminDisconnectFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminDisconnectedTitle": "Garmin Connect від’єднано",
+  "moreGarminDisconnectedBody": "З’єднання з Garmin Connect видалено. Нові активності більше не додаватимуться автоматично. Можна з’єднати знову будь-коли.",
+  "moreStravaDisconnected": "Strava від’єднано",
+  "moreConnectStravaFirst": "Спочатку з’єднай акаунт Strava",
+  "moreImportedFromStrava": "Імпортовано активностей зі Strava: {count}",
+  "@moreImportedFromStrava": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreNoNewActivities": "Немає нових активностей для імпорту",
+  "moreSyncError": "Помилка синхронізації: {error}",
+  "@moreSyncError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStravaImportDesc": "Імпортуй усі активності та спалені калорії",
+  "moreConnected": "З’єднано",
+  "moreSyncing": "Синхронізую...",
+  "moreSyncActivities": "Синхронізувати активності",
+  "moreDisconnectStrava": "Від’єднати Strava",
+  "moreConnecting": "З’єдную...",
+  "moreConnectStrava": "З’єднати зі Strava",
+  "moreGarminImportDesc": "Активності з Garmin додаються автоматично після синхронізації з Garmin Connect",
+  "moreGarminAutoImportInfo": "Усі нові активності з Garmin Connect імпортуються в застосунок. Ти вирішуєш, яку зарахувати в баланс.",
+  "moreGarminNeedUserId": "Щоб активності з Garmin з’являлися в застосунку, збережи дані з’єднання (ID Garmin).",
+  "moreSavingShort": "Зберігаю...",
+  "moreCompleteActivityReceiveData": "Доповни дані для отримання активностей",
+  "moreDisconnectGarmin": "Від’єднати Garmin",
+  "moreConnectGarmin": "З’єднати з Garmin Connect",
+  "moreGarminDisconnectErrorStatus": "Помилка від’єднання: {status}",
+  "@moreGarminDisconnectErrorStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "moreErrorStatusCode": "Помилка {code}",
+  "@moreErrorStatusCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "moreChallengesTitle": "Цілі та виклики",
+  "moreNoChallenges": "Немає цілей і викликів",
+  "moreNoChallengesHint": "Додай ціль або виклик, щоб стежити за прогресом",
+  "moreProgressPercent": "Прогрес: {percent}%",
+  "@moreProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStartDate": "Початок: {date}",
+  "@moreStartDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreEndDate": "Кінець: {date}",
+  "@moreEndDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreDeleteChallengeTitle": "Видалити виклик",
+  "moreDeleteChallengeConfirm": "Точно видалити «{title}»?",
+  "@moreDeleteChallengeConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "moreChallengeDeleted": "Виклик видалено",
+  "morePickStartDate": "Обери дату початку",
+  "morePickEndDate": "Обери дату завершення",
+  "morePick": "Обрати",
+  "moreChallengeAdded": "Виклик успішно додано!",
+  "moreTargetWeightKg": "Ціль ваги (кг)",
+  "moreCalorieDeficitKcal": "Дефіцит калорій (kcal)",
+  "moreWaterAmountMl": "Кількість води (мл)",
+  "moreWorkoutCount": "Кількість тренувань",
+  "moreStreakLengthDays": "Довжина серії (дні)",
+  "moreTargetValue": "Цільове значення",
+  "moreAddChallenge": "Додати виклик",
+  "moreChallengeType": "Тип виклику",
+  "moreCalorieDeficit": "Дефіцит калорій",
+  "moreWater": "Вода",
+  "moreExercise": "Вправи",
+  "moreStreak": "Серія",
+  "moreChallengeTitleLabel": "Назва виклику",
+  "moreChallengeTitleHint": "напр. Схуднути на 5 кг",
+  "moreChallengeTitleRequired": "Вкажи назву виклику",
+  "moreDescriptionOptional": "Опис (необов’язково)",
+  "moreChallengeDescHint": "Додаткова інформація про виклик",
+  "moreOptional": "Необов’язково",
+  "moreStartDateLabel": "Дата початку",
+  "moreSetEndDate": "Встановити дату завершення",
+  "moreEndDateLabel": "Дата завершення",
+  "morePickDate": "Обери дату",
+  "moreStreaksTitle": "Серії",
+  "moreNoStreaks": "Немає серій",
+  "moreNoStreaksHint": "Почни відстежувати звички, щоб побачити серії",
+  "moreLastTime": "Останній раз: {date}",
+  "@moreLastTime": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCurrentStreak": "Поточна серія",
+  "moreLongestStreak": "Найдовша серія",
+  "moreStreakMeals": "Страви",
+  "moreStreakActivities": "Активності",
+  "moreStreakWeight": "Вага",
+  "moreAiAdviceTitle": "Порада ШІ",
+  "moreAiLimitReachedPremium": "Ти використав сьогоднішній ліміт ({limit} запитів). Спробуй завтра.",
+  "@moreAiLimitReachedPremium": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiLimitReachedFree": "Ти використав сьогоднішній ліміт ({limit} запитів). Спробуй завтра або перейди на Premium.",
+  "@moreAiLimitReachedFree": {
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiNeedsConnection": "Порада ШІ потребує з’єднання із застосунком (Supabase) або ключа OpenAI в конфігурації.",
+  "moreAiNoResponse": "Не вдалося отримати відповідь. Спробуй знову.",
+  "moreAiRemainingToday": "Залишилось запитів сьогодні: {remaining} / {limit}",
+  "@moreAiRemainingToday": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiRemainingTodayPremium": "Залишилось запитів сьогодні: {remaining} / {limit} (Premium)",
+  "@moreAiRemainingTodayPremium": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiIntro": "Запитай пораду щодо дієти, харчування або фізичної активності. Відповідь генерує ШІ, і вона не замінює консультацію лікаря.",
+  "moreAiHint": "напр. Скільки білка мені потрібно при силових тренуваннях?",
+  "moreAiAnswer": "Відповідь",
+  "profErrNetwork": "Немає з’єднання з інтернетом. Перевір мережу і спробуй знову.",
+  "profErrCors": "Помилка з’єднання з послугою. Онови сторінку і спробуй знову.",
+  "profErrTimeout": "Перевищено час очікування. Спробуй знову.",
+  "profErrAuth": "Помилка авторизації. Увійди знову.",
+  "profErrNotFound": "Ресурс не знайдено.",
+  "profErrServer": "Помилка сервера. Спробуй пізніше.",
+  "profErrGeneric": "Сталася помилка. Спробуй знову.",
+  "profOfflineBanner": "Немає з’єднання з інтернетом.",
+  "premFeatureTitle": "Функція Premium",
+  "premFeatureDialog": "{feature} доступна в плані Premium. Хочеш дізнатися більше?",
+  "@premFeatureDialog": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premFeatureThis": "Ця функція",
+  "premSeePremium": "Переглянути Premium",
+  "premLockedTitle": "{feature} є в Premium",
+  "@premLockedTitle": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "premLockedBody": "Відкрий необмежені поради ШІ, експорт PDF і більше.",
+  "premCheckPremium": "Перевірити Premium",
+  "premThanks": "Дякуємо!",
+  "premActivatedBody": "Premium активовано.\nКористуйся повним доступом до Łatwa Forma — експорт PDF, поради ШІ, інтеграції та інше.",
+  "premBackToApp": "Повернутися до застосунку",
+  "premCloseTabHint": "Можна також закрити цю вкладку, якщо оплата була в окремому вікні.",
+  "premPaymentCancelled": "Оплату скасовано",
+  "premCancelBody": "Нічого не списано. Можеш повернутися і обрати план, коли будеш готовий.",
+  "premBackToPlans": "Повернутися до планів Premium",
+  "premGoToApp": "Перейти до застосунку",
+  "premTitle": "Łatwa Forma Premium",
+  "premHavePremium": "У тебе Premium!",
+  "premUnlockPotential": "Відкрий увесь потенціал",
+  "premAllFeaturesAvailable": "Усі функції Premium для тебе доступні.",
+  "premValidUntil": "Діє до: {date}",
+  "@premValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "premTrialTitle": "Пробний період (24 год)",
+  "premTrialLeft": "Залишилось: {hours} год {minutes} хв. ",
+  "@premTrialLeft": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "premTrialBody": "Усі функції Premium зараз доступні. {remaining}Після цього функції Premium вимкнуться, доки ти не придбаєш план. Пробний період нічого не списує і не підписує тебе автоматично.",
+  "@premTrialBody": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "premFeatHistoryOtherDays": "Перегляд історії інших днів, не лише сьогодні",
+  "premFeatMacrosDash": "Макронутрієнти на головному екрані",
+  "premFeatAiAdvice": "Порада ШІ (ліміт 100 на день)",
+  "premFeatAiPhoto": "Аналіз ШІ страви зі світлини",
+  "premFeatIngredients": "Додавання страви зі складників",
+  "premFeatEatingOut": "Додавання страви «у місті»",
+  "premFeatQuickActivity": "Швидке додавання в активностях",
+  "premFeatShare": "Надсилання підсумку і тижневої статистики",
+  "premFeatPdf": "Експорт звітів у PDF",
+  "premFeatCustomCalories": "Власна ціль калорій у редагуванні профілю",
+  "premFeatCustomMacros": "Власні макронутрієнти в редагуванні профілю",
+  "premFeatStrava": "Інтеграції Strava без лімітів",
+  "premFeatGoals": "Розширені цілі та виклики",
+  "premChoosePlan": "Обери план",
+  "premPlanMonthly": "Łatwa Forma Premium — щомісяця",
+  "premPlanMonthlyPeriod": "1 місяць, автопоновлення",
+  "premPlanYearly": "Łatwa Forma Premium — щороку",
+  "premPlanYearlyPeriod": "12 місяців, автопоновлення",
+  "premBadgeSave": "Економія ~17%",
+  "premPlanYearlyOnce": "На рік (одноразово)",
+  "premPlanYearlyOncePeriod": "на рік",
+  "premBadgeBlik": "Лише BLIK",
+  "premYearlyOnceSubtitle": "оплата раз на рік, без підписки",
+  "premHaveCode": "Маю код",
+  "premCodeLabel": "Код",
+  "premRedeemTooltip": "Застосувати",
+  "premOpeningPayment": "Відкриваю оплату…",
+  "premProcessingPurchase": "Обробляю покупку…",
+  "premBuy": "Придбати Premium",
+  "premRestoring": "Відновлюю…",
+  "premRestorePurchases": "Відновити покупки",
+  "premPaymentNoteWeb": "На рік (одноразово) — лише BLIK. Підписка — картка, Apple Pay, Google Pay. Підписка поновлюється автоматично, доки ти її не скасуєш.",
+  "premPaymentNoteMobile": "Оплата через App Store / Google Play. «Łatwa Forma Premium — щомісяця» (1 місяць) і «Łatwa Forma Premium — щороку» (12 місяців) поновлюються автоматично за ціною, показаною вище, доки ти не скасуєш у налаштуваннях магазину. BLIK є на latwaforma.pl. Базові функції працюють без підписки.",
+  "premAutoActivate": "Після оплати акаунт Premium активується автоматично.",
+  "premPrivacy": "Політика конфіденційності",
+  "premTerms": "Умови",
+  "premEula": "Terms of Use (EULA)",
+  "premActivating": "Активую…",
+  "premActivateTest": "Активувати Premium (тест)",
+  "premAvailableFeatures": "Доступні функції:",
+  "premFeatActiveHistory": "Історія інших днів",
+  "premFeatActiveMacros": "Макро на головному екрані",
+  "premFeatActiveAiPhoto": "Аналіз ШІ страви",
+  "premFeatActiveIngredients": "Страва зі складників",
+  "premFeatActiveEatingOut": "Страва «у місті»",
+  "premFeatActiveQuickActivity": "Швидке додавання активності",
+  "premFeatActiveShare": "Надсилання підсумку і статистики",
+  "premFeatActivePdf": "Експорт у PDF",
+  "premFeatActiveCalories": "Власна ціль калорій",
+  "premFeatActiveMacrosCustom": "Власні макронутрієнти",
+  "premFeatActiveStrava": "Інтеграції Strava",
+  "premFeatActiveGoals": "Розширені цілі",
+  "premOpening": "Відкриваю…",
+  "premCancelSub": "Скасувати підписку",
+  "premManageSub": "Керувати підпискою",
+  "premCancelNoteWeb": "Підписку можна скасувати. Доступ до Premium лишиться до кінця оплаченого періоду.",
+  "premCancelNoteMobile": "Скасування в налаштуваннях App Store / Google Play. Доступ Premium до кінця оплаченого періоду.",
+  "premEnterEmail": "Вкажи адресу ел. пошти.",
+  "premCodeSent": "Код надіслано",
+  "premCodeSentBody": "Ми надіслали посилання і код на {email}. Перевір пошту (також папку Спам) — натисни посилання в листі або введи код нижче.",
+  "@premCodeSentBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "premSignedIn": "Вхід виконано",
+  "premSignedInBuy": "Тепер можна придбати Premium.",
+  "premAccountExistsTitle": "Акаунт із цією адресою ел. пошти вже існує.",
+  "premAccountExistsBody": "Ти намагаєшся увійти в акаунт, пов’язаний із цією адресою. На цьому пристрої є інші дані (профіль, страви тощо).\n\nЩо хочеш зробити?\n\n• Оновити той акаунт — поточними даними з цього пристрою (профіль і страви буде перенесено).\n\n• Відновити дані акаунта — побачиш дані, прив’язані до акаунта з цією поштою (поточні дані пристрою не буде використано).\n\nВ обох випадках треба підтвердити особу — натисни посилання в листі або введи код підтвердження.",
+  "premRestoreAccountData": "Відновити дані акаунта",
+  "premUpdateWithCurrent": "Оновити акаунт цими даними",
+  "premConfirmIdentity": "Підтвердь особу",
+  "premVerifyEmailSent": "Ми надіслали лист на {email}. Можна натиснути посилання підтвердження в листі або ввести код нижче (перевір також папку Спам).",
+  "@premVerifyEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "premVerificationCode": "Код підтвердження",
+  "premCodeHint": "напр. 123456",
+  "premEnterFullCode": "Введи повний код із листа (мін. 6 символів).",
+  "premLoggedInMergeError": "Вхід виконано. Помилка перенесення даних: {error}",
+  "@premLoggedInMergeError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premVerifyErrorTitle": "Помилка підтвердження",
+  "premVerifyErrorBody": "Код закінчився або неправильний. Надішли знову.",
+  "premConfirm": "Підтвердити",
+  "premConnErrorTitle": "Помилка з’єднання",
+  "premConnErrorBody": "Не вдалося з’єднатися з оплатою. Спробуй за хвилину або напиши нам: contact@latwaforma.pl",
+  "premLoginToBuy": "Щоб придбати Premium, увійди (Apple, Google або ел. пошта з кодом вище).",
+  "premCodeNotForOnce": "Цей код не працює для одноразової оплати.",
+  "premTryLaterContact": "Спробуй знову за хвилину або напиши нам: contact@latwaforma.pl",
+  "premOpenPaymentFailed": "Не вдалося відкрити оплату",
+  "premCannotOpenPaymentPage": "Не можна відкрити сторінку оплати.",
+  "premCheckoutSessionError": "Помилка створення сесії оплати.",
+  "premTryLaterContactShort": "Спробуй за хвилину або напиши нам: contact@latwaforma.pl",
+  "premLoginToUseCode": "Щоб використати код, увійди (Apple, Google або ел. пошта).",
+  "premCodeSheetFailed": "Не вдалося відкрити введення коду. Спробуй знову.",
+  "premEnterCode": "Введи код.",
+  "premPlayStoreFailed": "Не вдалося відкрити Play Store.",
+  "premLoginToBuyMobile": "Щоб придбати Premium, увійди (Google, Apple або ел. пошта з кодом вище).",
+  "premThanksActive": "Дякуємо! Premium уже має бути активним. Якщо функції ще заблоковані, зачекай хвилину або повернися до застосунку.",
+  "premPurchasePending": "Покупку завершено. Статус Premium оновиться за хвилину. Якщо ні — скористайся «Відновити покупки».",
+  "premInfo": "Інформація",
+  "premPurchaseErrorTitle": "Помилка покупки",
+  "premPurchaseErrorBody": "Не вдалося завершити покупку. Перевір з’єднання і налаштування магазину або напиши: contact@latwaforma.pl\n\n{error}",
+  "@premPurchaseErrorBody": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premLoginToRestore": "Увійди, щоб відновити покупки.",
+  "premRestoredTitle": "Покупки відновлено",
+  "premNoPurchasesTitle": "Немає активних покупок",
+  "premRestoredBody": "Твій Premium відновлено. Якщо розблокування не видно, зачекай хвилину.",
+  "premNoPurchasesBody": "Не знайдено активної підписки, пов’язаної з цим акаунтом магазину.",
+  "premRestoreFailed": "Не вдалося відновити покупки: {error}",
+  "@premRestoreFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premSubscription": "Підписка",
+  "premManageHint": "Відкрий налаштування підписки в магазині Apple / Google, щоб скасувати Premium або керувати ним.",
+  "premSessionExpired": "Сесія закінчилася",
+  "premLoginAgain": "Увійди знову.",
+  "premPortalHintWeb": "Онови сторінку (F5) і спробуй знову. Якщо проблема повторюється, вийди і увійди знову.",
+  "premPortalHintMobile": "Вийди в профілі і увійди знову, потім ще раз спробуй «Скасувати підписку».",
+  "premCannotOpenPortal": "Не можна відкрити портал.",
+  "premPortalOpenError": "Помилка відкриття порталу.",
+  "premSessionExpiredCancel": "Сесія закінчилася. Вийди в профілі і увійди знову, потім ще раз спробуй «Скасувати підписку».",
+  "premErrorWithDetail": "Помилка: {error}",
+  "@premErrorWithDetail": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "premActivatedEnjoy": "Premium активовано. Користуйся повним доступом!",
+  "premLoginToBuyCard": "Щоб придбати Premium, потрібен акаунт. Увійди через Google, Apple або вкажи адресу ел. пошти — надішлемо лист із посиланням підтвердження і кодом.",
+  "premSigningIn": "Вхід…",
+  "premContinueGoogle": "Продовжити з Google",
+  "premContinueApple": "Продовжити з Apple",
+  "premOrEmail": "або ел. пошта:",
+  "premEmailLabel": "Адреса ел. пошти",
+  "premEmailHint": "напр. jan@example.com",
+  "premSending": "Надсилаю…",
+  "premSendCode": "Надіслати код",
+  "premConfirmIdentityHint": "Підтвердь особу: введи нижче код із листа або натисни посилання підтвердження в повідомленні (перевір також папку Спам).",
+  "premChecking": "Перевіряю…",
+  "premConfirmAndSignIn": "Підтвердити і увійти",
+  "premResendOtherEmail": "Надіслати код знову на іншу адресу",
+  "profTitle": "Профіль",
+  "profNotifications": "Сповіщення",
+  "profNoProfile": "Немає профілю",
+  "profErrorWithDetail": "Помилка: {error}",
+  "@profErrorWithDetail": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profAccountGoogle": "Акаунт Google",
+  "profAccountEmail": "Акаунт ел. пошти",
+  "profAccountSignedIn": "Акаунт, у який увійшли",
+  "profSignOutTitle": "Вийти",
+  "profSignOutBody": "Точно вийти? Потім можна увійти знову.",
+  "profSignOutConfirm": "Вийти",
+  "profDeleteAccountTitle": "Видалити акаунт",
+  "profDeleteAccountBody": "Твої дані буде повністю видалено, і їх не можна буде відновити. Коли повернешся до застосунку, профіль доведеться заповнити знову.\n\nЯкщо маєш підписку Premium у Google Play або App Store, скасуй її окремо в магазині — видалення акаунта її не завершує.\n\nТочно видалити акаунт?",
+  "profAccountDeleted": "Акаунт видалено",
+  "profDeleteUnavailable": "Послуга видалення акаунта недоступна. Напиши нам: {email}",
+  "@profDeleteUnavailable": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "profSessionExpiredRetry": "Сесія закінчилася. Увійди знову і спробуй ще раз.",
+  "profNoPermission": "Немає дозволу виконати цю дію.",
+  "profDeleteFailed": "Не вдалося видалити акаунт. Спробуй пізніше.",
+  "profInviteTitle": "Запроси друга",
+  "profInviteBody": "Вкажи адресу ел. пошти людини, якій хочеш надіслати запрошення до Łatwa Forma.",
+  "profEmailLabel": "Адреса ел. пошти",
+  "profEmailHintFriend": "напр. znajomy@example.com",
+  "profSessionExpiredWebInvite": "Сесія закінчилася. Онови сторінку (F5) і увійди знову, потім надішли запрошення.",
+  "profLoginAgainRetry": "Увійди знову і спробуй ще раз.",
+  "profInviteSent": "Запрошення надіслано",
+  "profSessionExpiredWebRetry": "Сесія закінчилася. Онови сторінку (F5) і спробуй знову. Якщо проблема повторюється, вийди і увійди знову.",
+  "profSessionExpiredInviteMobile": "Сесія закінчилася. Вийди і увійди знову, потім надішли запрошення.",
+  "profInviteAlreadySent": "На цю адресу вже надіслано запрошення. Перевір пошту (включно зі спамом) або вкажи іншу адресу.",
+  "profEmailAlreadyRegistered": "Цю адресу ел. пошти вже зареєстровано в Łatwa Forma. Запроси когось іншого.",
+  "profInviteRateLimit": "Забагато запрошень. Зачекай хвилину і спробуй знову.",
+  "profEnterValidEmail": "Вкажи правильну адресу ел. пошти.",
+  "profInviteSendFailed": "Не вдалося надіслати запрошення. Спробуй знову.",
+  "profSessionExpiredWebShort": "Сесія закінчилася. Онови сторінку (F5) і спробуй знову.",
+  "profSessionExpiredSignOutIn": "Сесія закінчилася. Вийди і увійди знову.",
+  "profSendInvite": "Надіслати запрошення",
+  "profInviteSentExclaim": "Запрошення надіслано!",
+  "profSaveProgress": "Збережи прогрес",
+  "profSaveProgressHint": "Увійди через Apple, Google або ел. пошту, щоб не втратити дані",
+  "profBasicData": "Основні дані",
+  "profGender": "Стать",
+  "profAge": "Вік",
+  "profAgeYears": "{age} р.",
+  "@profAgeYears": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "profHeight": "Зріст",
+  "profCurrentWeight": "Поточна вага",
+  "profTargetWeight": "Цільова вага",
+  "profActivityLevel": "Рівень активності",
+  "profGoal": "Ціль",
+  "profCalculations": "Розрахунки",
+  "profBmrExplain": "Потреба в калоріях у спокої — скільки калорій ти спалюєш без активності.",
+  "profTdeeExplain": "Повна денна потреба — скільки калорій ти спалюєш за день з урахуванням активності.",
+  "profCalorieGoalExplain": "Рекомендоване денне споживання калорій для досягнення цілі ваги.",
+  "profWaterGoal": "Ціль пиття води",
+  "profWaterGoalExplanation": "Розраховано з твоєї ваги: {mlPerKg} мл на кожен кг ({weightKg} кг → бл. {rawMl} мл, округлено до {goalMl} мл). Ціль можна змінити вручну.",
+  "@profWaterGoalExplanation": {
+    "placeholders": {
+      "mlPerKg": {
+        "type": "int"
+      },
+      "weightKg": {
+        "type": "String"
+      },
+      "rawMl": {
+        "type": "int"
+      },
+      "goalMl": {
+        "type": "int"
+      }
+    }
+  },
+  "profMacros": "Макро",
+  "profProtein": "Білки",
+  "profFat": "Жири",
+  "profCarbs": "Вуглеводи",
+  "profCarbsShort": "Вугл.",
+  "profTargetDateTitle": "Дата досягнення цілі:",
+  "profTargetDateHint": "Дій за планом, і цей день не зрушиться.",
+  "profSpeedUpHint": "Хочеш пришвидшити ціль? Зміни темп зміни ваги в режимі редагування профілю (іконка олівця вгорі).",
+  "profMaintainNoDateTitle": "Ціль: підтримка ваги",
+  "profMaintainNoDateBody": "При підтримці ваги немає окремої дати «досягнення». Зміни ціль на схуднення або набір (і цільову вагу) — тоді підкажу, коли приблизно її досягнеш.",
+  "profMaintainNoDateCta": "Змінити ціль у профілі",
+  "profAiAdvice": "Порада ШІ",
+  "profAiAdviceHint": "Запитай про дієту, харчування й активність",
+  "profBmiTitle": "Калькулятор BMI",
+  "profBmiHint": "Перевір свій індекс маси тіла",
+  "profTrialLeft": "Залишилось: {hours} год {minutes} хв",
+  "@profTrialLeft": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "profPremiumTitleActive": "Łatwa Forma Premium",
+  "profPremiumTitle": "Підписка Premium",
+  "profActive": "Активна",
+  "profPremiumHintActive": "Необмежений ШІ, експорт PDF, інтеграції",
+  "profPremiumHint": "Відкрий увесь потенціал — ШІ, PDF, інтеграції",
+  "profIntegrations": "Інтеграції",
+  "profIntegrationsHint": "Strava — імпортуй активності та спалені калорії",
+  "profExport": "Експорт даних",
+  "profExportHint": "Експортуй свої дані в CSV",
+  "profInviteHint": "Надішли запрошення ел. поштою до застосунку Łatwa Forma",
+  "profPrivacy": "Політика конфіденційності",
+  "profTerms": "Умови",
+  "profEula": "Terms of Use (EULA)",
+  "profDeleteAccountPage": "Видалити акаунт (сторінка)",
+  "profYourAccount": "Твій акаунт",
+  "profDeviceData": "Дані на цьому пристрої",
+  "profDeviceDataHint": "Ти користуєшся без акаунта. Можна видалити збережений профіль і страви з цього пристрою.",
+  "profDeleteData": "Видалити дані",
+  "profDeleteDataBody": "Профіль, страви та інші дані на цьому пристрої буде остаточно видалено. Відновити їх неможливо.\n\nТочно хочеш видалити дані?",
+  "profDataDeleted": "Дані з пристрою видалено.",
+  "profGenderMale": "Чоловік",
+  "profGenderFemale": "Жінка",
+  "profGenderOther": "Інша",
+  "profActSedentary": "Сидячий",
+  "profActLight": "Легка",
+  "profActModerate": "Помірна",
+  "profActIntense": "Інтенсивна",
+  "profActVeryIntense": "Дуже інтенсивна",
+  "profGoalLoss": "Схуднення",
+  "profGoalGain": "Набір ваги",
+  "profGoalMaintain": "Підтримка ваги",
+  "profGenderRequired": "Стать *",
+  "profAgeRequired": "Вік *",
+  "profYearsSuffix": "р.",
+  "profHeightRequired": "Зріст (см) *",
+  "profCurrentWeightRequired": "Поточна вага (кг) *",
+  "profTargetWeightRequired": "Цільова вага (кг) *",
+  "profWeightDiffError": "Різниця між вагами має бути щонайменше 1 кг",
+  "profActivityRequired": "Рівень активності *",
+  "profActSedentaryDesc": "Немає активності або мінімальна",
+  "profActLightDesc": "1–3 тренування / тиждень",
+  "profActModerateDesc": "3–5 тренувань / тиждень",
+  "profActIntenseDesc": "6–7 тренувань / тиждень",
+  "profActVeryIntenseDesc": "2 рази на день / важка робота",
+  "profWaterGoalMl": "Ціль води (мл)",
+  "profWaterGoalHelper": "Можна змінити вручну. Нижче пояснення, звідки береться пропозиція.",
+  "profSaveChanges": "Зберегти зміни",
+  "profWantLose": "Хочу схуднути.",
+  "profWantGain": "Хочу набрати вагу.",
+  "profWantMaintain": "Хочу зберегти поточну вагу.",
+  "profAdjustPlan": "Налаштувати план",
+  "profPlanPremiumOnly": "Власна ціль калорій і макронутрієнти доступні в Premium.",
+  "profSeePremium": "Переглянути Premium",
+  "profWeightRate": "Темп зміни ваги",
+  "profRateKgWeek": "{rate} кг/тиж.",
+  "@profRateKgWeek": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "profRateZero": "0 кг/тиж.",
+  "profMaintainRateZero": "Для підтримки ваги темп = 0",
+  "profRecommendedRate": "Рекомендований темп: 0,5 кг/тиж. — безпечно і здорово. Швидше схуднення може бути шкідливим (втрата м’язів, дефіцити, втома).",
+  "profEstTargetDate": "Орієнтовна дата досягнення цілі: {date}",
+  "@profEstTargetDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profMoveSlider": "Посунь повзунок, щоб побачити план",
+  "profCustomCalorieGoal": "Власна ціль калорій",
+  "profGoalKcal": "Ціль (kcal)",
+  "profLeaveEmptyFromRate": "Залиш порожнім, щоб порахувати з темпу.",
+  "profCustomMacros": "Власні макронутрієнти",
+  "profMacrosAutoRecalc": "Калорії і дата перерахуються автоматично.",
+  "profMacroSum": "Сума: {kcal} kcal",
+  "@profMacroSum": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroPerGram": "1 г = {kcal} kcal",
+  "@profMacroPerGram": {
+    "placeholders": {
+      "kcal": {
+        "type": "int"
+      }
+    }
+  },
+  "profValuesNotNegative": "Значення не можуть бути від’ємними.",
+  "profMacroMaxProtein": "білки макс. {g} г",
+  "@profMacroMaxProtein": {
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroMaxFat": "жири макс. {g} г",
+  "@profMacroMaxFat": {
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroMaxCarbs": "вуглеводи макс. {g} г",
+  "@profMacroMaxCarbs": {
+    "placeholders": {
+      "g": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroOverLimit": "⚠️ Значення перевищують рекомендовані денні ліміти: {parts}. Введи реалістичні значення для здорового харчування.",
+  "@profMacroOverLimit": {
+    "placeholders": {
+      "parts": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroCaloriesUnreal": "⚠️ Загальна кількість калорій ({calories} kcal) нереалістична для денної потреби. Рекомендований максимум — бл. {max} kcal/день.",
+  "@profMacroCaloriesUnreal": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroLossSurplus": "Твоя ціль — схуднення (цільова вага нижча за поточну), але введені макронутрієнти дають {surplus} kcal понад потребу (TDEE: {tdee} kcal). Зменш калорії/макронутрієнти, щоб отримати дефіцит.",
+  "@profMacroLossSurplus": {
+    "placeholders": {
+      "surplus": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profMacroGainDeficit": "Твоя ціль — набір ваги (цільова вага вища за поточну), але введені макронутрієнти дають дефіцит (TDEE: {tdee} kcal). Збільш калорії/макронутрієнти, щоб отримати надлишок.",
+  "@profMacroGainDeficit": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnCalAboveTdeeLoss": "⚠️ Ціль калорій вища за TDEE ({tdee} kcal). Щоб худнути, потрібен дефіцит калорій. Максимальний безпечний дефіцит — ~1100 kcal/день (бл. 1 кг/тиждень).",
+  "@profWarnCalAboveTdeeLoss": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnDeficitHuge": "⚠️ Дефіцит калорій дуже великий ({deficit} kcal/день). Рекомендований максимальний дефіцит — 1000–1500 kcal/день для безпечного схуднення.",
+  "@profWarnDeficitHuge": {
+    "placeholders": {
+      "deficit": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnDeficitTiny": "⚠️ Дефіцит калорій дуже малий. Для ефективного схуднення рекомендовано дефіцит 500–1000 kcal/день.",
+  "profWarnCalBelowTdeeGain": "⚠️ Ціль калорій нижча за TDEE ({tdee} kcal). Щоб набирати вагу, потрібен надлишок калорій. Рекомендований надлишок — 250–500 kcal/день (бл. 0,25–0,5 кг/тиждень).",
+  "@profWarnCalBelowTdeeGain": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnSurplusHuge": "⚠️ Надлишок калорій дуже великий ({surplus} kcal/день). Рекомендований надлишок — 250–500 kcal/день для здорового набору ваги.",
+  "@profWarnSurplusHuge": {
+    "placeholders": {
+      "surplus": {
+        "type": "String"
+      }
+    }
+  },
+  "profWarnSurplusTiny": "⚠️ Надлишок калорій дуже малий. Для ефективного набору ваги рекомендовано надлишок 250–500 kcal/день.",
+  "profWarnMaintainFar": "⚠️ Ціль калорій сильно відрізняється від TDEE ({tdee} kcal). Для підтримки ваги ціль має бути близькою до TDEE (±100–200 kcal).",
+  "@profWarnMaintainFar": {
+    "placeholders": {
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profCannotSaveLoss": "Не можна зберегти: ціль калорій ({calories} kcal) вища за TDEE ({tdee} kcal). Щоб худнути, потрібен дефіцит калорій.",
+  "@profCannotSaveLoss": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profCannotSaveGain": "Не можна зберегти: ціль калорій ({calories} kcal) нижча за TDEE ({tdee} kcal). Щоб набирати вагу, потрібен надлишок калорій.",
+  "@profCannotSaveGain": {
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      },
+      "tdee": {
+        "type": "String"
+      }
+    }
+  },
+  "profUserNotLoggedIn": "Користувач не увійшов",
+  "profGoalHistoryEdit": "Редагування профілю",
+  "profUpdatedSuccess": "Профіль успішно оновлено! Ціль перераховано.",
+  "profSaveError": "Помилка під час збереження: {error}",
+  "@profSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profCalorieGoal": "Ціль калорій",
+  "trackPremium": "Premium",
+  "trackStatistics": "Статистика",
+  "trackGoalsAndChallenges": "Цілі та виклики",
+  "trackProfile": "Профіль",
+  "trackSessionExpired": "Сесія закінчилася. Увійди знову.",
+  "trackLoadDataFailed": "Не вдалося завантажити дані. Перевір інтернет і натисни «Спробувати знову».",
+  "trackErrorWithDetails": "Помилка: {error}",
+  "@trackErrorWithDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSignIn": "Увійти",
+  "trackFeatureEatingOut": "Страва «у місті»",
+  "trackShareCaloriesText": "📊 Łatwa Forma – Калорії {date}",
+  "@trackShareCaloriesText": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackShareError": "Помилка надсилання: {error}",
+  "@trackShareError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesOverview": "Огляд калорій",
+  "trackSelectDate": "Обери дату",
+  "trackShare": "Поділитися",
+  "trackFeatureShareSummary": "Надсилання підсумку",
+  "trackEarlierWeek": "Попередній тиждень",
+  "trackFeatureBrowseHistory": "Перегляд історії інших днів",
+  "trackLaterWeek": "Наступний тиждень",
+  "trackShowingDataFrom": "Показано дані з {date}",
+  "@trackShowingDataFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackConsumed": "Спожито",
+  "trackTodayTarget": "Ціль на сьогодні",
+  "trackSurplusKcal": "Надлишок: {kcal} kcal",
+  "@trackSurplusKcal": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackProtein": "Білки",
+  "trackFat": "Жири",
+  "trackCarbs": "Вуглеводи",
+  "trackCarbsShort": "Вугл.",
+  "trackIncludingSaturated": "з них насичені",
+  "trackIncludingSugars": "з них цукри",
+  "trackFiber": "клітковина",
+  "trackFiberLabel": "Клітковина",
+  "trackSalt": "Сіль",
+  "trackFeatureAiMealAnalysis": "Аналіз ШІ страви",
+  "trackAiPhotoAnalysisTooltip": "Аналіз ШІ зі світлини",
+  "trackNoResults": "Немає результатів",
+  "trackWater": "Вода",
+  "trackWaterMotivation": "Вода потрібна щодня! 💧",
+  "trackActivitiesToday": "Активності сьогодні",
+  "trackActivitiesOnDate": "Активності — {date}",
+  "@trackActivitiesOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoActivities": "Немає активностей",
+  "trackAndMoreCount": "... і ще {count}",
+  "@trackAndMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealsToday": "Страви сьогодні",
+  "trackMealsOnDate": "Страви — {date}",
+  "@trackMealsOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoMeals": "Немає страв",
+  "trackDayMon": "Пн",
+  "trackDayTue": "Вт",
+  "trackDayWed": "Ср",
+  "trackDayThu": "Чт",
+  "trackDayFri": "Пт",
+  "trackDaySat": "Сб",
+  "trackDaySun": "Нд",
+  "trackAdd": "Додати",
+  "trackMeal": "Страва",
+  "trackEatingOut": "Їжа в місті",
+  "trackActivity": "Активність",
+  "trackWeight": "Вага",
+  "trackMeasurements": "Виміри",
+  "trackFavorites": "Обране",
+  "trackUserNotLoggedIn": "Користувач не увійшов",
+  "trackMealSavedAndFavorited": "Страву збережено і додано до обраного!",
+  "trackMealAddedSuccess": "Страву успішно додано!",
+  "trackFeatureIngredientsMeal": "Страва зі складників",
+  "trackOptionEatingOut": "У місті",
+  "trackOptionAiAnalysis": "Аналіз ШІ",
+  "trackOptionIngredients": "Складники",
+  "trackOptionBarcode": "Штрихкод",
+  "trackOptionSearchProduct": "Знайти продукт",
+  "trackOptionFavorites": "Обране",
+  "trackEditMeal": "Редагувати страву",
+  "trackAddMeal": "Додати страву",
+  "trackMealNameOptional": "Назва страви (необов’язково)",
+  "trackHintEmptyDefaultName": "Порожньо = «Без назви»",
+  "trackDefaultMealName": "Без назви",
+  "trackHintCaloriesFromMacros": "Порожньо = порахує з макронутрієнтів",
+  "trackEnterCaloriesOrMacros": "Вкажи калорії або заповни макронутрієнти",
+  "trackProteinG": "Білки (г)",
+  "trackFatG": "Жири (г)",
+  "trackCarbsG": "Вуглеводи (г)",
+  "trackFiberG": "Клітковина (г)",
+  "trackSaltG": "Сіль (г)",
+  "trackMealTypeOptional": "Тип страви — необов’язково",
+  "trackBreakfast": "Сніданок",
+  "trackLunch": "Обід",
+  "trackDinner": "Вечеря",
+  "trackSnack": "Перекус",
+  "trackAddToFavorites": "Додати до обраного",
+  "trackAddToFavoritesMealSubtitle": "Потім можна швидко додати цю страву",
+  "trackUpdateMeal": "Оновити страву",
+  "trackSaveMeal": "Зберегти страву",
+  "trackCalories": "Калорії",
+  "trackCameraUnavailableTitle": "Камера недоступна",
+  "trackCameraUnavailableBody": "Камера недоступна на цьому пристрої (наприклад, на симуляторі).\n\nСкористайся кнопкою «З галереї», щоб вибрати світлину.",
+  "trackFromGallery": "З галереї",
+  "trackPickImageError": "Помилка вибору світлини: {error}",
+  "@trackPickImageError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAnalysisFailedOpenAi": "Не вдалося проаналізувати світлину. Перевір, чи встановлено ключ OpenAI API.",
+  "trackAnalysisError": "Помилка аналізу: {error}",
+  "@trackAnalysisError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAiPhotoTitle": "Аналіз світлини ШІ",
+  "trackTakeMealPhoto": "Зроби світлину страви",
+  "trackAiPhotoDescription": "ШІ проаналізує світлину й оцінить поживну цінність. Світлину надсилають постачальнику ШІ (OpenAI) лише для цього — ми не зберігаємо галерею світлин. Оцінки орієнтовні і не є медичною порадою.",
+  "trackSimulatorCameraHint": "На симуляторі камера не працює — вибери світлину з галереї.",
+  "trackTakePhoto": "Зробити світлину",
+  "trackAnalyzingPhoto": "Аналізуємо світлину...",
+  "trackMayTakeAMoment": "Це може трохи тривати",
+  "trackProductNotFound": "Продукт із кодом {code} не знайдено в базі продуктів.",
+  "@trackProductNotFound": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "trackFetchProductFailed": "Не вдалося отримати дані продукту: {error}",
+  "@trackFetchProductFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackBarcodeScannerTitle": "Сканер штрихкодів",
+  "trackSimulatorEnterCode": "На симуляторі введи код вручну",
+  "trackEnterProductCode": "Введи код продукту",
+  "trackSearchProduct": "Шукати продукт",
+  "trackScannerUnavailable": "Сканер недоступний — скористайся симулятором або фізичним пристроєм",
+  "trackPointAtBarcode": "Наведи на штрихкод продукту",
+  "trackBarcodePrivacy": "Дані буде отримано з бази продуктів. Камера служить лише для зчитування коду — світлину ми не зберігаємо і не надсилаємо.",
+  "trackScanBarcode": "Сканувати штрихкод",
+  "trackAddProduct": "Додати продукт",
+  "trackEnterProductWeight": "Вкажи вагу продукту",
+  "trackNutritionPer100g": "Поживна цінність (на 100 г):",
+  "trackWeightHintExample": "напр. 75.5",
+  "trackWeightHelper": "Скільки грамів продукту ти їси?",
+  "trackEditBeforeSave": "Редагувати перед збереженням",
+  "trackPer100g": "{label}/100 г",
+  "@trackPer100g": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWeightG": "Вага (г)",
+  "trackSearchProductTitle": "Знайти продукт",
+  "trackSearchProductHint": "Назва продукту, напр. молоко, nutella…",
+  "trackEnterProductName": "Введи назву продукту",
+  "trackSearchProductSubtitle": "Користуємося базою Open Food Facts. Результати з’являться після кількох літер.",
+  "trackNoResultsTryBarcode": "Спробуй іншу назву або відскануй штрихкод продукту.",
+  "trackBackToDashboard": "Повернутися на головний екран",
+  "trackMealsDateTitle": "Страви — {date}",
+  "@trackMealsDateTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackFavoriteMealsTooltip": "Обрані страви",
+  "trackNoMealsForDay": "Немає страв за цей день",
+  "trackUsePlusToAddMeal": "Натисни +, щоб додати страву",
+  "trackDeleteMealTitle": "Видалити страву",
+  "trackDeleteMealConfirm": "Точно видалити «{name}»?",
+  "@trackDeleteMealConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealDeleted": "Страву видалено",
+  "trackAddAtLeastOneIngredient": "Додай щонайменше один складник",
+  "trackMealFromIngredientsTitle": "Страва зі складників",
+  "trackTotalWeightG": "Загальна вага: {weight} г",
+  "@trackTotalWeightG": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "trackIngredientsCount": "Складники ({count})",
+  "@trackIngredientsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddIngredient": "Додати складник",
+  "trackNoIngredients": "Немає складників",
+  "trackAddIngredientsHint": "Додай складники, щоб зібрати страву",
+  "trackEditIngredient": "Редагувати складник",
+  "trackIngredientNameOptional": "Назва складника (необов’язково)",
+  "trackAmountG": "Кількість (г)",
+  "trackEnterAmount": "Вкажи кількість",
+  "trackEnterValidAmount": "Вкажи правильну кількість",
+  "trackEnterCaloriesOrFillMacros": "Вкажи калорії або заповни макронутрієнти",
+  "trackProteinPer100g": "Білки (г/100 г)",
+  "trackFatPer100g": "Жири (г/100 г)",
+  "trackCarbsPer100g": "Вуглеводи (г/100 г)",
+  "trackEatingOutTitle": "🍽️ Їм у місті",
+  "trackEatingOutSubtitle": "Обери, що ти їв (оцінка калорій):",
+  "trackPortionLabel": "Порція: {label}",
+  "@trackPortionLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesCount": "Кількість шматків: {count}",
+  "@trackSlicesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesUnit": "{count} шт.",
+  "@trackSlicesUnit": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalPerSlice": "kcal на шматок:",
+  "trackKcalPerPieceLabel": "{kcal} kcal/шт.",
+  "@trackKcalPerPieceLabel": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalLabel": "{kcal} kcal",
+  "@trackKcalLabel": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackKcalTimesSlices": "{kcal} × {slices} = {total} kcal",
+  "@trackKcalTimesSlices": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "slices": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSaving": "Збереження…",
+  "trackAddToDiary": "Додати до щоденника",
+  "trackSelectMealAbove": "Обери страву вище",
+  "trackEatingOutTip": "Якщо решта дня була легкою — це нормально. Не переживай.",
+  "trackMealNameEatingOutSlices": "{name} ({slices} шт.) (у місті)",
+  "@trackMealNameEatingOutSlices": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "slices": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealNameEatingOut": "{name} (у місті)",
+  "@trackMealNameEatingOut": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddedEatingOut": "Додано: {name}{slicesPart} (~{kcal} kcal)",
+  "@trackAddedEatingOut": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "slicesPart": {
+        "type": "String"
+      },
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSlicesPart": " ({slices} шт.)",
+  "@trackSlicesPart": {
+    "placeholders": {
+      "slices": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEatingOutPizza": "Піца",
+  "trackEatingOutPizzaLabel": "~250–450 kcal / шматок",
+  "trackEatingOutKebab": "Кебаб",
+  "trackEatingOutKebabLabel": "~600–900 kcal",
+  "trackEatingOutBurger": "Бургер (загалом)",
+  "trackEatingOutBurgerLabel": "~500–800 kcal",
+  "trackEatingOutChinese": "Китайська кухня",
+  "trackEatingOutChineseLabel": "~500–900 kcal",
+  "trackEatingOutMcdCheeseburger": "McDonald's – Cheeseburger",
+  "trackEatingOutMcdCheeseburgerLabel": "~300 kcal",
+  "trackEatingOutMcd2ForYou": "McDonald's – 2forYou (Cheeseburger + картопля фрі)",
+  "trackEatingOutMcd2ForYouLabel": "~530 kcal",
+  "trackEatingOutMcdBigMac": "McDonald's – Big Mac",
+  "trackEatingOutMcdBigMacLabel": "~590 kcal",
+  "trackEatingOutMcdMcDouble": "McDonald's – McDouble",
+  "trackEatingOutMcdMcDoubleLabel": "~400 kcal",
+  "trackEatingOutMcdSmallFries": "McDonald's – маленька картопля фрі",
+  "trackEatingOutMcdSmallFriesLabel": "~230 kcal",
+  "trackEatingOutMcdMediumFries": "McDonald's – середня картопля фрі",
+  "trackEatingOutMcdMediumFriesLabel": "~340 kcal",
+  "trackEatingOutKfcDrumstick": "KFC – стегно/ніжка",
+  "trackEatingOutKfcDrumstickLabel": "~200 kcal / шт.",
+  "trackEatingOutKfcTenders": "KFC – Strips / Tenders",
+  "trackEatingOutKfcTendersLabel": "~400–600 kcal",
+  "trackEatingOutSubway6": "Subway – 6'' sub",
+  "trackEatingOutSubway6Label": "~300–500 kcal",
+  "trackEatingOutSubwayFootlong": "Subway – Footlong",
+  "trackEatingOutSubwayFootlongLabel": "~600–900 kcal",
+  "trackActivitiesDateTitle": "Активності — {date}",
+  "@trackActivitiesDateTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoActivitiesForDay": "Немає активностей за цей день",
+  "trackAddFirstActivity": "Додай першу активність",
+  "trackDaySummary": "Підсумок дня",
+  "trackBurned": "Спалено",
+  "trackTime": "Час",
+  "trackGarminActivitiesNote": "Дані активності походять із пристроїв Garmin.",
+  "trackDeleteActivityTitle": "Видалити активність",
+  "trackDeleteActivityConfirm": "Точно видалити «{name}»?",
+  "@trackDeleteActivityConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityDeleted": "Активність видалено",
+  "trackExcludeFromBalance": "Не враховувати в балансі (спалені)",
+  "trackActivityExcludedFromBalance": "Активність виключено з балансу",
+  "trackActivityIncludedInBalance": "Активність враховано в балансі",
+  "trackOtherActivities": "Інші активності.",
+  "trackActivityTypeOther": "Інша",
+  "trackActivityTypeLow": "Низька",
+  "trackActivityTypeModerate": "Помірна",
+  "trackActivityTypeHigh": "Висока",
+  "trackActivityTypeVeryHigh": "Дуже висока",
+  "trackActivityTypeRun": "Біг",
+  "trackActivityTypeCycling": "Велосипед",
+  "trackActivityTypeSwim": "Плавання",
+  "trackActivityTypeWalk": "Ходьба",
+  "trackActivityTypeHike": "Похід",
+  "trackActivityTypeRow": "Веслування",
+  "trackActivityTypeTennis": "Теніс",
+  "trackActivityTypeYoga": "Йога",
+  "trackActivityTypeTraining": "Тренування",
+  "trackFeatureQuickAddActivities": "Швидке додавання в активностях",
+  "trackActivitySavedAndFavorited": "Активність збережено і додано до обраного!",
+  "trackActivityAddedSuccess": "Активність успішно додано!",
+  "trackEditActivity": "Редагувати активність",
+  "trackAddActivity": "Додати активність",
+  "trackQuickAdd": "Швидке додавання",
+  "trackActivityNameOptional": "Назва активності (необов’язково)",
+  "trackHintEmptyDefaultActivityName": "Порожньо = «Активність без назви»",
+  "trackDefaultActivityName": "Активність без назви",
+  "trackEnterBurnedCalories": "Вкажи кількість спалених калорій",
+  "trackEnterValidCalories": "Вкажи правильну кількість калорій",
+  "trackActivityTypeOptional": "Тип активності — необов’язково",
+  "trackAddToFavoritesActivitySubtitle": "Потім можна швидко додати цю активність",
+  "trackUpdateActivity": "Оновити активність",
+  "trackSaveActivity": "Зберегти активність",
+  "trackDurationMinutes": "Час (хв)",
+  "trackBurnedCalories": "Спалені калорії",
+  "trackAddedWaterMl": "Додано {amount} мл води",
+  "@trackAddedWaterMl": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddWaterError": "Помилка під час додавання води: {error}",
+  "@trackAddWaterError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackUpdatedAmountMl": "Оновлено: {amount} мл",
+  "@trackUpdatedAmountMl": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackUpdateError": "Помилка під час оновлення: {error}",
+  "@trackUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDeleteEntryTitle": "Видалити запис",
+  "trackDeleteWaterConfirm": "Точно видалити запис {amount} мл?",
+  "@trackDeleteWaterConfirm": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEntryDeleted": "Запис видалено",
+  "trackDeleteError": "Помилка під час видалення: {error}",
+  "@trackDeleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "trackEditAmount": "Редагувати кількість",
+  "trackAmountMl": "Кількість (мл)",
+  "trackAmountMlHintRange": "1–5000 мл",
+  "trackAmountMustBeRange": "Кількість має бути від 1 до 5000 мл",
+  "trackAddWater": "Додати воду",
+  "trackAmountMlHintExample": "напр. 250",
+  "trackMaxAmountPerEntry": "Максимальна кількість — 5000 мл на запис",
+  "trackEnterAmountRange": "Вкажи кількість від 1 до 5000 мл",
+  "trackDailyWaterGoal": "Денна ціль пиття води",
+  "trackGoalHintExample": "напр. 2000",
+  "trackGoalMustBeRange": "Вкажи значення від 500 до 10000 мл",
+  "trackWaterGoalUpdated": "Ціль води оновлено",
+  "trackChangeDailyWaterGoal": "Змінити денну ціль пиття води",
+  "trackEveryDropCounts": "Кожна крапля має значення!",
+  "trackCustomAmount": "Своя",
+  "trackWaterHistoryHint": "Перегляд — можна редагувати і видаляти. Додавання лише на сьогодні.",
+  "trackNoEntries": "Немає записів",
+  "trackEdit": "Редагувати",
+  "trackAmountMlLabel": "{amount} мл",
+  "@trackAmountMlLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDailyGoal": "Денна ціль",
+  "trackEnterWeight": "Вкажи вагу",
+  "trackEnterValidWeight": "Вкажи правильну вагу (30–300 кг)",
+  "trackWeightSaved": "Вагу успішно збережено!",
+  "trackWeightMotivation": "Регулярні виміри допомагають тримати ціль. Кожен запис наближає до бажаної форми!",
+  "trackPickMeasurementDate": "Обери дату виміру",
+  "trackMeasurementSavedWithDate": "Вимір буде збережено з обраною датою",
+  "trackSaveWeight": "Зберегти вагу",
+  "trackDeleteMeasurementTitle": "Видалити вимір",
+  "trackDeleteWeightConfirm": "Точно видалити вимір {weight} кг?",
+  "@trackDeleteWeightConfirm": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasurementDeleted": "Вимір видалено",
+  "trackNoWeightMeasurements": "Немає вимірів ваги",
+  "trackAddFirstMeasurementHint": "Додай перший вимір, щоб побачити історію",
+  "trackNoDataToDisplay": "Немає даних для показу",
+  "trackWeightKg": "Вага (кг)",
+  "trackHistory": "Історія",
+  "trackEnterMeasurementValue": "Вкажи значення виміру",
+  "trackEnterValidPositiveValue": "Вкажи правильне значення (більше за 0)",
+  "trackEnterCustomTypeName": "Введи назву власного типу виміру (напр. біцепс)",
+  "trackMeasurementSaved": "Вимір успішно збережено!",
+  "trackBodyMeasurementsTitle": "Виміри тіла",
+  "trackBodyMeasurementsMotivation": "Вимірюй розміри регулярно — кожен вимір є доказом прогресу і кроком до бажаної форми!",
+  "trackMeasurementType": "Тип виміру",
+  "trackCustomTypeHint": "напр. Біцепс, живіт",
+  "trackCustomTypeName": "Назва власного типу",
+  "trackValueCm": "Значення (см)",
+  "trackValueHintExample": "напр. 85.5",
+  "trackSaveMeasurement": "Зберегти вимір",
+  "trackMeasurementHistory": "Історія вимірів — {label}",
+  "@trackMeasurementHistory": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "trackDeleteBodyMeasurementConfirm": "Точно видалити вимір {value} см?",
+  "@trackDeleteBodyMeasurementConfirm": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "trackNoMeasurements": "Немає вимірів",
+  "trackTypeWaist": "Талія",
+  "trackTypeHips": "Стегна",
+  "trackTypeChest": "Груди",
+  "trackTypeArm": "Рука",
+  "trackTypeThigh": "Стегно",
+  "trackTypeCustom": "Власний",
+  "trackNoFavorites": "Немає обраного",
+  "trackNoFavoritesSubtitle": "Додавай страви або активності до обраного під час збереження",
+  "trackFavoriteMeals": "Обрані страви",
+  "trackNoFavoriteMeals": "Немає обраних страв",
+  "trackFavoriteActivities": "Обрані активності",
+  "trackNoFavoriteActivities": "Немає обраних активностей",
+  "trackAddToMealsOnDate": "Додати до страв {date}",
+  "@trackAddToMealsOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddToTodaysMeals": "Додати до сьогоднішніх страв",
+  "trackRemoveFromFavorites": "Видалити з обраного",
+  "trackAddToActivitiesOnDate": "Додати до активностей {date}",
+  "@trackAddToActivitiesOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAddToTodaysActivities": "Додати до сьогоднішніх активностей",
+  "trackMealAddedToMealsOnDate": "{name} додано до страв {date}",
+  "@trackMealAddedToMealsOnDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMealAddedToTodaysMeals": "{name} додано до сьогоднішніх страв",
+  "@trackMealAddedToTodaysMeals": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityAddedToActivitiesOnDate": "{name} додано до активностей {date}",
+  "@trackActivityAddedToActivitiesOnDate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackActivityAddedToTodaysActivities": "{name} додано до сьогоднішніх активностей",
+  "@trackActivityAddedToTodaysActivities": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackRemoveFromFavoritesConfirm": "Точно видалити «{name}» з обраного?",
+  "@trackRemoveFromFavoritesConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "trackRemovedFromFavorites": "Видалено з обраного",
+  "trackEditFavoriteMeal": "Редагувати обрану страву",
+  "trackFavoriteMealUpdated": "Обрану страву оновлено",
+  "trackRecalculateFromIngredients": "Перерахувати зі складників",
+  "trackMinutesLabel": "{minutes} хв",
+  "@trackMinutesLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesKcal": "Калорії (kcal)",
+  "trackIncludingSaturatedG": "з них насичені (г)",
+  "trackIncludingSugarsG": "з них цукри (г)",
+  "trackWeightGOptional": "Вага (г) — необов’язково",
+  "trackGoalMl": "Ціль (мл)",
+  "trackWaterTitle": "Вода",
+  "trackOfGoal": "{current} / {goal} мл",
+  "@trackOfGoal": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackSearchShort": "Пошук",
+  "trackWaterToday": "Вода — Сьогодні",
+  "trackWaterOnDate": "Вода — {date}",
+  "@trackWaterOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "trackHydrationBasics": "Зволоження — основа форми.",
+  "trackSugar": "Цукри",
+  "trackSaturatedFat": "Насичені",
+  "trackProduct": "Продукт",
+  "trackMealMacrosLine": "{kcal} kcal • Б: {protein}г • Ж: {fat}г • В: {carbs}г",
+  "@trackMealMacrosLine": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      },
+      "protein": {
+        "type": "String"
+      },
+      "fat": {
+        "type": "String"
+      },
+      "carbs": {
+        "type": "String"
+      }
+    }
+  },
+  "trackAnalysisResults": "Результати аналізу",
+  "trackName": "Назва",
+  "trackProductNotFoundTitle": "Продукт не знайдено",
+  "trackBarcodeLabel": "Штрихкод",
+  "trackFetchingProductData": "Отримуємо дані продукту...",
+  "trackBrand": "Бренд: {brand}",
+  "@trackBrand": {
+    "placeholders": {
+      "brand": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWeightGRequired": "Вага (г) *",
+  "trackYourPortion": "Твоя порція:",
+  "trackMacroAbbrevProtein": "Б",
+  "trackMacroAbbrevFat": "Ж",
+  "trackMacroAbbrevCarbs": "В",
+  "trackAddedKcal": "Додано: {kcal} kcal",
+  "@trackAddedKcal": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackCaloriesPer100g": "Калорії (kcal/100 г)",
+  "trackDashToday": "Сьогодні",
+  "trackNoDate": "Немає дати",
+  "trackEntries": "Записи",
+  "trackWeightHistory": "Історія ваги",
+  "trackMeasurementName": "Назва виміру",
+  "trackChoose": "Обрати",
+  "trackDurationMinutesOptional": "Тривалість (хвилини) — необов’язково",
+  "trackMax5000Helper": "Максимум 5000 мл на один запис",
+  "trackRecommendedMin2l": "Рекомендовано щонайменше 2 л",
+  "trackSummary": "Підсумок",
+  "trackBurnedKcalName": "Спалено {kcal} kcal",
+  "@trackBurnedKcalName": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMeasurementDate": "Дата виміру",
+  "trackKcalBurned": "{kcal} kcal спалено",
+  "@trackKcalBurned": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackMacrosInPremium": "Макро — у Premium",
+  "trackSearchProductEllipsis": "Шукати продукт…",
+  "trackMacros": "Макро",
+  "trackRecentMeasurements": "Останні виміри",
+  "authEnterFullCode": "Введи повний код із листа.",
+  "authSignedIn": "Вхід успішний!",
+  "authCodeExpired": "Код закінчився або неправильний. Надішли знову.",
+  "authEnterEmail": "Вкажи адресу ел. пошти",
+  "authInvalidEmail": "Неправильний формат ел. пошти",
+  "authLinkAndCodeSent": "Ми надіслали посилання і код на {email}. Перевір пошту (також папку Спам) — натисни посилання або введи код у застосунку.",
+  "@authLinkAndCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authCouldNotStart": "Не вдалося почати вхід.",
+  "authEmailTaken": "Цю адресу ел. пошти вже зареєстровано. Увійди за посиланням із листа (перевір спам).",
+  "authAlreadyLinked": "Цей акаунт уже з’єднано з іншим користувачем.",
+  "authManualLinking": "З’єднання акаунтів потребує ввімкнення в Supabase. Увімкни \"Manual linking\" у Authentication → Providers.",
+  "authConnection": "Помилка з’єднання. Перевір інтернет.",
+  "authTooManyAttempts": "Забагато спроб входу. Спробуй за годину.",
+  "authTooManyEmails": "Забагато листів на цю адресу. Перевір пошту або спробуй за хвилину.",
+  "authInvalidEmailAddress": "Неправильна адреса ел. пошти.",
+  "authGenericError": "Помилка: {detail}",
+  "@authGenericError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "premAboutPerMonth": "бл. {amount} {unit} / місяць",
+  "@premAboutPerMonth": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "premYearlyPerMonthFallback": "у перерахунку бл. 16,25 zł / міс. (оплата раз на рік)",
+  "moreStreakWater": "Вода",
+  "premStoreNotReady": "Покупки в магазині ще не готові. Спробуй знову за хвилину.",
+  "trackAddToCatalog": "Додати до бази",
+  "trackAddToCatalogHint": "Сфотографуй таблицю поживної цінності або впиши дані з етикетки. Продукт потрапить до спільної бази.",
+  "trackLabelPhoto": "Фото етикетки",
+  "trackReadingLabel": "Читаю етикетку…",
+  "trackLabelNotRead": "Не вдалося прочитати таблицю. Впиши значення вручну.",
+  "trackEnterNameAndCalories": "Вкажи назву і калорії на 100 г.",
+  "trackProductSavedCatalog": "Продукт збережено. Наступного разу сканер його знайде.",
+  "trackCatalogNotSaved": "Страву можна додати, але спільна база не зберегла продукт.",
+  "trackBrandOptional": "Бренд (необов’язково)",
+  "trackCopyYesterday": "Скопіювати вчора",
+  "trackCopiedMealsCount": "Скопійовано страв: {count}",
+  "@trackCopiedMealsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackNoMealsYesterday": "Учора не було страв для копіювання.",
+  "trackCopyConfirmTitle": "Страви вже є",
+  "trackCopyConfirmBody": "Цього дня вже є {count} страв. Скопіювати вчорашні ще раз? (з’являться дублікати)",
+  "@trackCopyConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackCopyAgain": "Копіювати знову",
+  "trackCopying": "Копіювання…",
+  "trackRecentFoods": "Нещодавно їв",
+  "trackMealIdeasTitle": "Підходить на сьогодні",
+  "trackMealIdeasLeft": "Залишилось бл. {kcal} ккал",
+  "@trackMealIdeasLeft": {
+    "placeholders": {
+      "kcal": {
+        "type": "String"
+      }
+    }
+  },
+  "trackWaterTipSerious": "Регулярне пиття підтримує концентрацію та обмін речовин — пий протягом дня.",
+  "trackAddFirstMealTitle": "Додай першу страву",
+  "trackAddFirstMealSubtitle": "Запиши, що їси — решту порахуємо ми.",
+  "trackAddFirstMealCta": "Додати страву",
+  "trackShortcutRecent": "Нещодавні",
+  "trackRemainingKcal": "Залишилось до цілі",
+  "trackOverGoalLabel": "Понад ціль",
+  "trackGoalVerificationDays": "{days}/7 днів із даними",
+  "@trackGoalVerificationDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trackCalorieGoalSuccess": "Молодець — сьогодні ти близько до калорійної цілі.",
+  "trackD1ChecklistTitle": "Перший день — чекліст",
+  "trackD1ChecklistMeal": "Додай страву",
+  "trackD1ChecklistWater": "Запиши воду",
+  "trackD1ChecklistWeight": "Запиши вагу",
+  "trackD1ChecklistDismiss": "Зрозуміло",
+  "trackPremiumLabel": "Premium",
+  "trackPercentOfGoal": "{percent}% цілі",
+  "@trackPercentOfGoal": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  }
+}

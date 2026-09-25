@@ -7,10 +7,12 @@ Prosta instrukcja krok po kroku.
 ## Co musisz mieć
 
 - W głównym folderze projektu plik **`.env`** z wpisami:
+
   ```
   SUPABASE_URL=https://twoj-projekt.supabase.co
   SUPABASE_ANON_KEY=twoj_klucz_anon
   ```
+
 - Zainstalowany Flutter na komputerze.
 
 ---
@@ -20,9 +22,11 @@ Prosta instrukcja krok po kroku.
 1. Otwórz **terminal**.
 2. Wejdź w folder projektu Łatwa Forma (tam gdzie jest `pubspec.yaml`).
 3. Wpisz i zatwierdź:
+
    ```bash
    flutter build web
    ```
+
 4. Poczekaj, aż build się skończy (bez błędów).
 
 ---

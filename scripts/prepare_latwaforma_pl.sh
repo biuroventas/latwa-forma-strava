@@ -19,6 +19,10 @@ if [ -f "$ROOT/.env" ]; then
   { grep -E '^GARMIN_CLIENT_ID\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
   { grep -E '^GARMIN_CLIENT_SECRET\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
   { grep -E '^GARMIN_REDIRECT_URI\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^TURSO_DATABASE_URL\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^TURSO_AUTH_TOKEN\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^REVENUECAT_IOS_API_KEY\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
+  { grep -E '^REVENUECAT_ANDROID_API_KEY\s*=' "$ROOT/.env" || true; } >> "$ROOT/env.production"
   if [ -s "$ROOT/env.production" ]; then
     echo "env.production utworzony z .env (Supabase, Strava, Garmin w buildzie)."
     mkdir -p "$ROOT/assets"
@@ -48,6 +52,8 @@ cp "$ROOT/web/polityka-prywatnosci.html" "$BUILD_WEB/"
 cp "$ROOT/web/regulamin.html" "$BUILD_WEB/"
 cp "$ROOT/web/privacy.html" "$BUILD_WEB/"
 cp "$ROOT/web/terms.html" "$BUILD_WEB/"
+cp "$ROOT/web/usun-konto.html" "$BUILD_WEB/"
+cp "$ROOT/web/delete-account.html" "$BUILD_WEB/"
 [ -f "$ROOT/web/garmin-callback.html" ] && cp "$ROOT/web/garmin-callback.html" "$BUILD_WEB/" || true
 [ -f "$ROOT/web/strava-callback.html" ] && cp "$ROOT/web/strava-callback.html" "$BUILD_WEB/" || true
 [ -f "$ROOT/web/logo300x300.png" ] && cp "$ROOT/web/logo300x300.png" "$BUILD_WEB/" || true
@@ -56,7 +62,20 @@ mkdir -p "$BUILD_WEB/auth_redirect"
 cp "$ROOT/web/auth_redirect/index.html" "$BUILD_WEB/auth_redirect/" 2>/dev/null || true
 
 # SPA: /api/garmin, /api/garmin-disconnect (Netlify Functions), potem env, na końcu fallback na index.html.
-printf '%s\n%s\n%s\n%s\n%s\n%s\n' '/api/garmin  /.netlify/functions/garmin  200' '/api/garmin/  /.netlify/functions/garmin  200' '/api/garmin/*  /.netlify/functions/garmin  200' '/api/garmin-disconnect  /.netlify/functions/garmin-disconnect  200' '/env.production  /env.production  200' '/*    /index.html   200' > "$BUILD_WEB/_redirects"
+printf '%s\n' \
+  '/api/garmin  /.netlify/functions/garmin  200' \
+  '/api/garmin/  /.netlify/functions/garmin  200' \
+  '/api/garmin/*  /.netlify/functions/garmin  200' \
+  '/api/garmin-disconnect  /.netlify/functions/garmin-disconnect  200' \
+  '/env.production  /env.production  200' \
+  '/firma.html  /regulamin.html  301' \
+  '/polityka-prywatnosci.html  /polityka-prywatnosci.html  200' \
+  '/regulamin.html  /regulamin.html  200' \
+  '/privacy.html  /privacy.html  200' \
+  '/terms.html  /terms.html  200' \
+  '/usun-konto.html  /usun-konto.html  200' \
+  '/delete-account.html  /delete-account.html  200' \
+  '/*    /index.html   200' > "$BUILD_WEB/_redirects"
 
 # Długi cache dla JS i assets – szybsze ponowne wejścia
 cat > "$BUILD_WEB/_headers" << 'EOF'
@@ -68,6 +87,18 @@ cat > "$BUILD_WEB/_headers" << 'EOF'
   Cache-Control: public, max-age=31536000, immutable
 /icons/*
   Cache-Control: public, max-age=31536000, immutable
+/usun-konto.html
+  Cache-Control: public, max-age=0, must-revalidate
+/delete-account.html
+  Cache-Control: public, max-age=0, must-revalidate
+/polityka-prywatnosci.html
+  Cache-Control: public, max-age=0, must-revalidate
+/regulamin.html
+  Cache-Control: public, max-age=0, must-revalidate
+/privacy.html
+  Cache-Control: public, max-age=0, must-revalidate
+/terms.html
+  Cache-Control: public, max-age=0, must-revalidate
 EOF
 
 echo "Gotowe: $BUILD_WEB (deploy na latwaforma.pl)"

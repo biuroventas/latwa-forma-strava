@@ -57,7 +57,7 @@ Wynik: **`build/app/outputs/bundle/release/app-release.aab`**. Ten plik wgrywasz
 - Wejdź na [dashboard.stripe.com](https://dashboard.stripe.com).
 - Przełącz z **„Test mode”** na **„Live”** (przełącznik u góry).
 - W **Developers → API keys** skopiuj **Secret key** (zaczyna się od `sk_live_...`).
-- W **Products** upewnij się, że masz produkt Premium z cenami **Live** (69,98 zł / m-c, 194,95 zł / rok, ewent. jednorazowa 194,95 zł). Skopiuj **Price ID** (price_...) dla każdej ceny.
+- W **Products** upewnij się, że masz produkt Premium z cenami **Live** (69,99 zł / m-c, 194,99 zł / rok, ewent. jednorazowa 194,99 zł). Skopiuj **Price ID** (price_...) dla każdej ceny.
 
 ### Krok 3.2. Webhook Stripe (Live)
 
@@ -72,7 +72,7 @@ Wynik: **`build/app/outputs/bundle/release/app-release.aab`**. Ten plik wgrywasz
 - Ustaw (lub nadpisz) **wartości Live**:
 
 | Sekret | Wartość (Live) |
-|--------|-----------------|
+| --- | --- |
 | `STRIPE_SECRET_KEY` | `sk_live_...` |
 | `STRIPE_PREMIUM_PRICE_MONTHLY` | Price ID ceny miesięcznej (price_...) |
 | `STRIPE_PREMIUM_PRICE_YEARLY` | Price ID ceny rocznej (price_...) |
@@ -105,7 +105,7 @@ Po tych krokach płatności w aplikacji są **prawdziwe**.
    - **Strona sklepu:** krótki opis (80 zn.), pełny opis, grafika (ikona 512×512, zrzuty ekranu – min. 2). Teksty gotowe w **docs/STORE_LISTING.md**.
    - **Polityka prywatności:** URL `https://latwaforma.pl/polityka-prywatnosci.html`.
    - **Bezpieczeństwo danych:** formularz w konsoli – jakie dane zbierasz (e-mail, waga, itd.) – zgodnie z polityką.
-   - **Grupa aplikacji:** jeśli masz subskrypcję, zaznacz „Oferuje produkty w aplikacji” i skonfiguruj (Stripe nie wymaga integracji „Google Play Billing” – płatności idą przez Stripe).
+   - **Grupa aplikacji:** zaznacz, że aplikacja oferuje produkty / subskrypcje w aplikacji. Płatności Premium w Androidzie idą **wyłącznie przez Google Play Billing** (RevenueCat). Stripe jest tylko na stronie latwaforma.pl – **nie** prowadź użytkowników Androida ze sklepu do Stripe.
 4. **Wersja produkcyjna:** Utwórz wydanie → Wgraj **app-release.aab** (z `flutter build appbundle --release`) → Uzupełnij opis zmian → Prześlij do recenzji.
 
 Szczegóły tekstów, zrzutów i wymagań prawnych: **docs/STORE_LISTING.md**, **docs/WYMAGANIA_PRAWNE_SKLEPY.md**.
@@ -115,7 +115,7 @@ Szczegóły tekstów, zrzutów i wymagań prawnych: **docs/STORE_LISTING.md**, *
 ## 5. Szybka lista – co masz zrobić
 
 | # | Działanie |
-|---|-----------|
+| --- | --- |
 | 1 | Wygeneruj keystore, utwórz `android/key.properties` (na podstawie `key.properties.example`). |
 | 2 | Zbuduj AAB: `flutter build appbundle --release`. |
 | 3 | Stripe: przełącz na Live, utwórz ceny Live, webhook Live, skopiuj klucze i Price ID. |

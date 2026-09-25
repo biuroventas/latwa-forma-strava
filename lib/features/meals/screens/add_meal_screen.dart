@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,6 +44,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   bool _caloriesManuallyEdited = false;
   bool _isUpdatingCaloriesFromMacros = false;
   bool _addToFavorites = false;
+  List<Meal> _recentMeals = [];
 
   /// Inicjalizacja tekstu: puste gdy brak wartości lub 0, żeby użytkownik nie musiał usuwać "0".
   static String _optionalNum(String? value, bool isDecimal) {
@@ -71,6 +73,33 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
       text: (meal?.weightG != null && meal!.weightG! > 0) ? meal.weightG!.toStringAsFixed(0) : '',
     );
     _mealType = meal?.mealType;
+    if (meal == null) _loadRecentMeals();
+  }
+
+  Future<void> _loadRecentMeals() async {
+    final userId = SupabaseConfig.auth.currentUser?.id;
+    if (userId == null) return;
+    try {
+      final meals = await SupabaseService().getRecentDistinctMeals(userId);
+      if (mounted) setState(() => _recentMeals = meals);
+    } catch (_) {}
+  }
+
+  void _applyRecentMeal(Meal meal) {
+    _nameController.text = meal.name;
+    _caloriesController.text = meal.calories > 0 ? meal.calories.toStringAsFixed(0) : '';
+    _proteinController.text = _optionalNum(meal.proteinG.toString(), false);
+    _fatController.text = _optionalNum(meal.fatG.toString(), false);
+    _carbsController.text = _optionalNum(meal.carbsG.toString(), false);
+    _saturatedFatController.text = _optionalNum(meal.saturatedFatG.toString(), true);
+    _sugarController.text = _optionalNum(meal.sugarG.toString(), true);
+    _fiberController.text = _optionalNum(meal.fiberG.toString(), true);
+    _saltController.text = _optionalNum(meal.saltG.toString(), true);
+    _weightController.text =
+        (meal.weightG != null && meal.weightG! > 0) ? meal.weightG!.toStringAsFixed(0) : '';
+    _mealType = meal.mealType;
+    _caloriesManuallyEdited = true;
+    setState(() {});
   }
 
   @override
@@ -94,16 +123,18 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+    final l10n = context.l10n;
+    final defaultMealName = l10n.trackDefaultMealName;
 
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
       if (userId == null) {
-        throw Exception('Użytkownik nie jest zalogowany');
+        throw Exception(l10n.trackUserNotLoggedIn);
       }
 
       final service = SupabaseService();
       
-      final effectiveDate = widget.date ?? DateTime.now();
+      final effectiveDate = widget.date ?? widget.meal?.createdAt ?? DateTime.now();
       await StreakUpdater.updateStreak(userId, AppConstants.streakMeals, effectiveDate);
 
       if (widget.meal != null && widget.meal!.id != null) {
@@ -111,7 +142,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         final updatedMeal = Meal(
           id: widget.meal!.id,
           userId: userId,
-          name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
+          name: _nameController.text.trim().isEmpty ? defaultMealName : _nameController.text.trim(),
           calories: _getCalories(),
           proteinG: double.tryParse(_proteinController.text) ?? 0,
           fatG: double.tryParse(_fatController.text) ?? 0,
@@ -127,18 +158,6 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
           source: widget.meal!.source,
         );
         await service.updateMeal(updatedMeal);
-        if (mounted && _addToFavorites) {
-          final name = _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim();
-          final favorite = FavoriteMeal(
-            userId: userId,
-            name: name,
-            calories: _getCalories(),
-            proteinG: double.tryParse(_proteinController.text) ?? 0,
-            fatG: double.tryParse(_fatController.text) ?? 0,
-            carbsG: double.tryParse(_carbsController.text) ?? 0,
-          );
-          await service.createFavoriteMeal(favorite);
-        }
       } else {
         // Tworzenie nowego posiłku
         final calories = _getCalories();
@@ -152,7 +171,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         final source = widget.meal?.source ?? AppConstants.mealSourceManual;
         final meal = Meal(
           userId: userId,
-          name: _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim(),
+          name: _nameController.text.trim().isEmpty ? defaultMealName : _nameController.text.trim(),
           calories: calories,
           proteinG: double.tryParse(_proteinController.text) ?? 0,
           fatG: double.tryParse(_fatController.text) ?? 0,
@@ -173,7 +192,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
       }
 
       if (mounted && _addToFavorites) {
-        final name = _nameController.text.trim().isEmpty ? AppConstants.defaultMealName : _nameController.text.trim();
+        final name = _nameController.text.trim().isEmpty ? defaultMealName : _nameController.text.trim();
         final favorite = FavoriteMeal(
           userId: userId,
           name: name,
@@ -187,14 +206,11 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
 
       if (mounted) {
         context.pop(true);
-        SuccessMessage.show(
-          context,
-          _addToFavorites ? 'Posiłek zapisany i dodany do ulubionych!' : 'Posiłek dodany pomyślnie!',
-          duration: const Duration(seconds: 2),
+        SuccessMessage.show(context, _addToFavorites ? context.l10n.trackMealSavedAndFavorited : context.l10n.trackMealAddedSuccess, l10n: context.l10n, duration: const Duration(seconds: 2),
         );
       }
     } catch (e) {
-      if (mounted) ErrorHandler.showSnackBar(context, error: e);
+      if (mounted) ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -229,11 +245,12 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
 
   Future<void> _navigateToOption(String option) async {
     if (option == 'eating_out' || option == 'ai' || option == 'ingredients') {
+      final l10n = context.l10n;
       final featureName = option == 'eating_out'
-          ? 'Posiłek „na mieście”'
+          ? l10n.trackFeatureEatingOut
           : option == 'ai'
-              ? 'Analiza AI posiłku'
-              : 'Posiłek ze składników';
+              ? l10n.trackFeatureAiMealAnalysis
+              : l10n.trackFeatureIngredientsMeal;
       final canProceed = await checkPremiumOrNavigate(context, ref, featureName: featureName);
       if (!canProceed || !mounted) return;
     }
@@ -243,16 +260,16 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         result = await showEatingOutBottomSheet(context, date: widget.date ?? DateTime.now());
         break;
       case 'ai':
-        result = await context.push<bool>(AppRoutes.aiPhoto);
+        result = await context.push<bool>(AppRoutes.aiPhoto, extra: widget.date);
         break;
       case 'ingredients':
-        result = await context.push<bool>(AppRoutes.ingredientsMeal);
+        result = await context.push<bool>(AppRoutes.ingredientsMeal, extra: widget.date);
         break;
       case 'barcode':
-        result = await context.push<bool>(AppRoutes.barcodeScanner);
+        result = await context.push<bool>(AppRoutes.barcodeScanner, extra: widget.date);
         break;
       case 'search_products':
-        result = await context.push<bool>(AppRoutes.productSearch);
+        result = await context.push<bool>(AppRoutes.productSearch, extra: widget.date);
         break;
       case 'favorites':
         result = await context.push<bool>(
@@ -319,9 +336,12 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     );
   }
 
+  /// Szerokość kolumny „Szybkie dodawanie” – jedna dla wszystkich przycisków, żeby tekst się nie ucinał.
+  static const double _quickAddColumnWidth = 130.0;
+
   Widget _buildTilesColumn(BuildContext context) {
     return Container(
-      width: 110,
+      width: _quickAddColumnWidth,
       padding: const EdgeInsets.fromLTRB(8, 16, 16, 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
@@ -332,26 +352,45 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Szybkie dodawanie',
+            context.l10n.trackQuickAdd,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 12),
-          _buildAddOptionTile(context: context, icon: Icons.storefront, label: 'Na mieście', color: Colors.orange, option: 'eating_out'),
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddOptionTile(context: context, icon: Icons.storefront, label: context.l10n.trackOptionEatingOut, color: Colors.orange, option: 'eating_out'),
+          ),
           const SizedBox(height: 8),
-          _buildAddOptionTile(context: context, icon: Icons.camera_alt, label: 'Analiza AI', color: Colors.purple, option: 'ai'),
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddOptionTile(context: context, icon: Icons.camera_alt, label: context.l10n.trackOptionAiAnalysis, color: Colors.purple, option: 'ai'),
+          ),
           const SizedBox(height: 8),
-          _buildAddOptionTile(context: context, icon: Icons.restaurant_menu, label: 'Składniki', color: Colors.teal, option: 'ingredients'),
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddOptionTile(context: context, icon: Icons.restaurant_menu, label: context.l10n.trackOptionIngredients, color: Colors.teal, option: 'ingredients'),
+          ),
           const SizedBox(height: 8),
-          _buildAddOptionTile(context: context, icon: Icons.qr_code_scanner, label: 'Kod kreskowy', color: Colors.blue, option: 'barcode'),
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddOptionTile(context: context, icon: Icons.qr_code_scanner, label: context.l10n.trackOptionBarcode, color: Colors.blue, option: 'barcode'),
+          ),
           const SizedBox(height: 8),
-          _buildAddOptionTile(context: context, icon: Icons.search, label: 'Wyszukaj produkt', color: Colors.indigo, option: 'search_products'),
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddOptionTile(context: context, icon: Icons.search, label: context.l10n.trackOptionSearchProduct, color: Colors.indigo, option: 'search_products'),
+          ),
           const SizedBox(height: 8),
-          _buildAddOptionTile(context: context, icon: Icons.favorite_border, label: 'Ulubione', color: Colors.pink, option: 'favorites'),
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddOptionTile(context: context, icon: Icons.favorite_border, label: context.l10n.trackOptionFavorites, color: Colors.pink, option: 'favorites'),
+          ),
         ],
       ),
     );
@@ -366,17 +405,17 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(child: _buildCompactTile(context, Icons.storefront, 'Na mieście', Colors.orange, 'eating_out', tileHeight)),
+            Expanded(child: _buildCompactTile(context, Icons.storefront, context.l10n.trackOptionEatingOut, Colors.orange, 'eating_out', tileHeight)),
             SizedBox(width: gap),
-            Expanded(child: _buildCompactTile(context, Icons.camera_alt, 'Analiza AI', Colors.purple, 'ai', tileHeight)),
+            Expanded(child: _buildCompactTile(context, Icons.camera_alt, context.l10n.trackOptionAiAnalysis, Colors.purple, 'ai', tileHeight)),
             SizedBox(width: gap),
-            Expanded(child: _buildCompactTile(context, Icons.restaurant_menu, 'Składniki', Colors.teal, 'ingredients', tileHeight)),
+            Expanded(child: _buildCompactTile(context, Icons.restaurant_menu, context.l10n.trackOptionIngredients, Colors.teal, 'ingredients', tileHeight)),
             SizedBox(width: gap),
-            Expanded(child: _buildCompactTile(context, Icons.qr_code_scanner, 'Kod kreskowy', Colors.blue, 'barcode', tileHeight)),
+            Expanded(child: _buildCompactTile(context, Icons.qr_code_scanner, context.l10n.trackOptionBarcode, Colors.blue, 'barcode', tileHeight)),
             SizedBox(width: gap),
-            Expanded(child: _buildCompactTile(context, Icons.search, 'Wyszukaj', Colors.indigo, 'search_products', tileHeight)),
+            Expanded(child: _buildCompactTile(context, Icons.search, context.l10n.trackSearchShort, Colors.indigo, 'search_products', tileHeight)),
             SizedBox(width: gap),
-            Expanded(child: _buildCompactTile(context, Icons.favorite_border, 'Ulubione', Colors.pink, 'favorites', tileHeight)),
+            Expanded(child: _buildCompactTile(context, Icons.favorite_border, context.l10n.trackOptionFavorites, Colors.pink, 'favorites', tileHeight)),
           ],
         ),
       ),
@@ -427,7 +466,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     final isWide = MediaQuery.of(context).size.width >= 500;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.meal != null ? 'Edytuj posiłek' : 'Dodaj posiłek'),
+        title: Text(widget.meal != null ? context.l10n.trackEditMeal : context.l10n.trackAddMeal),
       ),
       body: LoadingOverlay(
         isLoading: _isLoading,
@@ -467,20 +506,42 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   }
 
   List<Widget> _buildFormChildren() {
+    final l10n = context.l10n;
     return [
+            if (widget.meal == null && _recentMeals.isNotEmpty) ...[
+              Text(
+                l10n.trackRecentFoods,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final meal in _recentMeals)
+                    ActionChip(
+                      label: Text(meal.name),
+                      onPressed: () => _applyRecentMeal(meal),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
             TextFormField(
               controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nazwa posiłku (opcjonalnie)',
-                      hintText: 'Puste = "Bez nazwy"',
+                    decoration: InputDecoration(
+                      labelText: l10n.trackMealNameOptional,
+                      hintText: l10n.trackHintEmptyDefaultName,
                     ),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _caloriesController,
-              decoration: const InputDecoration(
-                labelText: 'Kalorie (kcal)',
-                hintText: 'Puste = policzy z makroskładników',
+              decoration: InputDecoration(
+                labelText: l10n.trackCaloriesKcal,
+                hintText: l10n.trackHintCaloriesFromMacros,
               ),
               keyboardType: TextInputType.number,
               onChanged: (_) => setState(() {
@@ -492,14 +553,14 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
                     ? double.tryParse(value)
                     : _calculateCaloriesFromMacros();
                 if (calories == null || calories < 0) {
-                  return 'Podaj liczbę kalorii lub uzupełnij makroskładniki';
+                  return l10n.trackEnterCaloriesOrMacros;
                 }
                 return null;
               },
             ),
             const SizedBox(height: 16),
             Text(
-              'Białko',
+              l10n.trackProtein,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -508,8 +569,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             const SizedBox(height: 4),
             TextFormField(
               controller: _proteinController,
-              decoration: const InputDecoration(
-                labelText: 'Białko (g)',
+              decoration: InputDecoration(
+                labelText: l10n.trackProteinG,
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -517,7 +578,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Tłuszcze',
+              l10n.trackFat,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -526,8 +587,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             const SizedBox(height: 4),
             TextFormField(
               controller: _fatController,
-              decoration: const InputDecoration(
-                labelText: 'Tłuszcze (g)',
+              decoration: InputDecoration(
+                labelText: l10n.trackFatG,
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -538,8 +599,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               padding: const EdgeInsets.only(left: 8),
               child: TextFormField(
                 controller: _saturatedFatController,
-                decoration: const InputDecoration(
-                  labelText: 'w tym nasycone (g)',
+                decoration: InputDecoration(
+                  labelText: l10n.trackIncludingSaturatedG,
                   isDense: true,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -548,7 +609,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Węglowodany',
+              l10n.trackCarbs,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -557,8 +618,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             const SizedBox(height: 4),
             TextFormField(
               controller: _carbsController,
-              decoration: const InputDecoration(
-                labelText: 'Węglowodany (g)',
+              decoration: InputDecoration(
+                labelText: l10n.trackCarbsG,
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -569,8 +630,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               padding: const EdgeInsets.only(left: 8),
               child: TextFormField(
                 controller: _sugarController,
-                decoration: const InputDecoration(
-                  labelText: 'w tym cukry (g)',
+                decoration: InputDecoration(
+                  labelText: l10n.trackIncludingSugarsG,
                   isDense: true,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -582,8 +643,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               padding: const EdgeInsets.only(left: 8),
               child: TextFormField(
                 controller: _fiberController,
-                decoration: const InputDecoration(
-                  labelText: 'Błonnik (g)',
+                decoration: InputDecoration(
+                  labelText: l10n.trackFiberG,
                   isDense: true,
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -592,7 +653,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Sól',
+              l10n.trackSalt,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -601,8 +662,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             const SizedBox(height: 4),
             TextFormField(
               controller: _saltController,
-              decoration: const InputDecoration(
-                labelText: 'Sól (g)',
+              decoration: InputDecoration(
+                labelText: l10n.trackSaltG,
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))],
@@ -610,8 +671,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _weightController,
-              decoration: const InputDecoration(
-                labelText: 'Waga (g) - opcjonalnie',
+              decoration: InputDecoration(
+                labelText: l10n.trackWeightGOptional,
                 hintText: '0',
               ),
               keyboardType: TextInputType.number,
@@ -620,14 +681,14 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _mealType,
-              decoration: const InputDecoration(
-                labelText: 'Typ posiłku - opcjonalnie',
+              decoration: InputDecoration(
+                labelText: l10n.trackMealTypeOptional,
               ),
-              items: const [
-                DropdownMenuItem(value: AppConstants.mealBreakfast, child: Text('Śniadanie')),
-                DropdownMenuItem(value: AppConstants.mealLunch, child: Text('Obiad')),
-                DropdownMenuItem(value: AppConstants.mealDinner, child: Text('Kolacja')),
-                DropdownMenuItem(value: AppConstants.mealSnack, child: Text('Przekąska')),
+              items: [
+                DropdownMenuItem(value: AppConstants.mealBreakfast, child: Text(l10n.trackBreakfast)),
+                DropdownMenuItem(value: AppConstants.mealLunch, child: Text(l10n.trackLunch)),
+                DropdownMenuItem(value: AppConstants.mealDinner, child: Text(l10n.trackDinner)),
+                DropdownMenuItem(value: AppConstants.mealSnack, child: Text(l10n.trackSnack)),
               ],
               onChanged: (value) {
                 setState(() => _mealType = value);
@@ -639,8 +700,8 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
               onChanged: (value) {
                 setState(() => _addToFavorites = value ?? false);
               },
-              title: const Text('Dodaj do ulubionych'),
-              subtitle: const Text('Będziesz mógł szybko dodać ten posiłek później'),
+              title: Text(l10n.trackAddToFavorites),
+              subtitle: Text(l10n.trackAddToFavoritesMealSubtitle),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
             ),
@@ -653,7 +714,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 child: Text(
-                  widget.meal != null ? 'Zaktualizuj posiłek' : 'Zapisz posiłek',
+                  widget.meal != null ? l10n.trackUpdateMeal : l10n.trackSaveMeal,
                   style: const TextStyle(fontSize: 16),
                 ),
               ),

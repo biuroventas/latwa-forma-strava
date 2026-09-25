@@ -2,7 +2,7 @@ name: latwa_forma
 description: "Łatwa Forma - Aplikacja do śledzenia kalorii i aktywności fizycznej"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.5+10
 
 environment:
   sdk: ^3.10.4
@@ -63,7 +63,13 @@ dependencies:
   
   # Crypto (PKCE dla Garmin OAuth)
   crypto: ^3.0.3
+
+  # Natywne Sign in with Apple na iOS (Android: OAuth w karcie przeglądarki)
+  sign_in_with_apple: ^6.1.4
   
+  # In-app purchases (iOS/Android; stub on web)
+  purchases_flutter: ^10.4.2
+
   # Utilities
   uuid: ^4.5.1
   confetti: ^0.8.0
@@ -71,6 +77,8 @@ dependencies:
   share_plus: ^10.1.4
   pdf: ^3.11.3
   printing: ^5.13.4
+  flutter_web_auth_2: ^5.1.0
+  video_player: ^2.11.1
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +94,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
@@ -94,6 +103,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/videos/
     - assets/icons/
     - assets/fonts/
     # env.production w root i w assets (skrypt prepare kopiuje do obu; web ładuje z assets)
@@ -106,22 +116,10 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600

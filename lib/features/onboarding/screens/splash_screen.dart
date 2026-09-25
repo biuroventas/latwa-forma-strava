@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/auth/auth_callback_handler.dart';
 import '../../../core/auth/sign_out_guard.dart';
 import '../../../core/config/supabase_config.dart';
@@ -53,18 +54,24 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
         : Duration.zero;
     if (elapsed > _splashMaxTime) {
       _navigateDone = true;
-      debugPrint('Splash: app resumed after ${elapsed.inSeconds}s – przechodzę na welcome');
-      context.go(AppRoutes.welcome);
+      debugPrint('Splash: app resumed after ${elapsed.inSeconds}s – schodzę ze splasha');
+      _leaveSplash();
     }
   }
 
+  /// Welcome tylko bez sesji. Przy sesji (także anonimowej) welcome i tak wraca na splash.
+  void _leaveSplash() {
+    final hasSession = SupabaseConfig.isInitialized && SupabaseConfig.currentUserOrNull != null;
+    context.go(hasSession ? AppRoutes.dashboard : AppRoutes.welcome);
+  }
+
   Future<void> _navigateToNext() async {
-    // Zabezpieczenie: po _splashMaxTime zawsze idź na welcome
+    // Zabezpieczenie: po _splashMaxTime zejdź ze splasha (dashboard, gdy sesja jest).
     Future<void>.delayed(_splashMaxTime, () {
       if (!_navigateDone && mounted) {
         _navigateDone = true;
-        debugPrint('Splash: max time reached – przechodzę na welcome');
-        context.go(AppRoutes.welcome);
+        debugPrint('Splash: max time reached – schodzę ze splasha');
+        _leaveSplash();
       }
     });
 
@@ -80,8 +87,8 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
         context.go(AppRoutes.welcome);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Brak połączenia z serwerem. Sprawdź konfigurację (.env) i internet.'),
+            SnackBar(
+              content: Text(context.l10n.onbSplashNoServerConfig),
               backgroundColor: Colors.orange,
             ),
           );
@@ -92,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
       var user = SupabaseConfig.auth.currentUser;
       var userId = user?.id;
 
-      // Na iOS cold start z „Otwórz w Latwa Forma” link bywa dostępny dopiero tutaj.
+      // Na iOS cold start z „Otwórz w Łatwa Forma” link bywa dostępny dopiero tutaj.
       // Z timeoutem, żeby przy ?code= z Google ekran nie wisiał w nieskończoność.
       if (userId == null) {
         final sessionSet = await tryProcessInitialAuthLink()
@@ -104,28 +111,15 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
       }
 
       if (userId != null) {
-        // Zweryfikuj sesję – z limitem czasu, żeby aplikacja nie wisiała przy słabym sieci
+        // Zweryfikuj sesję – z limitem czasu, żeby aplikacja nie wisiała przy słabym sieci.
+        // Timeout przy istniejącej sesji lokalnej nie może iść na welcome: redirect wróciłby na splash.
         try {
           await SupabaseConfig.auth.getUser().timeout(
             _splashTimeout,
             onTimeout: () => throw TimeoutException('getUser'),
           );
         } on TimeoutException {
-          debugPrint('Splash: timeout getUser – przechodzę na welcome');
-          if (!mounted) return;
-          _navigateDone = true;
-          final elapsed = stopwatch.elapsed;
-          if (elapsed < minDisplayTime) await Future.delayed(minDisplayTime - elapsed);
-          if (!mounted) return;
-          context.go(AppRoutes.welcome);
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Brak połączenia. Sprawdź internet i spróbuj ponownie.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-          return;
+          debugPrint('Splash: timeout getUser – zostaję przy lokalnej sesji');
         } on Object {
           // Sesja nieważna (np. użytkownik usunięty) – wyloguj i przejdź na start
           await SupabaseConfig.auth.signOut();
@@ -147,20 +141,13 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
             onTimeout: () => throw TimeoutException('getProfile'),
           );
         } on TimeoutException {
-          debugPrint('Splash: timeout getProfile – przechodzę na welcome');
+          debugPrint('Splash: timeout getProfile – idę na dashboard z lokalną sesją');
           if (!mounted) return;
           _navigateDone = true;
           final elapsed = stopwatch.elapsed;
           if (elapsed < minDisplayTime) await Future.delayed(minDisplayTime - elapsed);
           if (!mounted) return;
-          context.go(AppRoutes.welcome);
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Brak połączenia. Sprawdź internet i spróbuj ponownie.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
+          context.go(AppRoutes.dashboard);
           return;
         }
 
@@ -201,9 +188,7 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
         if (!lastGoogleCallbackFailed) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Nie udało się zalogować. Uzupełnij profil lub spróbuj zalogować się ponownie.',
-              ),
+              content: Text(context.l10n.onbSplashLoginFailed),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 4),
             ),
@@ -219,12 +204,10 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
     if (!lastGoogleCallbackFailed) return;
     clearLastGoogleCallbackFailed();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Logowanie Google nie powiodło się. Zaloguj się ponownie w tej samej karcie.',
-        ),
+      SnackBar(
+        content: Text(context.l10n.onbSplashGoogleFailed),
         backgroundColor: Colors.orange,
-        duration: Duration(seconds: 6),
+        duration: const Duration(seconds: 6),
       ),
     );
   }
@@ -232,6 +215,7 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
+    final l10n = context.l10n;
     // Bez własnego AppBackground – tło daje ShellRoute (jednolite z resztą aplikacji).
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -239,21 +223,17 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+            Opacity(
+              opacity: 0.82,
               child: Image.asset(
-                'assets/images/logo400x400.png',
+                'assets/images/logotrans.png',
                 width: 120,
                 height: 120,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Icon(Icons.fitness_center, size: 60, color: Color(0xFF4CAF50)),
+                fit: BoxFit.contain,
+                errorBuilder: (_, _, _) => const Icon(
+                  Icons.fitness_center,
+                  size: 60,
+                  color: Color(0xFF4CAF50),
                 ),
               ),
             ),
@@ -271,7 +251,7 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
                 },
                 icon: Icon(Icons.close, color: primary, size: 20),
                 label: Text(
-                  'Przerwij',
+                  l10n.onbSplashAbort,
                   style: TextStyle(color: primary, fontWeight: FontWeight.w500),
                 ),
               ),

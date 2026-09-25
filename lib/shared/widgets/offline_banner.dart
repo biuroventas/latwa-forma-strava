@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../core/providers/connectivity_provider.dart';
 
 /// Banner wyświetlany gdy brak połączenia z internetem.
@@ -28,7 +29,7 @@ class OfflineBanner extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Brak połączenia z internetem.',
+                        context.l10n.profOfflineBanner,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.white,
                             ),

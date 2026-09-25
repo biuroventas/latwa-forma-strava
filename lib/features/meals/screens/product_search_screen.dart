@@ -1,26 +1,43 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../shared/services/product_service.dart';
 import '../../../shared/widgets/empty_state_widget.dart';
+import 'add_catalog_product_screen.dart';
 
 /// Wyszukiwanie produktów po nazwie (najpierw własna baza, potem Open Food Facts).
 /// Po wyborze produktu przechodzi do ekranu dodawania z wagą (jak po skanowaniu kodu).
 class ProductSearchScreen extends StatefulWidget {
-  const ProductSearchScreen({super.key});
+  const ProductSearchScreen({super.key, this.initialQuery, this.date});
+
+  final String? initialQuery;
+  final DateTime? date;
 
   @override
   State<ProductSearchScreen> createState() => _ProductSearchScreenState();
 }
 
 class _ProductSearchScreenState extends State<ProductSearchScreen> {
-  final TextEditingController _queryController = TextEditingController();
+  late final TextEditingController _queryController;
   final ProductService _productService = ProductService();
   List<Map<String, dynamic>> _products = [];
   bool _loading = false;
   String _lastQuery = '';
   Timer? _debounce;
+  int _searchGen = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _queryController = TextEditingController(text: widget.initialQuery ?? '');
+    if (widget.initialQuery != null && widget.initialQuery!.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _runSearch(widget.initialQuery!.trim());
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -31,6 +48,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
 
   Future<void> _runSearch(String query) async {
     if (query.trim().isEmpty) {
+      _searchGen++;
       setState(() {
         _products = [];
         _loading = false;
@@ -38,11 +56,22 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
       });
       return;
     }
+    final gen = ++_searchGen;
     setState(() => _loading = true);
-    final results = await _productService.searchProducts(query.trim(), pageSize: 24);
-    if (mounted) {
+    try {
+      final results = await _productService.searchProducts(query.trim(), pageSize: 20);
+      if (!mounted || gen != _searchGen) return;
       setState(() {
         _products = results;
+        _loading = false;
+        _lastQuery = query.trim();
+      });
+    } catch (e, st) {
+      debugPrint('ProductSearchScreen: błąd wyszukiwania: $e');
+      debugPrint('$st');
+      if (!mounted || gen != _searchGen) return;
+      setState(() {
+        _products = [];
         _loading = false;
         _lastQuery = query.trim();
       });
@@ -58,14 +87,14 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
       });
       return;
     }
-    _debounce = Timer(const Duration(milliseconds: 400), () => _runSearch(value));
+    _debounce = Timer(const Duration(milliseconds: 300), () => _runSearch(value));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wyszukaj produkt'),
+        title: Text(context.l10n.trackSearchProductTitle),
       ),
       body: Column(
         children: [
@@ -75,7 +104,7 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
               controller: _queryController,
               onChanged: _onQueryChanged,
               decoration: InputDecoration(
-                hintText: 'Nazwa produktu, np. mleko, nutella…',
+                hintText: context.l10n.trackSearchProductHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
@@ -93,6 +122,18 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
     );
   }
 
+  Future<void> _addMissing(String name) async {
+    final added = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => AddCatalogProductScreen(
+          initialName: name,
+          date: widget.date,
+        ),
+      ),
+    );
+    if (added == true && mounted) context.pop(true);
+  }
+
   Widget _buildBody(BuildContext context) {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
@@ -101,8 +142,8 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
       return Center(
         child: EmptyStateWidget(
           icon: Icons.search,
-          title: 'Wpisz nazwę produktu',
-          subtitle: 'Korzystamy z bazy Open Food Facts. Wyniki pojawią się po wpisaniu min. kilku liter.',
+          title: context.l10n.trackEnterProductName,
+          subtitle: context.l10n.trackSearchProductSubtitle,
           iconColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
         ),
       );
@@ -111,9 +152,14 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
       return Center(
         child: EmptyStateWidget(
           icon: Icons.inventory_2_outlined,
-          title: 'Brak wyników',
-          subtitle: 'Spróbuj innej nazwy lub zeskanuj kod kreskowy produktu.',
+          title: context.l10n.trackNoResults,
+          subtitle: context.l10n.trackNoResultsTryBarcode,
           iconColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+          action: FilledButton.icon(
+            onPressed: () => _addMissing(_lastQuery),
+            icon: const Icon(Icons.add),
+            label: Text(context.l10n.trackAddToCatalog),
+          ),
         ),
       );
     }
@@ -125,8 +171,12 @@ class _ProductSearchScreenState extends State<ProductSearchScreen> {
         return _ProductTile(
           product: p,
           onTap: () async {
-            final result = await context.push<bool>(AppRoutes.barcodeProduct, extra: p);
-            if (mounted && result == true) context.pop(true);
+            final result = await context.push<bool>(
+              AppRoutes.barcodeProduct,
+              extra: mealFlowExtra(product: p, date: widget.date),
+            );
+            if (!context.mounted) return;
+            if (result == true) context.pop(true);
           },
         );
       },
@@ -142,7 +192,7 @@ class _ProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = product['name'] as String? ?? 'Produkt';
+    final name = product['name'] as String? ?? context.l10n.trackProduct;
     final brand = product['brand'] as String?;
     final cal = (product['calories'] as num?)?.toDouble();
     final imageUrl = product['imageUrl'] as String?;
@@ -160,7 +210,7 @@ class _ProductTile extends StatelessWidget {
                   width: 48,
                   height: 48,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _placeholderIcon(context),
+                  errorBuilder: (_, Object error, StackTrace? stackTrace) => _placeholderIcon(context),
                 ),
               )
             : _placeholderIcon(context),

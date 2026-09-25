@@ -3,7 +3,13 @@
   "description": "Import Polish Open Food Facts subset into Supabase products table",
   "private": true,
   "type": "module",
+  "scripts": {
+    "import:turso": "node run-turso.js",
+    "import:supabase": "node run.js"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+    "@libsql/client": "^0.14.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5"
   }
 }

@@ -25,7 +25,7 @@ Od **pierwszego użycia** aplikacji (pierwsze wejście na dashboard po zalogowan
 ## Free vs Premium
 
 | Funkcja | Free | Premium |
-|--------|------|---------|
+| --- | --- | --- |
 | Przeglądanie historii | Tylko dzień bieżący | Dowolny dzień |
 | Makroskładniki na dashboardzie | Ukryte | Podgląd włączony |
 | Porada AI | Limit dzienny (np. 10 zapytań) | Nieograniczona |
@@ -78,20 +78,28 @@ Migracja bazy: `database/supabase/migration_subscription_tier.sql` (wykonaj w Su
 
 ---
 
-## Stripe (wdrożone)
+## Stripe (web)
 
-Płatność za Premium przez **Stripe** (strona Checkout otwierana z aplikacji). Pełna instrukcja: **[docs/STRIPE.md](STRIPE.md)**.
+Płatność za Premium przez **Stripe** na **latwaforma.pl** (Checkout). Instrukcja: **[docs/STRIPE.md](STRIPE.md)**.
 
-- Aplikacja wywołuje Edge Function **create-checkout-session** → użytkownik płaci na stronie Stripe.
-- Webhook **stripe-webhook** po `checkout.session.completed` ustawia w `profiles`: `subscription_tier = 'premium'`, `subscription_expires_at` z końca okresu subskrypcji.
+- Aplikacja (web) wywołuje Edge Function **create-checkout-session** → użytkownik płaci na stronie Stripe.
+- Webhook **stripe-webhook** po `checkout.session.completed` ustawia w `profiles`: `subscription_tier = 'premium'`, `subscription_expires_at`.
+
+## RevenueCat / IAP (iOS + Android)
+
+Płatność w aplikacjach ze sklepów: **App Store / Google Play** przez RevenueCat. Instrukcja: **[docs/REVENUECAT.md](REVENUECAT.md)**.
+
+- Product IDs: `premium_monthly`, `premium_yearly`; entitlement `premium`.
+- Flutter: `purchases_flutter` + `RevenueCatService` (stub na webie).
+- Paywall mobile: zakup + „Przywróć zakupy”; Stripe ukryty poza webem.
+- Webhook **revenuecat-webhook** aktualizuje `profiles` po INITIAL_PURCHASE / RENEWAL / EXPIRATION itd.
 
 Dodatkowo: przycisk testowy (debug) i ręczna edycja w Supabase nadal działają.
 
 ---
 
-## Co dalej (rozwój subskrypcji)
+## Co dalej (po launchu)
 
-1. **Płatności w aplikacji** – integracja `in_app_purchase` (Google Play / App Store) lub RevenueCat; po zakupie wywołanie Edge Function / API, które ustawi `subscription_tier` i `subscription_expires_at`.
-2. **Stripe / strona WWW** – ✅ wdrożone (patrz STRIPE.md).
-3. **UX** – przywracanie zakupów, wyświetlanie cennika (miesięcznie/rocznie), zarządzanie subskrypcją (link do ustawień systemowych).
-4. **Logika** – okresowe sprawdzanie wygaśnięcia, powiadomienia przed końcem Premium, ewentualny okres grace.
+1. Monitorowanie webhooków i odnowień.
+2. Crash reporting (Sentry / Crashlytics).
+3. Garmin production key (jeśli integracja w listingach).

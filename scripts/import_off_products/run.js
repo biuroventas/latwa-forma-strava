@@ -1,14 +1,15 @@
 /**
  * Import Open Food Facts products (Polish subset) into Supabase `products` table.
  * Usage:
- *   1. Download: curl -o openfoodfacts-products.jsonl.gz https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz
- *   2. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
+ *   1. Download: curl -L -o openfoodfacts-products.jsonl.gz https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz
+ *   2. Skopiuj .env.example jako .env i uzupełnij SUPABASE_URL oraz SUPABASE_SERVICE_ROLE_KEY
  *   3. node run.js [path/to/openfoodfacts-products.jsonl.gz]
  *
  * Reads JSONL line by line (gzip), filters by countries_tags containing Poland and nutriments,
  * maps to products row, batch inserts. Limits to ~30k products to stay under 500MB.
  */
 
+import 'dotenv/config';
 import { createReadStream } from 'fs';
 import { createInterface } from 'readline';
 import { createGunzip } from 'zlib';

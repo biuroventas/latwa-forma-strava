@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/config/supabase_config.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/utils/error_handler.dart';
@@ -50,13 +51,14 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final activitiesAsync = ref.watch(activitiesListProvider(_displayedDate));
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: 'Wróć do dashboardu',
+          tooltip: l10n.trackBackToDashboard,
           onPressed: () => context.pop(),
         ),
         title: Row(
@@ -86,7 +88,7 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                       );
                       if (picked != null && mounted) setState(() => _displayedDate = picked);
                     },
-                    child: Text('Aktywności - ${_formatDate(_displayedDate)}'),
+                    child: Text(l10n.trackActivitiesDateTitle(date: _formatDate(_displayedDate))),
                   ),
                 ),
               ),
@@ -116,13 +118,13 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                   height: MediaQuery.of(context).size.height - 200,
                   child: EmptyStateWidget(
                     icon: Icons.fitness_center,
-                    title: 'Brak aktywności na ten dzień',
+                    title: l10n.trackNoActivitiesForDay,
                     action: TextButton(
                       onPressed: () async {
                         final result = await context.push<bool>(AppRoutes.activitiesAdd, extra: _displayedDate);
                         if (result == true && context.mounted) ref.invalidate(activitiesListProvider(_displayedDate));
                       },
-                      child: const Text('Dodaj pierwszą aktywność'),
+                      child: Text(l10n.trackAddFirstActivity),
                     ),
                   ),
                 ),
@@ -156,15 +158,15 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'Podsumowanie dnia',
+                            l10n.trackDaySummary,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 12),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildSummaryItem(context, 'Spalone', totalBurned.toStringAsFixed(0), 'kcal'),
-                              _buildSummaryItem(context, 'Czas', _formatDuration(totalDuration), ''),
+                              _buildSummaryItem(context, l10n.trackBurned, totalBurned.toStringAsFixed(0), 'kcal'),
+                              _buildSummaryItem(context, l10n.trackTime, _formatDuration(totalDuration), ''),
                             ],
                           ),
                         ],
@@ -177,7 +179,7 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                       child: Text(
-                        'Dane aktywności pochodzą z urządzeń Garmin.',
+                        l10n.trackGarminActivitiesNote,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontStyle: FontStyle.italic,
@@ -205,7 +207,7 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                                       width: 28,
                                       height: 28,
                                       fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) => Icon(
+                                      errorBuilder: (_, _, _) => Icon(
                                         Icons.watch,
                                         color: Colors.blue.shade700,
                                         size: 28,
@@ -223,11 +225,15 @@ class _ActivitiesListScreenState extends ConsumerState<ActivitiesListScreen> {
                                   : activity.name,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-subtitle: Text(
-                              '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
-                              '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
-                              ' • ${_getActivityTypeDisplayName(activity.activityType)}'
-                              '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
+                            subtitle: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
+                                '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
+                                ' • ${_getActivityTypeDisplayName(activity.activityType)}'
+                                '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
+                              ),
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -247,8 +253,8 @@ subtitle: Text(
                                   onPressed: () async {
                                     final confirmed = await DeleteConfirmationDialog.show(
                                       context,
-                                      title: 'Usuń aktywność',
-                                      content: 'Czy na pewno chcesz usunąć "${activity.isFromGarmin ? activity.name.replaceFirst(' (Garmin)', '') : activity.name}"?',
+                                      title: l10n.trackDeleteActivityTitle,
+                                      content: l10n.trackDeleteActivityConfirm(name: activity.isFromGarmin ? activity.name.replaceFirst(' (Garmin)', '') : activity.name),
                                     );
                                     if (confirmed) {
                                       try {
@@ -257,11 +263,11 @@ subtitle: Text(
                                         if (context.mounted) {
                                           ref.invalidate(activitiesListProvider(_displayedDate));
                                           ref.invalidate(dashboardDataProvider(_displayedDate));
-                                          SuccessMessage.show(context, 'Aktywność usunięta');
+                                          SuccessMessage.show(context, l10n.trackActivityDeleted, l10n: context.l10n);
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ErrorHandler.showSnackBar(context, error: e);
+                                          ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
                                         }
                                       }
                                     }
@@ -282,7 +288,7 @@ subtitle: Text(
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Nie licz w bilansie (spalone)',
+                                    l10n.trackExcludeFromBalance,
                                     style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   const SizedBox(width: 8),
@@ -297,14 +303,11 @@ subtitle: Text(
                                         if (context.mounted) {
                                           ref.invalidate(activitiesListProvider(_displayedDate));
                                           ref.invalidate(dashboardDataProvider(_displayedDate));
-                                          SuccessMessage.show(
-                                            context,
-                                            value ? 'Aktywność wyłączona z bilansu' : 'Aktywność wliczana do bilansu',
-                                          );
+                                          SuccessMessage.show(context, value ? l10n.trackActivityExcludedFromBalance : l10n.trackActivityIncludedInBalance, l10n: context.l10n);
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ErrorHandler.showSnackBar(context, error: e);
+                                          ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
                                         }
                                       }
                                     },
@@ -324,7 +327,7 @@ subtitle: Text(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Text(
-                        'Pozostałe aktywności.',
+                        l10n.trackOtherActivities,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontStyle: FontStyle.italic,
@@ -352,7 +355,7 @@ subtitle: Text(
                                       width: 28,
                                       height: 28,
                                       fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) => Icon(
+                                      errorBuilder: (_, _, _) => Icon(
                                         Icons.watch,
                                         color: Colors.blue.shade700,
                                         size: 28,
@@ -370,11 +373,15 @@ subtitle: Text(
                                   : activity.name,
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            subtitle: Text(
-                              '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
-                              '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
-                              ' • ${_getActivityTypeDisplayName(activity.activityType)}'
-                              '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
+                            subtitle: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '${activity.caloriesBurned.toStringAsFixed(0)} kcal'
+                                '${activity.durationMinutes != null ? ' • ${activity.durationMinutes} min' : ''}'
+                                ' • ${_getActivityTypeDisplayName(activity.activityType)}'
+                                '${activity.excludedFromBalance ? ' • nie w bilansie' : ''}',
+                              ),
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -394,8 +401,8 @@ subtitle: Text(
                                   onPressed: () async {
                                     final confirmed = await DeleteConfirmationDialog.show(
                                       context,
-                                      title: 'Usuń aktywność',
-                                      content: 'Czy na pewno chcesz usunąć "${activity.isFromGarmin ? activity.name.replaceFirst(' (Garmin)', '') : activity.name}"?',
+                                      title: l10n.trackDeleteActivityTitle,
+                                      content: l10n.trackDeleteActivityConfirm(name: activity.isFromGarmin ? activity.name.replaceFirst(' (Garmin)', '') : activity.name),
                                     );
                                     if (confirmed) {
                                       try {
@@ -404,11 +411,11 @@ subtitle: Text(
                                         if (context.mounted) {
                                           ref.invalidate(activitiesListProvider(_displayedDate));
                                           ref.invalidate(dashboardDataProvider(_displayedDate));
-                                          SuccessMessage.show(context, 'Aktywność usunięta');
+                                          SuccessMessage.show(context, l10n.trackActivityDeleted, l10n: context.l10n);
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ErrorHandler.showSnackBar(context, error: e);
+                                          ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
                                         }
                                       }
                                     }
@@ -429,7 +436,7 @@ subtitle: Text(
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Nie licz w bilansie (spalone)',
+                                    l10n.trackExcludeFromBalance,
                                     style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                   const SizedBox(width: 8),
@@ -444,14 +451,11 @@ subtitle: Text(
                                         if (context.mounted) {
                                           ref.invalidate(activitiesListProvider(_displayedDate));
                                           ref.invalidate(dashboardDataProvider(_displayedDate));
-                                          SuccessMessage.show(
-                                            context,
-                                            value ? 'Aktywność wyłączona z bilansu' : 'Aktywność wliczana do bilansu',
-                                          );
+                                          SuccessMessage.show(context, value ? l10n.trackActivityExcludedFromBalance : l10n.trackActivityIncludedInBalance, l10n: context.l10n);
                                         }
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ErrorHandler.showSnackBar(context, error: e);
+                                          ErrorHandler.showSnackBar(context, l10n: context.l10n, error: e);
                                         }
                                       }
                                     },
@@ -477,11 +481,11 @@ subtitle: Text(
             children: [
               const Icon(Icons.error_outline, size: 64, color: Colors.red),
               const SizedBox(height: 16),
-              Text('Błąd: $error'),
+              Text(l10n.trackErrorWithDetails(error: '$error')),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(activitiesListProvider(_displayedDate)),
-                child: const Text('Spróbuj ponownie'),
+                child: Text(l10n.commonRetry),
               ),
             ],
           ),
@@ -527,21 +531,22 @@ subtitle: Text(
 
   /// Etykieta typu aktywności: Garmin (RUNNING→Bieg) i legacy (high→Wysoka).
   String _getActivityTypeDisplayName(String? activityType) {
-    if (activityType == null || activityType.isEmpty) return 'Inna';
+    final l10n = context.l10n;
+    if (activityType == null || activityType.isEmpty) return l10n.trackActivityTypeOther;
     final t = activityType.toUpperCase();
-    if (t == 'LOW') return 'Niska';
-    if (t == 'MODERATE') return 'Umiarkowana';
-    if (t == 'HIGH') return 'Wysoka';
-    if (t == 'VERY_HIGH') return 'Bardzo wysoka';
-    if (t.contains('RUN')) return 'Bieg';
-    if (t.contains('CYCLE') || t.contains('BIKE')) return 'Kolarstwo';
-    if (t.contains('SWIM')) return 'Pływanie';
-    if (t.contains('WALK')) return 'Chodzenie';
-    if (t.contains('HIKE')) return 'Wędrówka';
-    if (t.contains('ROW')) return 'Wioślarstwo';
-    if (t.contains('TENNIS')) return 'Tenis';
-    if (t.contains('YOGA')) return 'Joga';
-    if (t.contains('STRENGTH') || t.contains('TRAINING')) return 'Trening';
+    if (t == 'LOW') return l10n.trackActivityTypeLow;
+    if (t == 'MODERATE') return l10n.trackActivityTypeModerate;
+    if (t == 'HIGH') return l10n.trackActivityTypeHigh;
+    if (t == 'VERY_HIGH') return l10n.trackActivityTypeVeryHigh;
+    if (t.contains('RUN')) return l10n.trackActivityTypeRun;
+    if (t.contains('CYCLE') || t.contains('BIKE')) return l10n.trackActivityTypeCycling;
+    if (t.contains('SWIM')) return l10n.trackActivityTypeSwim;
+    if (t.contains('WALK')) return l10n.trackActivityTypeWalk;
+    if (t.contains('HIKE')) return l10n.trackActivityTypeHike;
+    if (t.contains('ROW')) return l10n.trackActivityTypeRow;
+    if (t.contains('TENNIS')) return l10n.trackActivityTypeTennis;
+    if (t.contains('YOGA')) return l10n.trackActivityTypeYoga;
+    if (t.contains('STRENGTH') || t.contains('TRAINING')) return l10n.trackActivityTypeTraining;
     return activityType;
   }
 

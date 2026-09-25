@@ -1,0 +1,1270 @@
+{
+  "moreStatisticsTitle": {
+    "pl": "Statystyki",
+    "en": "Statistics"
+  },
+  "moreStreaksTooltip": {
+    "pl": "Serie",
+    "en": "Streaks"
+  },
+  "moreWeeklySummary": {
+    "pl": "Tygodniowe podsumowanie",
+    "en": "Weekly summary"
+  },
+  "moreShareTooltip": {
+    "pl": "Udostępnij",
+    "en": "Share"
+  },
+  "moreShareWeeklyStatsFeature": {
+    "pl": "Udostępnianie tygodniowych statystyk",
+    "en": "Sharing weekly statistics"
+  },
+  "moreShareWeeklySummaryText": {
+    "pl": "📊 Łatwa Forma – Tygodniowe podsumowanie",
+    "en": "📊 Łatwa Forma – Weekly summary"
+  },
+  "moreShareError": {
+    "pl": "Błąd udostępniania: {error}",
+    "en": "Share error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAvgDailyCalories": {
+    "pl": "Średnie dzienne kalorie",
+    "en": "Average daily calories"
+  },
+  "moreTotalCaloriesWeek": {
+    "pl": "Całkowite kalorie (tydzień)",
+    "en": "Total calories (week)"
+  },
+  "moreBurnedCaloriesWeek": {
+    "pl": "Spalone kalorie (tydzień)",
+    "en": "Calories burned (week)"
+  },
+  "moreWaterWeek": {
+    "pl": "Woda (tydzień)",
+    "en": "Water (week)"
+  },
+  "moreCaloriesDuringWeek": {
+    "pl": "Kalorie w ciągu tygodnia",
+    "en": "Calories during the week"
+  },
+  "moreMacrosWeek": {
+    "pl": "Makro (tydzień)",
+    "en": "Macros (week)"
+  },
+  "moreProtein": {
+    "pl": "Białko",
+    "en": "Protein"
+  },
+  "moreFat": {
+    "pl": "Tłuszcze",
+    "en": "Fat"
+  },
+  "moreCarbs": {
+    "pl": "Węgle",
+    "en": "Carbs"
+  },
+  "moreCarbsFull": {
+    "pl": "Węglowodany",
+    "en": "Carbohydrates"
+  },
+  "moreGoalVerification": {
+    "pl": "Weryfikacja celu",
+    "en": "Goal verification"
+  },
+  "moreGoalVerificationHint": {
+    "pl": "Wprowadzaj posiłki i wagę codziennie przez tydzień. Aplikacja zweryfikuje Twój cel i zaproponuje poprawki, jeśli Twoje realne zapotrzebowanie różni się od kalkulatora.",
+    "en": "Log meals and weight every day for a week. The app will verify your goal and suggest adjustments if your real needs differ from the calculator."
+  },
+  "moreProgressDaysWithData": {
+    "pl": "Postęp: {days}/7 dni z danymi",
+    "en": "Progress: {days}/7 days with data",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "moreBasedOnLast7Days": {
+    "pl": "Na podstawie ostatnich 7 dni:",
+    "en": "Based on the last 7 days:"
+  },
+  "moreAvgCaloriesPerDayBullet": {
+    "pl": "• Średnio: ~{calories} kcal/dzień",
+    "en": "• Average: ~{calories} kcal/day",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightStable": {
+    "pl": "stała",
+    "en": "stable"
+  },
+  "moreWeightIncrease": {
+    "pl": "wzrost (+{kg} kg)",
+    "en": "increase (+{kg} kg)",
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightDecrease": {
+    "pl": "spadek ({kg} kg)",
+    "en": "decrease ({kg} kg)",
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreWeightBullet": {
+    "pl": "• Waga: {change}",
+    "en": "• Weight: {change}",
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSaving": {
+    "pl": "Zapisywanie…",
+    "en": "Saving…"
+  },
+  "moreApplyCorrectedGoal": {
+    "pl": "Wprowadź poprawiony cel",
+    "en": "Apply corrected goal"
+  },
+  "moreGoalAligned": {
+    "pl": "Masz wystarczająco danych. Twój obecny cel jest zgodny z trendem – nie ma potrzeby korekty.",
+    "en": "You have enough data. Your current goal matches the trend – no adjustment needed."
+  },
+  "moreRealTdee": {
+    "pl": "Realne zapotrzebowanie: ~{calories} kcal",
+    "en": "Real needs: ~{calories} kcal",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGoalUpdated": {
+    "pl": "Cel zaktualizowany do ~{calories} kcal",
+    "en": "Goal updated to ~{calories} kcal",
+    "placeholders": {
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "moreErrorWithDetails": {
+    "pl": "Błąd: {error}",
+    "en": "Error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGoalHistoryReason": {
+    "pl": "Weryfikacja na podstawie danych z ostatniego tygodnia",
+    "en": "Verification based on last week’s data"
+  },
+  "moreDayMon": {
+    "pl": "Pon",
+    "en": "Mon"
+  },
+  "moreDayTue": {
+    "pl": "Wt",
+    "en": "Tue"
+  },
+  "moreDayWed": {
+    "pl": "Śr",
+    "en": "Wed"
+  },
+  "moreDayThu": {
+    "pl": "Czw",
+    "en": "Thu"
+  },
+  "moreDayFri": {
+    "pl": "Pt",
+    "en": "Fri"
+  },
+  "moreDaySat": {
+    "pl": "Sob",
+    "en": "Sat"
+  },
+  "moreDaySun": {
+    "pl": "Nie",
+    "en": "Sun"
+  },
+  "moreSuggestionWeightLossFlat": {
+    "pl": "Waga stała przy ~{avg} kcal. Twoje realne zapotrzebowanie to ~{real} kcal. Chcesz schudnąć? Spróbuj ~{corr} kcal.",
+    "en": "Weight stable at ~{avg} kcal. Your real needs are ~{real} kcal. Want to lose weight? Try ~{corr} kcal.",
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightLossDown": {
+    "pl": "Chudniesz przy ~{avg} kcal. Realne TDEE: ~{real} kcal. Sugerowany cel: ~{corr} kcal.",
+    "en": "You’re losing weight at ~{avg} kcal. Real TDEE: ~{real} kcal. Suggested goal: ~{corr} kcal.",
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightGainFlat": {
+    "pl": "Waga stała przy ~{avg} kcal. Twoje realne zapotrzebowanie to ~{real} kcal. Chcesz przytyć? Spróbuj ~{corr} kcal.",
+    "en": "Weight stable at ~{avg} kcal. Your real needs are ~{real} kcal. Want to gain weight? Try ~{corr} kcal.",
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionWeightGainUp": {
+    "pl": "Tyjesz przy ~{avg} kcal. Realne TDEE: ~{real} kcal. Sugerowany cel: ~{corr} kcal.",
+    "en": "You’re gaining weight at ~{avg} kcal. Real TDEE: ~{real} kcal. Suggested goal: ~{corr} kcal.",
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "real": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreSuggestionMaintain": {
+    "pl": "Realne zapotrzebowanie: ~{real} kcal (kalkulator: {calc} kcal). Cel: ~{corr} kcal.",
+    "en": "Real needs: ~{real} kcal (calculator: {calc} kcal). Goal: ~{corr} kcal.",
+    "placeholders": {
+      "real": {
+        "type": "String"
+      },
+      "calc": {
+        "type": "String"
+      },
+      "corr": {
+        "type": "String"
+      }
+    }
+  },
+  "moreBmiCalculatorTitle": {
+    "pl": "Kalkulator BMI",
+    "en": "BMI calculator"
+  },
+  "moreYourBmi": {
+    "pl": "Twoje BMI",
+    "en": "Your BMI"
+  },
+  "moreCalculatedBasedOn": {
+    "pl": "Obliczono na podstawie:",
+    "en": "Calculated based on:"
+  },
+  "moreCurrentWeightBullet": {
+    "pl": "• Aktualna waga: {weight} kg",
+    "en": "• Current weight: {weight} kg",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "moreHeightBullet": {
+    "pl": "• Wzrost: {height} cm",
+    "en": "• Height: {height} cm",
+    "placeholders": {
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "moreNormalBmiRangeHint": {
+    "pl": "Aby być w normie (BMI 18,5–24,9), dąż do wagi w przedziale od {minKg} do {maxKg} kg.",
+    "en": "To stay in the normal range (BMI 18.5–24.9), aim for a weight between {minKg} and {maxKg} kg.",
+    "placeholders": {
+      "minKg": {
+        "type": "String"
+      },
+      "maxKg": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCompleteProfileForBmi": {
+    "pl": "Uzupełnij profil (waga i wzrost), aby zobaczyć swoje BMI",
+    "en": "Complete your profile (weight and height) to see your BMI"
+  },
+  "moreBmiScale": {
+    "pl": "Skala BMI",
+    "en": "BMI scale"
+  },
+  "moreBmiUnderweight": {
+    "pl": "Niedowaga",
+    "en": "Underweight"
+  },
+  "moreBmiNormal": {
+    "pl": "Normalna",
+    "en": "Normal"
+  },
+  "moreBmiOverweight": {
+    "pl": "Nadwaga",
+    "en": "Overweight"
+  },
+  "moreBmiObesity1": {
+    "pl": "Otyłość I stopnia",
+    "en": "Obesity class I"
+  },
+  "moreBmiObesity2": {
+    "pl": "Otyłość II stopnia",
+    "en": "Obesity class II"
+  },
+  "moreBmiObesity3": {
+    "pl": "Otyłość III stopnia",
+    "en": "Obesity class III"
+  },
+  "moreBmiFormulaTitle": {
+    "pl": "Wzór BMI",
+    "en": "BMI formula"
+  },
+  "moreBmiFormula": {
+    "pl": "BMI = waga (kg) / wzrost (m)²",
+    "en": "BMI = weight (kg) / height (m)²"
+  },
+  "moreBmiExplanation": {
+    "pl": "BMI to wskaźnik masy ciała, który pomaga ocenić, czy waga jest odpowiednia do wzrostu.",
+    "en": "BMI is a body mass index that helps assess whether weight is appropriate for height."
+  },
+  "moreExportTitle": {
+    "pl": "Eksport danych",
+    "en": "Data export"
+  },
+  "moreExportDescription": {
+    "pl": "Wyeksportuj dane do pliku CSV (pełna lista) lub PDF (raport z ostatnich 30 dni). Otworzy się okno udostępniania.",
+    "en": "Export data to a CSV file (full list) or PDF (report for the last 30 days). A share sheet will open."
+  },
+  "moreExporting": {
+    "pl": "Eksportowanie...",
+    "en": "Exporting..."
+  },
+  "moreExportToCsv": {
+    "pl": "Eksportuj do CSV",
+    "en": "Export to CSV"
+  },
+  "moreExportToPdfPremium": {
+    "pl": "Eksportuj do PDF (Premium)",
+    "en": "Export to PDF (Premium)"
+  },
+  "moreExportPdfFeature": {
+    "pl": "Eksport do PDF",
+    "en": "PDF export"
+  },
+  "moreUserNotLoggedIn": {
+    "pl": "Użytkownik nie jest zalogowany",
+    "en": "User is not logged in"
+  },
+  "moreCsvCopiedClipboard": {
+    "pl": "Dane skopiowane do schowka. Wklej do Notatnika lub Excela i zapisz jako .csv",
+    "en": "Data copied to the clipboard. Paste into Notepad or Excel and save as .csv"
+  },
+  "moreCsvFileReady": {
+    "pl": "Plik CSV gotowy. Możesz go zapisać lub udostępnić.",
+    "en": "CSV file ready. You can save or share it."
+  },
+  "moreCsvClipboardFallback": {
+    "pl": "Dane wyeksportowane do schowka (CSV). Wklej je np. do Notatek i zapisz jako plik .csv",
+    "en": "Data exported to the clipboard (CSV). Paste it into Notes and save as a .csv file"
+  },
+  "moreCsvClipboardShort": {
+    "pl": "Dane wyeksportowane do schowka (CSV).",
+    "en": "Data exported to the clipboard (CSV)."
+  },
+  "moreExportFailed": {
+    "pl": "Nie udało się wyeksportować. Sprawdź połączenie i spróbuj ponownie.",
+    "en": "Export failed. Check your connection and try again."
+  },
+  "moreExportShareText": {
+    "pl": "Eksport danych Łatwa Forma",
+    "en": "Łatwa Forma data export"
+  },
+  "moreExportShareSubject": {
+    "pl": "Dane Łatwa Forma - {date}",
+    "en": "Łatwa Forma data - {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfReportShareText": {
+    "pl": "Raport Łatwa Forma",
+    "en": "Łatwa Forma report"
+  },
+  "morePdfReportShareSubject": {
+    "pl": "Raport Łatwa Forma - {date}",
+    "en": "Łatwa Forma report - {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfDownloaded": {
+    "pl": "PDF został pobrany. Sprawdź folder Pobrane.",
+    "en": "PDF downloaded. Check your Downloads folder."
+  },
+  "morePdfShareOrDownloadFailed": {
+    "pl": "Nie udało się udostępnić ani pobrać PDF. Spróbuj w przeglądarce Chrome lub wyeksportuj do CSV.",
+    "en": "Could not share or download the PDF. Try Chrome or export to CSV."
+  },
+  "morePdfShareFailed": {
+    "pl": "Nie udało się udostępnić PDF. Spróbuj wyeksportować do CSV.",
+    "en": "Could not share the PDF. Try exporting to CSV."
+  },
+  "morePdfFileReady": {
+    "pl": "Plik PDF gotowy. Możesz go zapisać lub udostępnić.",
+    "en": "PDF file ready. You can save or share it."
+  },
+  "morePdfExportFailedWithHint": {
+    "pl": "Eksport PDF nie powiódł się ({hint}). Spróbuj do CSV.",
+    "en": "PDF export failed ({hint}). Try CSV.",
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfExportFailed": {
+    "pl": "Eksport PDF nie powiódł się. Spróbuj ponownie lub wyeksportuj do CSV.",
+    "en": "PDF export failed. Try again or export to CSV."
+  },
+  "moreCsvSectionProfile": {
+    "pl": "=== PROFIL ===",
+    "en": "=== PROFILE ==="
+  },
+  "moreCsvHeaderTypeNameValue": {
+    "pl": "Typ,Nazwa,Wartość",
+    "en": "Type,Name,Value"
+  },
+  "moreCsvProfile": {
+    "pl": "Profil",
+    "en": "Profile"
+  },
+  "moreCsvGender": {
+    "pl": "Płeć",
+    "en": "Gender"
+  },
+  "moreGenderMale": {
+    "pl": "Mężczyzna",
+    "en": "Male"
+  },
+  "moreGenderFemale": {
+    "pl": "Kobieta",
+    "en": "Female"
+  },
+  "moreGenderOther": {
+    "pl": "Inna",
+    "en": "Other"
+  },
+  "moreCsvAge": {
+    "pl": "Wiek",
+    "en": "Age"
+  },
+  "moreCsvAgeYears": {
+    "pl": "{age} lat",
+    "en": "{age} years",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCsvHeight": {
+    "pl": "Wzrost",
+    "en": "Height"
+  },
+  "moreCsvCurrentWeight": {
+    "pl": "Aktualna waga",
+    "en": "Current weight"
+  },
+  "moreCsvTargetWeight": {
+    "pl": "Waga docelowa",
+    "en": "Target weight"
+  },
+  "moreCsvGoal": {
+    "pl": "Cel",
+    "en": "Goal"
+  },
+  "moreGoalWeightLoss": {
+    "pl": "Utrata wagi",
+    "en": "Weight loss"
+  },
+  "moreGoalWeightGain": {
+    "pl": "Przybranie wagi",
+    "en": "Weight gain"
+  },
+  "moreGoalMaintain": {
+    "pl": "Utrzymanie",
+    "en": "Maintenance"
+  },
+  "moreGoalMaintainWeight": {
+    "pl": "Utrzymanie wagi",
+    "en": "Weight maintenance"
+  },
+  "moreCsvCalorieGoal": {
+    "pl": "Cel kaloryczny",
+    "en": "Calorie goal"
+  },
+  "moreCsvProteinG": {
+    "pl": "Białko (g)",
+    "en": "Protein (g)"
+  },
+  "moreCsvFatG": {
+    "pl": "Tłuszcze (g)",
+    "en": "Fat (g)"
+  },
+  "moreCsvCarbsG": {
+    "pl": "Węglowodany (g)",
+    "en": "Carbohydrates (g)"
+  },
+  "moreCsvTargetDate": {
+    "pl": "Szacowany termin osiągnięcia celu",
+    "en": "Estimated goal date"
+  },
+  "moreCsvSectionDiary": {
+    "pl": "=== DANE DZIENNIKA ===",
+    "en": "=== DIARY DATA ==="
+  },
+  "moreCsvGarminNote": {
+    "pl": "# Dane aktywności mogą obejmować dane z urządzeń Garmin.",
+    "en": "# Activity data may include data from Garmin devices."
+  },
+  "moreCsvHeaderDiary": {
+    "pl": "Typ,Nazwa,Wartość,Data,Źródło danych",
+    "en": "Type,Name,Value,Date,Data source"
+  },
+  "moreCsvMeal": {
+    "pl": "Posiłek",
+    "en": "Meal"
+  },
+  "moreCsvActivity": {
+    "pl": "Aktywność",
+    "en": "Activity"
+  },
+  "moreCsvWeight": {
+    "pl": "Waga",
+    "en": "Weight"
+  },
+  "morePdfReportTitle": {
+    "pl": "Łatwa Forma – Raport",
+    "en": "Łatwa Forma – Report"
+  },
+  "morePdfPageFooter": {
+    "pl": "Strona {page} z {pages} • Wygenerowano {date}",
+    "en": "Page {page} of {pages} • Generated {date}",
+    "placeholders": {
+      "page": {
+        "type": "String"
+      },
+      "pages": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfProfileSummary": {
+    "pl": "Podsumowanie profilu",
+    "en": "Profile summary"
+  },
+  "morePdfProfileLine1": {
+    "pl": "Płeć: {gender} • Wiek: {age} lat • Wzrost: {height} cm",
+    "en": "Gender: {gender} • Age: {age} years • Height: {height} cm",
+    "placeholders": {
+      "gender": {
+        "type": "String"
+      },
+      "age": {
+        "type": "String"
+      },
+      "height": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfProfileLine2": {
+    "pl": "Waga: {weight} kg • Cel: {target} kg • Cel kaloryczny: {calories} kcal",
+    "en": "Weight: {weight} kg • Target: {target} kg • Calorie goal: {calories} kcal",
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      },
+      "calories": {
+        "type": "String"
+      }
+    }
+  },
+  "morePdfGoalWeightLoss": {
+    "pl": "Cel: Utrata wagi",
+    "en": "Goal: Weight loss"
+  },
+  "morePdfGoalWeightGain": {
+    "pl": "Cel: Przybranie wagi",
+    "en": "Goal: Weight gain"
+  },
+  "morePdfGoalMaintain": {
+    "pl": "Cel: Utrzymanie wagi",
+    "en": "Goal: Weight maintenance"
+  },
+  "morePdfNoProfile": {
+    "pl": "Brak profilu",
+    "en": "No profile"
+  },
+  "morePdfMealsLast30": {
+    "pl": "Ostatnie 30 dni – posiłki",
+    "en": "Last 30 days – meals"
+  },
+  "morePdfNoMeals": {
+    "pl": "Brak posiłków",
+    "en": "No meals"
+  },
+  "morePdfDate": {
+    "pl": "Data",
+    "en": "Date"
+  },
+  "morePdfName": {
+    "pl": "Nazwa",
+    "en": "Name"
+  },
+  "morePdfActivitiesLast30": {
+    "pl": "Ostatnie 30 dni – aktywności",
+    "en": "Last 30 days – activities"
+  },
+  "morePdfNoActivities": {
+    "pl": "Brak aktywności",
+    "en": "No activities"
+  },
+  "morePdfGarminAttribution": {
+    "pl": "Dane aktywności pochodzą z urządzeń Garmin.",
+    "en": "Activity data comes from Garmin devices."
+  },
+  "morePdfWeightHistory": {
+    "pl": "Historia wagi",
+    "en": "Weight history"
+  },
+  "morePdfNoMeasurements": {
+    "pl": "Brak pomiarów",
+    "en": "No measurements"
+  },
+  "morePdfWeightKg": {
+    "pl": "Waga (kg)",
+    "en": "Weight (kg)"
+  },
+  "moreNotificationsTitle": {
+    "pl": "Powiadomienia",
+    "en": "Notifications"
+  },
+  "moreWaterReminders": {
+    "pl": "Przypomnienia o wodzie",
+    "en": "Water reminders"
+  },
+  "moreMealReminders": {
+    "pl": "Przypomnienia o posiłkach",
+    "en": "Meal reminders"
+  },
+  "moreAdd": {
+    "pl": "Dodaj",
+    "en": "Add"
+  },
+  "moreMealBreakfast": {
+    "pl": "Śniadanie",
+    "en": "Breakfast"
+  },
+  "moreMealLunch": {
+    "pl": "Obiad",
+    "en": "Lunch"
+  },
+  "moreMealDinner": {
+    "pl": "Kolacja",
+    "en": "Dinner"
+  },
+  "moreMealSnack": {
+    "pl": "Przekąska",
+    "en": "Snack"
+  },
+  "moreMealDefault": {
+    "pl": "Posiłek",
+    "en": "Meal"
+  },
+  "moreNewMealReminder": {
+    "pl": "Nowe przypomnienie o posiłku",
+    "en": "New meal reminder"
+  },
+  "moreMealNameLabel": {
+    "pl": "Nazwa posiłku",
+    "en": "Meal name"
+  },
+  "moreMealNameHint": {
+    "pl": "np. Drugie śniadanie, Podwieczorek",
+    "en": "e.g. Second breakfast, Afternoon snack"
+  },
+  "moreEditReminder": {
+    "pl": "Edytuj przypomnienie",
+    "en": "Edit reminder"
+  },
+  "moreNotifWaterTitle": {
+    "pl": "Pamiętaj o wodzie! 💧",
+    "en": "Remember to drink water! 💧"
+  },
+  "moreNotifWaterBody": {
+    "pl": "Czas na szklankę wody",
+    "en": "Time for a glass of water"
+  },
+  "moreNotifWaterChannel": {
+    "pl": "Przypomnienia o wodzie",
+    "en": "Water reminders"
+  },
+  "moreNotifWaterChannelDesc": {
+    "pl": "Przypomnienia o piciu wody",
+    "en": "Reminders to drink water"
+  },
+  "moreNotifMealTitle": {
+    "pl": "Czas na {label}! 🍽️",
+    "en": "Time for {label}! 🍽️",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "moreNotifMealBody": {
+    "pl": "Nie zapomnij zarejestrować posiłku",
+    "en": "Don’t forget to log your meal"
+  },
+  "moreNotifMealChannel": {
+    "pl": "Przypomnienia o posiłkach",
+    "en": "Meal reminders"
+  },
+  "moreNotifMealChannelDesc": {
+    "pl": "Przypomnienia o rejestracji posiłków",
+    "en": "Reminders to log meals"
+  },
+  "moreIntegrationsTitle": {
+    "pl": "Integracje",
+    "en": "Integrations"
+  },
+  "moreLoginToFinishStrava": {
+    "pl": "Zaloguj się, aby dokończyć połączenie ze Strava",
+    "en": "Sign in to finish connecting Strava"
+  },
+  "moreLoginToFinishGarmin": {
+    "pl": "Zaloguj się, aby dokończyć połączenie z Garmin",
+    "en": "Sign in to finish connecting Garmin"
+  },
+  "moreStravaConnectedImported": {
+    "pl": "Strava połączona. Zaimportowano {count} aktywności.",
+    "en": "Strava connected. Imported {count} activities.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreStravaConnectedNoNew": {
+    "pl": "Strava połączona. Brak nowych aktywności do importu.",
+    "en": "Strava connected. No new activities to import."
+  },
+  "moreStravaConnectedSuccess": {
+    "pl": "Strava połączona pomyślnie",
+    "en": "Strava connected successfully"
+  },
+  "moreStravaSyncFailedLater": {
+    "pl": "Synchronizacja nie powiodła się. Kliknij „Synchronizuj aktywności” później.",
+    "en": "Sync failed. Tap “Sync activities” later."
+  },
+  "moreGarminSessionExpiredRetry": {
+    "pl": "Sesja wygasła. Spróbuj ponownie połączyć Garmin.",
+    "en": "Session expired. Try connecting Garmin again."
+  },
+  "moreGarminSessionRejected": {
+    "pl": "Sesja odrzucona: {message}. Wyloguj się, zaloguj ponownie i spróbuj połączyć Garmin.",
+    "en": "Session rejected: {message}. Sign out, sign back in, and try connecting Garmin.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminSessionExpiredRelogin": {
+    "pl": "Sesja wygasła. Wyloguj się i zaloguj ponownie do Łatwej Formy, potem kliknij „Połącz z Garmin Connect”.",
+    "en": "Session expired. Sign out and back into Łatwa Forma, then tap “Connect Garmin Connect”."
+  },
+  "moreConnectedSuccessfully": {
+    "pl": "Połączono pomyślnie!",
+    "en": "Connected successfully!"
+  },
+  "moreGarminSessionExpiredShort": {
+    "pl": "Sesja wygasła. Wyloguj się i zaloguj ponownie, potem połącz Garmin.",
+    "en": "Session expired. Sign out and back in, then connect Garmin."
+  },
+  "moreGarminError": {
+    "pl": "Błąd Garmin: {error}",
+    "en": "Garmin error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStravaEnvMissing": {
+    "pl": "Dodaj STRAVA_CLIENT_ID i STRAVA_CLIENT_SECRET do pliku .env",
+    "en": "Add STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET to the .env file"
+  },
+  "moreGarminEnvMissing": {
+    "pl": "Dodaj GARMIN_CLIENT_ID do env (po zatwierdzeniu programu).",
+    "en": "Add GARMIN_CLIENT_ID to env (after program approval)."
+  },
+  "moreLoginAgainForGarmin": {
+    "pl": "Zaloguj się ponownie, aby uzupełnić dane Garmin.",
+    "en": "Sign in again to complete Garmin data."
+  },
+  "moreCouldNotComplete": {
+    "pl": "Nie udało się: {message}",
+    "en": "Could not complete: {message}",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminNoUserId": {
+    "pl": "Garmin nie zwrócił User ID. Spróbuj odłączyć i połączyć ponownie.",
+    "en": "Garmin did not return a User ID. Try disconnecting and connecting again."
+  },
+  "moreGarminReceiveDataSaved": {
+    "pl": "Dane do odbierania aktywności zapisane. Nowe treningi z Garmin Connect będą się pojawiać w aplikacji.",
+    "en": "Activity receive data saved. New workouts from Garmin Connect will appear in the app."
+  },
+  "moreGarminDisconnectFailed": {
+    "pl": "Nie udało się wywołać odłączenia u Garmin: {error}",
+    "en": "Could not disconnect from Garmin: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreGarminDisconnectedTitle": {
+    "pl": "Garmin Connect odłączony",
+    "en": "Garmin Connect disconnected"
+  },
+  "moreGarminDisconnectedBody": {
+    "pl": "Połączenie z Garmin Connect zostało usunięte. Nowe aktywności nie będą już dodawane automatycznie. Możesz połączyć ponownie w dowolnym momencie.",
+    "en": "Your Garmin Connect link was removed. New activities will no longer be added automatically. You can reconnect anytime."
+  },
+  "moreStravaDisconnected": {
+    "pl": "Strava odłączona",
+    "en": "Strava disconnected"
+  },
+  "moreConnectStravaFirst": {
+    "pl": "Najpierw połącz konto Strava",
+    "en": "Connect your Strava account first"
+  },
+  "moreImportedFromStrava": {
+    "pl": "Zaimportowano {count} aktywności ze Strava",
+    "en": "Imported {count} activities from Strava",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moreNoNewActivities": {
+    "pl": "Brak nowych aktywności do importu",
+    "en": "No new activities to import"
+  },
+  "moreSyncError": {
+    "pl": "Błąd synchronizacji: {error}",
+    "en": "Sync error: {error}",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStravaImportDesc": {
+    "pl": "Importuj wszystkie aktywności i spalone kalorie",
+    "en": "Import all activities and calories burned"
+  },
+  "moreConnected": {
+    "pl": "Połączona",
+    "en": "Connected"
+  },
+  "moreSyncing": {
+    "pl": "Synchronizuję...",
+    "en": "Syncing..."
+  },
+  "moreSyncActivities": {
+    "pl": "Synchronizuj aktywności",
+    "en": "Sync activities"
+  },
+  "moreDisconnectStrava": {
+    "pl": "Odłącz Strava",
+    "en": "Disconnect Strava"
+  },
+  "moreConnecting": {
+    "pl": "Łączę...",
+    "en": "Connecting..."
+  },
+  "moreConnectStrava": {
+    "pl": "Połącz ze Strava",
+    "en": "Connect to Strava"
+  },
+  "moreGarminImportDesc": {
+    "pl": "Aktywności z Garmin dodawane automatycznie po synchronizacji z Garmin Connect",
+    "en": "Garmin activities are added automatically after syncing with Garmin Connect"
+  },
+  "moreGarminAutoImportInfo": {
+    "pl": "Wszystkie nowe aktywności z Garmin Connect są importowane do aplikacji. To Ty decydujesz, którą wliczyć do bilansu.",
+    "en": "All new activities from Garmin Connect are imported into the app. You decide which ones count toward your balance."
+  },
+  "moreGarminNeedUserId": {
+    "pl": "Żeby aktywności z Garmin pojawiały się w aplikacji, zapisz dane połączenia (ID Garmin).",
+    "en": "To show Garmin activities in the app, save the connection data (Garmin ID)."
+  },
+  "moreSavingShort": {
+    "pl": "Zapisuję...",
+    "en": "Saving..."
+  },
+  "moreCompleteActivityReceiveData": {
+    "pl": "Uzupełnij dane do odbierania aktywności",
+    "en": "Complete activity receive data"
+  },
+  "moreDisconnectGarmin": {
+    "pl": "Odłącz Garmin",
+    "en": "Disconnect Garmin"
+  },
+  "moreConnectGarmin": {
+    "pl": "Połącz z Garmin Connect",
+    "en": "Connect Garmin Connect"
+  },
+  "moreGarminDisconnectErrorStatus": {
+    "pl": "Błąd odłączania: {status}",
+    "en": "Disconnect error: {status}",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "moreErrorStatusCode": {
+    "pl": "Błąd {code}",
+    "en": "Error {code}",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "moreChallengesTitle": {
+    "pl": "Cele i wyzwania",
+    "en": "Goals and challenges"
+  },
+  "moreNoChallenges": {
+    "pl": "Brak celów i wyzwań",
+    "en": "No goals or challenges"
+  },
+  "moreNoChallengesHint": {
+    "pl": "Dodaj cel lub wyzwanie, aby śledzić swoje postępy",
+    "en": "Add a goal or challenge to track your progress"
+  },
+  "moreProgressPercent": {
+    "pl": "Postęp: {percent}%",
+    "en": "Progress: {percent}%",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "moreStartDate": {
+    "pl": "Start: {date}",
+    "en": "Start: {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreEndDate": {
+    "pl": "Koniec: {date}",
+    "en": "End: {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreDeleteChallengeTitle": {
+    "pl": "Usuń wyzwanie",
+    "en": "Delete challenge"
+  },
+  "moreDeleteChallengeConfirm": {
+    "pl": "Czy na pewno chcesz usunąć \"{title}\"?",
+    "en": "Are you sure you want to delete \"{title}\"?",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "moreChallengeDeleted": {
+    "pl": "Wyzwanie usunięte",
+    "en": "Challenge deleted"
+  },
+  "morePickStartDate": {
+    "pl": "Wybierz datę rozpoczęcia",
+    "en": "Pick a start date"
+  },
+  "morePickEndDate": {
+    "pl": "Wybierz datę zakończenia",
+    "en": "Pick an end date"
+  },
+  "morePick": {
+    "pl": "Wybierz",
+    "en": "Pick"
+  },
+  "moreChallengeAdded": {
+    "pl": "Wyzwanie dodane pomyślnie!",
+    "en": "Challenge added successfully!"
+  },
+  "moreTargetWeightKg": {
+    "pl": "Cel wagi (kg)",
+    "en": "Weight goal (kg)"
+  },
+  "moreCalorieDeficitKcal": {
+    "pl": "Deficyt kaloryczny (kcal)",
+    "en": "Calorie deficit (kcal)"
+  },
+  "moreWaterAmountMl": {
+    "pl": "Ilość wody (ml)",
+    "en": "Water amount (ml)"
+  },
+  "moreWorkoutCount": {
+    "pl": "Liczba treningów",
+    "en": "Number of workouts"
+  },
+  "moreStreakLengthDays": {
+    "pl": "Długość serii (dni)",
+    "en": "Streak length (days)"
+  },
+  "moreTargetValue": {
+    "pl": "Wartość docelowa",
+    "en": "Target value"
+  },
+  "moreAddChallenge": {
+    "pl": "Dodaj wyzwanie",
+    "en": "Add challenge"
+  },
+  "moreChallengeType": {
+    "pl": "Typ wyzwania",
+    "en": "Challenge type"
+  },
+  "moreCalorieDeficit": {
+    "pl": "Deficyt kaloryczny",
+    "en": "Calorie deficit"
+  },
+  "moreWater": {
+    "pl": "Woda",
+    "en": "Water"
+  },
+  "moreExercise": {
+    "pl": "Ćwiczenia",
+    "en": "Exercise"
+  },
+  "moreStreak": {
+    "pl": "Seria",
+    "en": "Streak"
+  },
+  "moreChallengeTitleLabel": {
+    "pl": "Tytuł wyzwania",
+    "en": "Challenge title"
+  },
+  "moreChallengeTitleHint": {
+    "pl": "np. Schudnij 5 kg",
+    "en": "e.g. Lose 5 kg"
+  },
+  "moreChallengeTitleRequired": {
+    "pl": "Podaj tytuł wyzwania",
+    "en": "Enter a challenge title"
+  },
+  "moreDescriptionOptional": {
+    "pl": "Opis (opcjonalnie)",
+    "en": "Description (optional)"
+  },
+  "moreChallengeDescHint": {
+    "pl": "Dodatkowe informacje o wyzwaniu",
+    "en": "Additional challenge details"
+  },
+  "moreOptional": {
+    "pl": "Opcjonalnie",
+    "en": "Optional"
+  },
+  "moreStartDateLabel": {
+    "pl": "Data rozpoczęcia",
+    "en": "Start date"
+  },
+  "moreSetEndDate": {
+    "pl": "Ustaw datę zakończenia",
+    "en": "Set an end date"
+  },
+  "moreEndDateLabel": {
+    "pl": "Data zakończenia",
+    "en": "End date"
+  },
+  "morePickDate": {
+    "pl": "Wybierz datę",
+    "en": "Pick a date"
+  },
+  "moreStreaksTitle": {
+    "pl": "Serie",
+    "en": "Streaks"
+  },
+  "moreNoStreaks": {
+    "pl": "Brak serii",
+    "en": "No streaks"
+  },
+  "moreNoStreaksHint": {
+    "pl": "Zacznij śledzić swoje nawyki, aby zobaczyć serie",
+    "en": "Start tracking your habits to see streaks"
+  },
+  "moreLastTime": {
+    "pl": "Ostatni raz: {date}",
+    "en": "Last time: {date}",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCurrentStreak": {
+    "pl": "Aktualna seria",
+    "en": "Current streak"
+  },
+  "moreLongestStreak": {
+    "pl": "Najdłuższa seria",
+    "en": "Longest streak"
+  },
+  "moreStreakMeals": {
+    "pl": "Posiłki",
+    "en": "Meals"
+  },
+  "moreStreakActivities": {
+    "pl": "Aktywności",
+    "en": "Activities"
+  },
+  "moreStreakWeight": {
+    "pl": "Waga",
+    "en": "Weight"
+  },
+  "moreAiAdviceTitle": {
+    "pl": "Porada AI",
+    "en": "AI advice"
+  },
+  "moreAiLimitReachedPremium": {
+    "pl": "Wykorzystałeś dzisiejszy limit ({limit} zapytań). Spróbuj jutro.",
+    "en": "You’ve used today’s limit ({limit} queries). Try again tomorrow.",
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiLimitReachedFree": {
+    "pl": "Wykorzystałeś dzisiejszy limit ({limit} zapytań). Spróbuj jutro lub przejdź na Premium.",
+    "en": "You’ve used today’s limit ({limit} queries). Try again tomorrow or upgrade to Premium.",
+    "placeholders": {
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiNeedsConnection": {
+    "pl": "Porada AI wymaga połączenia z aplikacją (Supabase) lub klucza OpenAI w konfiguracji.",
+    "en": "AI advice requires an app connection (Supabase) or an OpenAI key in the configuration."
+  },
+  "moreAiNoResponse": {
+    "pl": "Nie udało się uzyskać odpowiedzi. Spróbuj ponownie.",
+    "en": "Could not get a response. Please try again."
+  },
+  "moreAiRemainingToday": {
+    "pl": "Pozostało zapytań dziś: {remaining} / {limit}",
+    "en": "Queries left today: {remaining} / {limit}",
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiRemainingTodayPremium": {
+    "pl": "Pozostało zapytań dziś: {remaining} / {limit} (Premium)",
+    "en": "Queries left today: {remaining} / {limit} (Premium)",
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "moreAiIntro": {
+    "pl": "Zapytaj o poradę w zakresie diety, odżywiania lub aktywności fizycznej. Odpowiedź generuje AI i nie zastępuje konsultacji z lekarzem.",
+    "en": "Ask for advice on diet, nutrition, or physical activity. The answer is generated by AI and does not replace advice from a doctor."
+  },
+  "moreAiHint": {
+    "pl": "np. Ile białka potrzebuję przy treningu siłowym?",
+    "en": "e.g. How much protein do I need for strength training?"
+  },
+  "moreAiAnswer": {
+    "pl": "Odpowiedź",
+    "en": "Answer"
+  }
+}

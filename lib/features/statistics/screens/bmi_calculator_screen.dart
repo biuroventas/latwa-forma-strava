@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/utils/calculations.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../weight/screens/weight_tracking_screen.dart';
@@ -11,6 +12,7 @@ class BMICalculatorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     double? bmi;
     String? category;
     Color? categoryColor;
@@ -23,13 +25,13 @@ class BMICalculatorScreen extends ConsumerWidget {
         weightKg: weight,
         heightCm: height,
       );
-      category = _getBMICategory(bmi);
+      category = _getBMICategory(l10n, bmi);
       categoryColor = _getBMIColor(bmi);
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kalkulator BMI'),
+        title: Text(l10n.moreBmiCalculatorTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -45,7 +47,7 @@ class BMICalculatorScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        'Twoje BMI',
+                        l10n.moreYourBmi,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -85,18 +87,18 @@ class BMICalculatorScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Obliczono na podstawie:',
+                              l10n.moreCalculatedBasedOn,
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '• Aktualna waga: ${weight.toStringAsFixed(1)} kg',
+                              l10n.moreCurrentWeightBullet(weight: weight.toStringAsFixed(1)),
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                             Text(
-                              '• Wzrost: ${height.toStringAsFixed(0)} cm',
+                              l10n.moreHeightBullet(height: height.toStringAsFixed(0)),
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                             const SizedBox(height: 12),
@@ -104,7 +106,10 @@ class BMICalculatorScreen extends ConsumerWidget {
                               builder: (ctx) {
                                 final (minKg, maxKg) = Calculations.weightRangeForNormalBMI(height);
                                 return Text(
-                                  'Aby być w normie (BMI 18,5–24,9), dąż do wagi w przedziale od ${minKg.toStringAsFixed(1)} do ${maxKg.toStringAsFixed(1)} kg.',
+                                  ctx.l10n.moreNormalBmiRangeHint(
+                                    minKg: minKg.toStringAsFixed(1),
+                                    maxKg: maxKg.toStringAsFixed(1),
+                                  ),
                                   style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -124,7 +129,7 @@ class BMICalculatorScreen extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Uzupełnij profil (waga i wzrost), aby zobaczyć swoje BMI',
+                    l10n.moreCompleteProfileForBmi,
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   ),
@@ -133,18 +138,18 @@ class BMICalculatorScreen extends ConsumerWidget {
               const SizedBox(height: 24),
             ],
             Text(
-              'Skala BMI',
+              l10n.moreBmiScale,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 16),
-            _buildBMIRange(context, 'Niedowaga', '< 18.5', Colors.blue),
-            _buildBMIRange(context, 'Normalna', '18.5 - 24.9', Colors.green),
-            _buildBMIRange(context, 'Nadwaga', '25.0 - 29.9', Colors.orange),
-            _buildBMIRange(context, 'Otyłość I stopnia', '30.0 - 34.9', Colors.red),
-            _buildBMIRange(context, 'Otyłość II stopnia', '35.0 - 39.9', Colors.red.shade700),
-            _buildBMIRange(context, 'Otyłość III stopnia', '≥ 40.0', Colors.red.shade900),
+            _buildBMIRange(context, l10n.moreBmiUnderweight, '< 18.5', Colors.blue),
+            _buildBMIRange(context, l10n.moreBmiNormal, '18.5 - 24.9', Colors.green),
+            _buildBMIRange(context, l10n.moreBmiOverweight, '25.0 - 29.9', Colors.orange),
+            _buildBMIRange(context, l10n.moreBmiObesity1, '30.0 - 34.9', Colors.red),
+            _buildBMIRange(context, l10n.moreBmiObesity2, '35.0 - 39.9', Colors.red.shade700),
+            _buildBMIRange(context, l10n.moreBmiObesity3, '≥ 40.0', Colors.red.shade900),
             const SizedBox(height: 24),
             Card(
               color: Theme.of(context).colorScheme.primaryContainer,
@@ -154,19 +159,19 @@ class BMICalculatorScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Wzór BMI',
+                      l10n.moreBmiFormulaTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'BMI = waga (kg) / wzrost (m)²',
+                      l10n.moreBmiFormula,
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'BMI to wskaźnik masy ciała, który pomaga ocenić, czy waga jest odpowiednia do wzrostu.',
+                      l10n.moreBmiExplanation,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -203,13 +208,13 @@ class BMICalculatorScreen extends ConsumerWidget {
     );
   }
 
-  String _getBMICategory(double bmi) {
-    if (bmi < 18.5) return 'Niedowaga';
-    if (bmi < 25) return 'Normalna';
-    if (bmi < 30) return 'Nadwaga';
-    if (bmi < 35) return 'Otyłość I stopnia';
-    if (bmi < 40) return 'Otyłość II stopnia';
-    return 'Otyłość III stopnia';
+  String _getBMICategory(AppLocalizations l10n, double bmi) {
+    if (bmi < 18.5) return l10n.moreBmiUnderweight;
+    if (bmi < 25) return l10n.moreBmiNormal;
+    if (bmi < 30) return l10n.moreBmiOverweight;
+    if (bmi < 35) return l10n.moreBmiObesity1;
+    if (bmi < 40) return l10n.moreBmiObesity2;
+    return l10n.moreBmiObesity3;
   }
 
   Color _getBMIColor(double bmi) {

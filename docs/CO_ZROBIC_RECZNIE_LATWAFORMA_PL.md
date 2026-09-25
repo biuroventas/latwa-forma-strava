@@ -63,7 +63,7 @@ Obecnie **latwaforma.pl** może być ustawione w DNS na hosting OVH (strona z pr
 ## Podsumowanie
 
 | Krok | Gdzie | Co zrobić |
-|------|--------|-----------|
+| --- | --- | --- |
 | 1 | Netlify | Dodać domenę **latwaforma.pl** w Domain settings. |
 | 2 | OVH (DNS) | Ustawić **latwaforma.pl** (rekord A lub CNAME) na adres z Netlify. |
 | 3 | Supabase | Site URL i Redirect URLs ustawić na **https://latwaforma.pl** (i latwaforma.pl/**). |

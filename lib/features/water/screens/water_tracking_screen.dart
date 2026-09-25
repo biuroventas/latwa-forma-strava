@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/config/supabase_config.dart';
+import '../../../core/guest/guest_trial.dart';
 import '../../../shared/services/supabase_service.dart';
 import '../../../shared/models/water_log.dart';
 import '../../../shared/widgets/delete_confirmation_dialog.dart';
@@ -53,7 +55,13 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     if (!_isToday) return;
     try {
       final userId = SupabaseConfig.auth.currentUser?.id;
-      if (userId == null) throw Exception('Użytkownik nie jest zalogowany');
+      if (userId == null) {
+        throw Exception(
+          context == null
+              ? 'User not logged in'
+              : context.l10n.trackUserNotLoggedIn,
+        );
+      }
 
       final waterLog = WaterLog(
         userId: userId,
@@ -71,14 +79,15 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
 
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Dodano ${amount.toStringAsFixed(0)} ml wody')),
+          SnackBar(content: Text(context.l10n.trackAddedWaterMl(amount: amount.toStringAsFixed(0)))),
         );
       }
     } catch (e) {
+      if (e is GuestTrialEndedException) return;
       if (context != null && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Błąd podczas dodawania wody: $e'),
+            content: Text(context.l10n.trackAddWaterError(error: '$e')),
             backgroundColor: Colors.red,
           ),
         );
@@ -100,14 +109,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
       ref.invalidate(dashboardDataProvider(_displayedDate));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Zaktualizowano: ${newAmount.toStringAsFixed(0)} ml')),
+          SnackBar(content: Text(context.l10n.trackUpdatedAmountMl(amount: newAmount.toStringAsFixed(0)))),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Błąd podczas aktualizacji: $e'),
+            content: Text(context.l10n.trackUpdateError(error: '$e')),
             backgroundColor: Colors.red,
           ),
         );
@@ -118,8 +127,8 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
   Future<void> _deleteWater(WidgetRef ref, WaterLog log) async {
     final confirmed = await DeleteConfirmationDialog.show(
       context,
-      title: 'Usuń wpis',
-      content: 'Czy na pewno chcesz usunąć wpis ${log.amountMl.toStringAsFixed(0)} ml?',
+      title: context.l10n.trackDeleteEntryTitle,
+      content: context.l10n.trackDeleteWaterConfirm(amount: log.amountMl.toStringAsFixed(0)),
     );
     if (!confirmed || !mounted) return;
     try {
@@ -130,14 +139,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
       ref.invalidate(dashboardDataProvider(_displayedDate));
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Wpis usunięty')),
+          SnackBar(content: Text(context.l10n.trackEntryDeleted)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Błąd podczas usuwania: $e'),
+            content: Text(context.l10n.trackDeleteError(error: '$e')),
             backgroundColor: Colors.red,
           ),
         );
@@ -150,12 +159,12 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edytuj ilość'),
+        title: Text(context.l10n.trackEditAmount),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Ilość (ml)',
-            hintText: '1–5000 ml',
+          decoration: InputDecoration(
+            labelText: context.l10n.trackAmountMl,
+            hintText: context.l10n.trackAmountMlHintRange,
           ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           autofocus: true,
@@ -163,7 +172,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -173,14 +182,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                 _updateWater(ref, log, amount);
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Ilość musi być od 1 do 5000 ml'),
+                  SnackBar(
+                    content: Text(context.l10n.trackAmountMustBeRange),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: const Text('Zapisz'),
+            child: Text(context.l10n.commonSave),
           ),
         ],
       ),
@@ -192,17 +201,17 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Dodaj wodę'),
+        title: Text(context.l10n.trackAddWater),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Ilość (ml)',
-                hintText: 'np. 250',
-                helperText: 'Maksymalnie 5000 ml na jeden wpis',
+              decoration: InputDecoration(
+                labelText: context.l10n.trackAmountMl,
+                hintText: context.l10n.trackAmountMlHintExample,
+                helperText: context.l10n.trackMax5000Helper,
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               autofocus: true,
@@ -212,7 +221,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -222,21 +231,21 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                 _addWater(ref, context, amount);
               } else if (amount != null && amount > 5000) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Maksymalna ilość to 5000 ml na wpis'),
+                  SnackBar(
+                    content: Text(context.l10n.trackMaxAmountPerEntry),
                     backgroundColor: Colors.red,
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Podaj ilość od 1 do 5000 ml'),
+                  SnackBar(
+                    content: Text(context.l10n.trackEnterAmountRange),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: const Text('Dodaj'),
+            child: Text(context.l10n.trackAdd),
           ),
         ],
       ),
@@ -251,17 +260,17 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
     final value = await showDialog<double>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Cel dzienny picia wody'),
+        title: Text(context.l10n.trackDailyWaterGoal),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: controller,
-              decoration: const InputDecoration(
-                labelText: 'Cel (ml)',
-                hintText: 'np. 2000',
-                helperText: 'Zalecane jest min. 2l',
+              decoration: InputDecoration(
+                labelText: context.l10n.trackGoalMl,
+                hintText: context.l10n.trackGoalHintExample,
+                helperText: context.l10n.trackRecommendedMin2l,
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               autofocus: true,
@@ -271,7 +280,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Anuluj'),
+            child: Text(context.l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -280,14 +289,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                 Navigator.of(ctx).pop(v);
               } else {
                 ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(
-                    content: Text('Podaj wartość od 500 do 10000 ml'),
+                  SnackBar(
+                    content: Text(context.l10n.trackGoalMustBeRange),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: const Text('Zapisz'),
+            child: Text(context.l10n.commonSave),
           ),
         ],
       ),
@@ -300,13 +309,13 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
       ref.invalidate(profileProvider);
       ref.invalidate(dashboardDataProvider(DateTime.now()));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cel wody zaktualizowany')),
+        SnackBar(content: Text(context.l10n.trackWaterGoalUpdated)),
       );
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Błąd: $e'),
+          content: Text(context.l10n.trackErrorWithDetails(error: '$e')),
           backgroundColor: Colors.red,
         ),
       );
@@ -332,11 +341,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Wróć do dashboardu',
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
+        leading: context.canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: context.l10n.trackBackToDashboard,
+                onPressed: () => context.pop(),
+              )
+            : null,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -364,7 +376,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                       );
                       if (picked != null && mounted) setState(() => _displayedDate = picked);
                     },
-                    child: Text(_isToday ? 'Woda – Dzisiaj' : 'Woda – ${_formatDate(_displayedDate)}'),
+                    child: Text(_isToday ? context.l10n.trackWaterToday : context.l10n.trackWaterOnDate(date: _formatDate(_displayedDate))),
                   ),
                 ),
               ),
@@ -385,7 +397,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
             padding: const EdgeInsets.only(right: 8),
             child: IconButton(
               icon: const Icon(Icons.edit),
-              tooltip: 'Zmień cel dzienny picia wody',
+              tooltip: context.l10n.trackChangeDailyWaterGoal,
               onPressed: () => _showEditGoalDialog(context, ref, waterGoal),
               style: IconButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -438,14 +450,14 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Każda kropla się liczy!',
+                            context.l10n.trackEveryDropCounts,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
                           Text(
-                            'Nawodnienie to podstawa formy.',
+                            context.l10n.trackHydrationBasics,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context).colorScheme.onSurface,
                                 ),
@@ -498,7 +510,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                           );
                         },
                         loading: () => const SizedBox(height: 40, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                        error: (error, stackTrace) => Text('Błąd: $error', style: Theme.of(context).textTheme.bodySmall),
+                        error: (error, stackTrace) => Text(context.l10n.trackErrorWithDetails(error: '$error'), style: Theme.of(context).textTheme.bodySmall),
                       ),
                     ],
                   ),
@@ -517,7 +529,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                     _buildWaterChip(context, ref, 500),
                     ActionChip(
                       avatar: Icon(Icons.add, size: 16, color: Theme.of(context).colorScheme.primary),
-                      label: const Text('Własna'),
+                      label: Text(context.l10n.trackCustomAmount),
                       onPressed: () => _showCustomAmountDialog(context, ref),
                     ),
                   ],
@@ -526,7 +538,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8, bottom: 4),
                   child: Text(
-                    'Przegląd – edycja i usuwanie możliwe. Dodawanie tylko na dzisiaj.',
+                    context.l10n.trackWaterHistoryHint,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -534,7 +546,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                 ),
               const SizedBox(height: 12),
               Text(
-                'Wpisy',
+                context.l10n.trackEntries,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -546,7 +558,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Text(
-                        _isToday ? 'Brak wpisów' : 'Brak wpisów',
+                        context.l10n.trackNoEntries,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
@@ -581,7 +593,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                                     padding: const EdgeInsets.all(6),
                                     minimumSize: const Size(36, 36),
                                   ),
-                                  tooltip: 'Edytuj',
+                                  tooltip: context.l10n.trackEdit,
                                   onPressed: () => _showEditDialog(context, ref, log),
                                 ),
                                 IconButton(
@@ -590,7 +602,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                                     padding: const EdgeInsets.all(6),
                                     minimumSize: const Size(36, 36),
                                   ),
-                                  tooltip: 'Usuń',
+                                  tooltip: context.l10n.commonDelete,
                                   onPressed: () => _deleteWater(ref, log),
                                 ),
                               ],
@@ -607,7 +619,7 @@ class _WaterTrackingScreenState extends ConsumerState<WaterTrackingScreen> {
                 ),
                 error: (error, stackTrace) => Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('Błąd: $error', style: Theme.of(context).textTheme.bodySmall),
+                  child: Text(context.l10n.trackErrorWithDetails(error: '$error'), style: Theme.of(context).textTheme.bodySmall),
                 ),
               ),
             ],

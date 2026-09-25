@@ -3,6 +3,7 @@
 Poniżej masz **konkretne kroki**, co po kolei zrobić, żeby płatności Stripe działały w Łatwej Formie. Wystarczy iść od punktu 1 do końca.
 
 **Kolejność od zera:**  
+
 1) Stripe: konto → produkt + 2 ceny → API key → webhook → signing secret  
 2) Supabase: 6 sekretów (klucze i URLe)  
 3) Terminal: `supabase functions deploy` (3 funkcje)  
@@ -13,40 +14,46 @@ Poniżej masz **konkretne kroki**, co po kolei zrobić, żeby płatności Stripe
 ## CZĘŚĆ 1: Konto i produkt w Stripe
 
 ### Krok 1. Załóż konto Stripe
+
 - Wejdź na **https://stripe.com**
 - Kliknij **„Zarejestruj się”** (lub „Sign up”).
 - Wypełnij e-mail, hasło i załóż konto. Na start możesz używać **trybu testowego** (testowe płatności, bez prawdziwych pieniędzy).
 
 ### Krok 2. Wejdź w panel Stripe
+
 - Zaloguj się na **https://dashboard.stripe.com**
 - U góry strony upewnij się, że masz włączony **„Tryb testowy”** (przełącznik „Test mode” / „Tryb testowy”). Na początek zostaw go włączony.
 
 ### Krok 3. Utwórz produkt (Premium) z dwoma cennikami
-W aplikacji są dwie opcje: **69,98 zł / miesiąc** oraz **194,95 zł / rok**. W Stripe musisz mieć jeden produkt z **dwoma cennikami**.
+
+W aplikacji są dwie opcje: **69,99 zł / miesiąc** oraz **194,99 zł / rok**. W Stripe musisz mieć jeden produkt z **dwoma cennikami**.
 
 - W lewym menu kliknij **„Produkty”** („Products”).
 - Kliknij **„+ Dodaj produkt”** („+ Add product”).
 - **Nazwa produktu:** wpisz **„Łatwa Forma Premium”**.
 - **Opis:** np. „Subskrypcja Premium – nieograniczona porada AI, eksport PDF i inne”.
 - **Pierwszy cennik (miesięczny):**
-  - W sekcji **„Cennik”** wybierz **„Recurring”** (cykliczne), **69,98** PLN, **Miesięcznie** (Monthly).
+  - W sekcji **„Cennik”** wybierz **„Recurring”** (cykliczne), **69,99** PLN, **Miesięcznie** (Monthly).
   - Zapisz produkt („Add product” / „Save product”).
 - **Drugi cennik (roczny subskrypcja):**  
-  Po zapisaniu produktu wejdź w ten produkt, w sekcji **„Cennik”** kliknij **„Dodaj kolejną cenę”** („Add another price”). Ustaw **194,95** PLN, **Recurring**, **Rocznie** (Yearly). Zapisz.
+  Po zapisaniu produktu wejdź w ten produkt, w sekcji **„Cennik”** kliknij **„Dodaj kolejną cenę”** („Add another price”). Ustaw **194,99** PLN, **Recurring**, **Rocznie** (Yearly). Zapisz.
 - **Trzeci cennik (rok jednorazowo – BLIK):**  
-  W tym samym produkcie kliknij **„Dodaj kolejną cenę”**. Ustaw **194,95** PLN, **One time** (jednorazowa), waluta PLN. Zapisz – ta cena jest używana przy opcji „Rocznie (jednorazowo)” z BLIKiem.
+  W tym samym produkcie kliknij **„Dodaj kolejną cenę”**. Ustaw **194,99** PLN, **One time** (jednorazowa), waluta PLN. Zapisz – ta cena jest używana przy opcji „Rocznie (jednorazowo)” z BLIKiem.
 
 ### Krok 4. Skopiuj trzy Price ID
+
 - W karcie produktu „Łatwa Forma Premium” zobaczysz **trzy cenniki**.
-- **Miesięczny (recurring):** kliknij w cenę 69,98 zł / miesiąc. Na górze skopiuj **Price ID** (np. `price_1ABC...`). Zapisz jako **„Price ID miesięczny”**.
-- **Roczny (recurring):** kliknij w cenę 194,95 zł / rok (subskrypcja). Skopiuj **Price ID**. Zapisz jako **„Price ID roczny”**.
-- **Roczny jednorazowo:** kliknij w cenę 194,95 zł **One time**. Skopiuj **Price ID**. Zapisz jako **„Price ID roczny jednorazowo”** (do BLIK).
+- **Miesięczny (recurring):** kliknij w cenę 69,99 zł / miesiąc. Na górze skopiuj **Price ID** (np. `price_1ABC...`). Zapisz jako **„Price ID miesięczny”**.
+- **Roczny (recurring):** kliknij w cenę 194,99 zł / rok (subskrypcja). Skopiuj **Price ID**. Zapisz jako **„Price ID roczny”**.
+- **Roczny jednorazowo:** kliknij w cenę 194,99 zł **One time**. Skopiuj **Price ID**. Zapisz jako **„Price ID roczny jednorazowo”** (do BLIK).
 
 ### Krok 4a. Metody płatności (karta, BLIK, Apple Pay, Google Pay)
+
 - W Stripe w lewym menu: **Settings** (Ustawienia) → **Payment methods** (Metody płatności).
 - Włącz: **Cards** (Visa, Mastercard itd.), **BLIK**, **Apple Pay**, **Google Pay**. BLIK będzie dostępny przy płatności „Rocznie (jednorazowo)” w aplikacji.
 
 ### Krok 5. Skopiuj Secret key (klucz API)
+
 - W lewym menu Stripe kliknij **„Developers”** („Programiści”), potem **„API keys”** („Klucze API”).
 - Zobaczysz dwa klucze: **Publishable key** (zaczyna się od `pk_`) i **Secret key** (zaczyna się od `sk_test_` w trybie testowym).
 - Przy **Secret key** kliknij **„Reveal”** („Pokaż”), żeby zobaczyć cały klucz.
@@ -57,6 +64,7 @@ W aplikacji są dwie opcje: **69,98 zł / miesiąc** oraz **194,95 zł / rok**. 
 ## CZĘŚĆ 2: Webhook w Stripe (żeby Stripe „powiedział” Supabase, że ktoś zapłacił)
 
 ### Krok 6. Znajdź adres URL swojego projektu Supabase
+
 - Wejdź na **https://supabase.com** i zaloguj się.
 - Otwórz **swój projekt** (Łatwa Forma).
 - W lewym menu kliknij **ikonę zębatki** (Settings) → **„API”**.
@@ -64,21 +72,27 @@ W aplikacji są dwie opcje: **69,98 zł / miesiąc** oraz **194,95 zł / rok**. 
 - **Skopiuj tylko tę część:** `abcdefghijk` (ciąg liter/cyfr przed `.supabase.co`). To jest **Project REF** (identyfikator projektu). Zapisz w Notatniku.
 
 ### Krok 7. Dodaj endpoint webhooka w Stripe
+
 - Wróć do Stripe: **Developers** → **„Webhooks”** (w lewym menu).
 - Kliknij **„Add endpoint”** („Dodaj endpoint”).
 - W polu **„Endpoint URL”** wklej (zamień `TWOJ_PROJECT_REF` na to, co skopiowałeś w kroku 6):
+
   ```
   https://TWOJ_PROJECT_REF.supabase.co/functions/v1/stripe-webhook
   ```
+
   Przykład: jeśli Project REF to `tslsayftpegpliihfmyg`, adres będzie:
+
   ```
   https://tslsayftpegpliihfmyg.supabase.co/functions/v1/stripe-webhook
   ```
+
 - W sekcji **„Events to send”** („Zdarzenia do wysłania”) kliknij **„Select events”**.
 - Wyszukaj i **zaznacz jedno zdarzenie:** **`checkout.session.completed`**.
 - Kliknij **„Add endpoint”**.
 
 ### Krok 8. Skopiuj Signing secret webhooka
+
 - Na liście webhooków zobaczysz nowy endpoint. **Kliknij w niego** (w adres URL albo w nazwę).
 - W sekcji **„Signing secret”** kliknij **„Reveal”** („Pokaż”).
 - **Skopiuj cały Signing secret** (zaczyna się od `whsec_...`) i **zapisz w Notatniku** – będzie potrzebny w Supabase.
@@ -88,23 +102,25 @@ W aplikacji są dwie opcje: **69,98 zł / miesiąc** oraz **194,95 zł / rok**. 
 ## CZĘŚĆ 3: Ustawienie „sekretów” w Supabase (żeby funkcje mogły rozmawiać ze Stripe)
 
 ### Krok 9. Wejdź w ustawienia Edge Functions w Supabase
+
 - W Supabase (twój projekt) w lewym menu kliknij **„Edge Functions”**.
 - U góry przejdź do zakładki **„Secrets”** („Sekrety”) albo **„Manage secrets”**.
 
 (Jeśli nie widzisz „Secrets”, możesz ustawić je przez **Project Settings** → **Edge Functions** → sekcja z zmiennymi środowiskowymi / secrets.)
 
 ### Krok 10. Dodaj każdy sekret po kolei
+
 Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new secret”**, wpisz **nazwę** i **wartość**, zapisz.
 
-| Nr | Nazwa (Name)                             | Wartość (Value) – skąd wziąć                          |
-|----|------------------------------------------|--------------------------------------------------------|
-| 1  | `STRIPE_SECRET_KEY`                      | Wklej **Secret key** z kroku 5 (sk_test_...)          |
-| 2  | `STRIPE_PREMIUM_PRICE_MONTHLY`           | Wklej **Price ID miesięczny** z kroku 4 (price_...)    |
-| 3  | `STRIPE_PREMIUM_PRICE_YEARLY`            | Wklej **Price ID roczny** (subskrypcja) z kroku 4     |
-| 4  | `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME`   | Wklej **Price ID roczny jednorazowo** z kroku 4 (BLIK)|
-| 5  | `STRIPE_WEBHOOK_SECRET`                  | Wklej **Signing secret** z kroku 8 (whsec_...)        |
-| 6  | `STRIPE_SUCCESS_URL`                     | Adres strony po udanej płatności, np. `https://twojastrona.pl/dziekujemy` albo na test: `https://example.com/success` |
-| 7  | `STRIPE_CANCEL_URL`                      | Adres po anulowaniu, np. `https://twojastrona.pl/anulowano` albo na test: `https://example.com/cancel` |
+| Nr | Nazwa (Name) | Wartość (Value) – skąd wziąć |
+| --- | --- | --- |
+| 1 | `STRIPE_SECRET_KEY` | Wklej **Secret key** z kroku 5 (sk_test_...) |
+| 2 | `STRIPE_PREMIUM_PRICE_MONTHLY` | Wklej **Price ID miesięczny** z kroku 4 (price_...) |
+| 3 | `STRIPE_PREMIUM_PRICE_YEARLY` | Wklej **Price ID roczny** (subskrypcja) z kroku 4 |
+| 4 | `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | Wklej **Price ID roczny jednorazowo** z kroku 4 (BLIK) |
+| 5 | `STRIPE_WEBHOOK_SECRET` | Wklej **Signing secret** z kroku 8 (whsec_...) |
+| 6 | `STRIPE_SUCCESS_URL` | Adres strony po udanej płatności, np. `https://twojastrona.pl/dziekujemy` albo na test: `https://example.com/success` |
+| 7 | `STRIPE_CANCEL_URL` | Adres po anulowaniu, np. `https://twojastrona.pl/anulowano` albo na test: `https://example.com/cancel` |
 
 **Uwaga:** Nazwy wpisuj **dokładnie** tak jak w tabeli (wielkie litery, podkreślniki). Wartości wklejaj bez spacji na początku i końcu.
 
@@ -113,6 +129,7 @@ Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new
 ## CZĘŚĆ 4: Wgranie funkcji na Supabase (deploy)
 
 ### Krok 11. Zainstaluj Supabase CLI (jeśli jeszcze go nie masz)
+
 - Na komputerze otwórz **terminal** (lub „Wiersz poleceń” / PowerShell).
 - Wpisz (lub wklej) i naciśnij Enter:
   - **Windows (PowerShell):**  
@@ -122,11 +139,13 @@ Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new
 - Jeśli coś się nie instaluje, wejdź na **https://supabase.com/docs/guides/cli** i wybierz swoją platformę – tam są aktualne komendy.
 
 ### Krok 12. Zaloguj się w Supabase z terminala
+
 - W terminalu wpisz:  
   `supabase login`  
 - Naciśnij Enter. Otworzy się przeglądarka – zaloguj się do Supabase i potwierdź dostęp. Potem wróć do terminala.
 
 ### Krok 13. Połącz terminal z Twoim projektem
+
 - W terminalu przejdź do **folderu z projektem Łatwa Forma** (tam, gdzie masz pliki aplikacji). Np.:
   `cd "ścieżka\do\Latwa_Forma"`
 - Wpisz:  
@@ -135,6 +154,7 @@ Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new
 - Gdy zapyta o hasło, wpisz hasło do projektu z Supabase (jeśli je ustawiałeś).
 
 ### Krok 14. Wgraj trzy funkcje
+
 - W terminalu, w folderze projektu, wpisz po kolei (po każdej naciśnij Enter i poczekaj na „Deployed”):
 
   ```
@@ -154,6 +174,7 @@ Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new
 ## CZĘŚĆ 5: Baza danych (kolumny subskrypcji)
 
 ### Krok 15. Kolumny w tabeli „profiles”
+
 - Jeśli używasz **Supabase CLI** i projekt jest podłączony (`supabase link`), w terminalu w folderze projektu wpisz:  
   **`supabase db push`**  
   – wgra to wszystkie migracje (subscription_tier, subscription_expires_at, stripe_customer_id itd.).
@@ -176,25 +197,29 @@ Dodaj **7 sekretów**. Dla każdego: wybierz **„New secret”** / **„Add new
 **Na czym to polega:** Dotąd Stripe działał w „trybie testowym” – nikt nie płaci prawdziwymi pieniędzmi. Żeby klienci mogli faktycznie kupować Premium, musisz w Stripe przełączyć się na **Live** i w Supabase podmienić klucze na „live”.
 
 ### Krok L1. Przełącz Stripe na Live
+
 - Wejdź na **https://dashboard.stripe.com**.
 - **U góry strony** zobaczysz przełącznik **„Test mode” / „Tryb testowy”** (czasem w prawym górnym rogu).
 - Kliknij go, żeby przełączyć na **„Live”** („Tryb produkcyjny”). Stripe pokaże ostrzeżenie – to normalne.
 
 ### Krok L2. Produkt i ceny w trybie Live
+
 W trybie **Live** lista produktów jest **osobna** niż w Test. Jeśli nie masz jeszcze produktu „Łatwa Forma Premium” w Live:
 
 - W lewym menu: **Products** (Produkty) → **+ Add product**.
-- Zrób to samo co w Kroku 3 (nazwa „Łatwa Forma Premium”, trzy cenniki: 69,98 zł / miesiąc, 194,95 zł / rok recurring, 194,95 zł jednorazowo).
+- Zrób to samo co w Kroku 3 (nazwa „Łatwa Forma Premium”, trzy cenniki: 69,99 zł / miesiąc, 194,99 zł / rok recurring, 194,99 zł jednorazowo).
 - **Skopiuj trzy Price ID** z tego produktu (tak jak w Kroku 4) – będą to **nowe** ID (price_...), inne niż w trybie testowym. Zapisz je (miesięczny, roczny, roczny jednorazowo).
 
 Jeśli produkt w Live już masz – po prostu skopiuj z niego trzy Price ID.
 
 ### Krok L3. Klucz API (Live)
+
 - W Stripe (upewnij się, że jest **Live**): **Developers** → **API keys**.
 - Zobaczysz teraz **Live** klucze (Secret key zaczyna się od **sk_live_**).
 - Kliknij **Reveal** przy **Secret key** i **skopiuj cały klucz** (sk_live_...). Zapisz – wkleisz go do Supabase.
 
 ### Krok L4. Webhook dla Live
+
 W trybie Live Stripe **nie używa** tego samego webhooka co w Test. Trzeba dodać **drugi** endpoint (ten sam adres, ale w trybie Live).
 
 - W Stripe (nadal **Live**): **Developers** → **Webhooks** → **Add endpoint**.
@@ -205,20 +230,22 @@ W trybie Live Stripe **nie używa** tego samego webhooka co w Test. Trzeba doda�
 - Zapisz endpoint. Wejdź w ten nowy webhook → **Signing secret** → **Reveal** → **skopiuj** (whsec_...). To jest **Live** signing secret – zapisz.
 
 ### Krok L5. Podmiana sekretów w Supabase
+
 - Wejdź na **supabase.com** → swój projekt → **Edge Functions** → **Secrets**.
 - **Zamień** (edytuj lub usuń stary i dodaj nowy) te sekrety na wartości **Live**:
 
-| Sekret                         | Nowa wartość (Live) |
-|--------------------------------|----------------------|
-| `STRIPE_SECRET_KEY`            | **sk_live_...** z Kroku L3 |
+| Sekret | Nowa wartość (Live) |
+| --- | --- |
+| `STRIPE_SECRET_KEY` | **sk_live_...** z Kroku L3 |
 | `STRIPE_PREMIUM_PRICE_MONTHLY` | **Price ID** miesięczny z Kroku L2 (Live) |
-| `STRIPE_PREMIUM_PRICE_YEARLY`  | **Price ID** roczny (recurring) z Kroku L2 (Live) |
+| `STRIPE_PREMIUM_PRICE_YEARLY` | **Price ID** roczny (recurring) z Kroku L2 (Live) |
 | `STRIPE_PREMIUM_PRICE_YEARLY_ONE_TIME` | **Price ID** roczny jednorazowo z Kroku L2 (Live) |
-| `STRIPE_WEBHOOK_SECRET`        | **Signing secret** z Kroku L4 (Live, whsec_...) |
+| `STRIPE_WEBHOOK_SECRET` | **Signing secret** z Kroku L4 (Live, whsec_...) |
 
 - **STRIPE_SUCCESS_URL** i **STRIPE_CANCEL_URL** muszą wskazywać na **latwaforma.pl** (gdzie działa aplikacja), np. `https://latwaforma.pl/#/premium-success` i `https://latwaforma.pl/#/premium-cancel`. **Nie używaj app.latwaforma.pl** – wtedy po płatności otworzy się stara domena.
 
 ### Krok L6. (Opcjonalnie) Stripe Customer Portal – branding
+
 - W Stripe: **Settings** (ikonka zębatki) → **Billing** → **Customer portal** (lub **Branding**).
 - Możesz dodać link do polityki prywatności (https://latwaforma.pl/polityka-prywatnosci.html) i regulaminu – wtedy klient przy rezygnacji zobaczy Twoje strony.
 
@@ -228,14 +255,14 @@ W trybie Live Stripe **nie używa** tego samego webhooka co w Test. Trzeba doda�
 
 ## Szybka ściąga – co gdzie wkleić
 
-| Gdzie (Supabase Secrets)        | Skąd (Stripe / własne)                    |
-|---------------------------------|-------------------------------------------|
-| STRIPE_SECRET_KEY               | Developers → API keys → Secret key        |
-| STRIPE_PREMIUM_PRICE_MONTHLY    | Produkty → Premium → cena 69,98 zł / m-c → Price ID |
-| STRIPE_PREMIUM_PRICE_YEARLY     | Produkty → Premium → cena 194,95 zł / rok → Price ID |
-| STRIPE_WEBHOOK_SECRET           | Developers → Webhooks → endpoint → Signing secret |
-| STRIPE_SUCCESS_URL              | Własny adres (np. strona „Dziękujemy”)    |
-| STRIPE_CANCEL_URL               | Własny adres (np. strona „Anulowano”)     |
+| Gdzie (Supabase Secrets) | Skąd (Stripe / własne) |
+| --- | --- |
+| STRIPE_SECRET_KEY | Developers → API keys → Secret key |
+| STRIPE_PREMIUM_PRICE_MONTHLY | Produkty → Premium → cena 69,99 zł / m-c → Price ID |
+| STRIPE_PREMIUM_PRICE_YEARLY | Produkty → Premium → cena 194,99 zł / rok → Price ID |
+| STRIPE_WEBHOOK_SECRET | Developers → Webhooks → endpoint → Signing secret |
+| STRIPE_SUCCESS_URL | Własny adres (np. strona „Dziękujemy”) |
+| STRIPE_CANCEL_URL | Własny adres (np. strona „Anulowano”) |
 
 **Metody płatności:** Settings → Payment methods – włącz Cards, BLIK, Apple Pay, Google Pay.
 

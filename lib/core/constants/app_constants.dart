@@ -37,6 +37,9 @@ class AppConstants {
   // Logowanie opóźnione – po ilu posiłkach pokazać „Zapisz postępy”
   static const int saveProgressMealsThreshold = 5;
 
+  /// Integracja Garmin w UI. Włącz po uzyskaniu klucza produkcyjnego.
+  static const bool garminEnabled = false;
+
   // Streak Types
   static const String streakMeals = 'meals';
   static const String streakWater = 'water';
@@ -85,8 +88,19 @@ class AppConstants {
 
   /// URL polityki prywatności (wymagane w sklepach i RODO).
   static const String privacyPolicyUrl = 'https://latwaforma.pl/polityka-prywatnosci.html';
-  /// URL regulaminu (wymagane w sklepach). Po opublikowaniu regulaminu ustaw tutaj docelowy adres.
+  /// URL regulaminu (wymagane w sklepach).
   static const String termsUrl = 'https://latwaforma.pl/regulamin.html';
+  /// Standard Apple EULA – wymóg App Review 3.1.2 dla auto-odnawialnych subskrypcji.
+  static const String appleEulaUrl =
+      'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+  /// Zewnętrzna strona usuwania konta (wymóg Google Play: Data safety + User Data).
+  static const String accountDeletionUrl = 'https://latwaforma.pl/usun-konto.html';
+
+  /// Disclaimer zdrowotny – polityka Health Content (Play / App Store).
+  static const String healthDisclaimer =
+      'Łatwa Forma nie jest urządzeniem medycznym i nie diagnozuje, nie leczy, nie zapobiega ani nie leczy żadnej choroby ani stanu zdrowia. '
+      'Obliczenia kalorii, makroskładników i porady AI mają charakter orientacyjny. '
+      'W sprawach zdrowia skonsultuj się z lekarzem lub dietetykiem.';
 
   /// Adres powrotu po logowaniu Google/email na webie (musi być w Supabase Auth → Redirect URLs).
   static const String webAuthRedirectUrl = 'https://latwaforma.pl';
@@ -95,6 +109,11 @@ class AppConstants {
   static const String contactEmail = 'contact@latwaforma.pl';
   /// Adres e-mail reprezentanta / właściciela (np. wniosek Garmin, dokumentacja).
   static const String ownerEmail = 'norbert.wroblewski@latwaforma.pl';
+
+  static const String companyName = 'VENTAS NORBERT WRÓBLEWSKI';
+  static const String companyNip = '728-284-53-14';
+  static const String companyAddress =
+      'ul. Szczytowa 27/10, 41-608 Świętochłowice, Polska';
 
   /// URL do profilu Facebook (stopka „Śledź nas”). Gdy null – przycisk nieaktywny.
   static const String? socialFacebookUrl = null;

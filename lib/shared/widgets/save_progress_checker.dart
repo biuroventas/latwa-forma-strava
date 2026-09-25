@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latwa_forma/l10n/l10n.dart';
 import '../../../core/auth/sign_out_guard.dart';
 import '../../../core/config/supabase_config.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../core/guest/guest_trial.dart';
 import '../../../core/router/app_router.dart';
 import '../services/auth_link_service.dart';
 import '../utils/pending_verification_email.dart';
 import 'save_progress_modal.dart';
 
-/// Opakowuje dziecko i wyświetla modal „Zapisz postępy”, gdy użytkownik anonimowy
-/// ma >= X posiłków. Przy „Później” komunikat pojawi się ponownie przy następnym uruchomieniu.
+/// Karta na dashboardzie: ile zostało bez konta, jedno ciche przypomnienie,
+/// a po 7 dniach pasek z prośbą o konto. Nowe wpisy blokuje [GuestTrial].
 class SaveProgressChecker extends StatefulWidget {
   /// Pokazuje modal „Zapisz postępy” z opcjami Google/Email. Używane na dashboardzie
   /// i z karty w profilu. Przy „Później” tylko zamyka – bez zapisywania.
@@ -17,28 +18,42 @@ class SaveProgressChecker extends StatefulWidget {
     BuildContext context, {
     required int mealsCount,
     VoidCallback? onInvalidate,
+    bool allowDismiss = true,
+    String? titleText,
+    String? bodyText,
   }) async {
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (_) => SaveProgressModal(
         mealsCount: mealsCount,
-        onDismiss: () {}, // Później – nie zapisuj, pojawi się przy następnym uruchomieniu
+        allowDismiss: allowDismiss,
+        titleText: titleText,
+        bodyText: bodyText,
+        onDismiss: () {},
         onLinkEmail: () => _runLinkEmail(context, onInvalidate),
-        onLinkApple: null, // Wyłączone – wymaga Apple Developer Program
+        onLinkApple: () => _runLinkApple(context, onInvalidate),
         onLinkGoogle: () => _runLinkGoogle(context, onInvalidate),
         onEnterCode: () => _runEnterCodeOnly(context, onInvalidate),
       ),
     );
   }
 
+  static Future<void> _runLinkApple(BuildContext context, VoidCallback? onInvalidate) async {
+    await _runLinkFlow(
+      context,
+      future: AuthLinkService().linkWithApple(),
+      onInvalidate: onInvalidate,
+      useLoadingDialog: false,
+    );
+  }
+
   static Future<void> _runLinkGoogle(BuildContext context, VoidCallback? onInvalidate) async {
-    // Google przez inAppWebView – OAuth w aplikacji, bez crash przy powrocie
     await _runLinkFlow(
       context,
       future: AuthLinkService().linkWithGoogle(),
       onInvalidate: onInvalidate,
-      useLoadingDialog: true,
+      useLoadingDialog: false,
     );
   }
 
@@ -64,15 +79,17 @@ class SaveProgressChecker extends StatefulWidget {
     String email,
     String? infoMessage,
     VoidCallback? onInvalidate, {
-    String dialogTitle = 'Sprawdź skrzynkę',
+    String? dialogTitle,
     bool isSignInFlow = false,
   }) async {
+    final l10n = context.l10n;
+    final title = dialogTitle ?? l10n.onbCheckInbox;
     final codeController = TextEditingController();
     await showDialog<void>(
       context: context,
       useRootNavigator: true,
       builder: (ctx) => AlertDialog(
-        title: Text(dialogTitle),
+        title: Text(title),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -80,12 +97,12 @@ class SaveProgressChecker extends StatefulWidget {
             children: [
               Text(
                 infoMessage ??
-                    'Wysłaliśmy link i kod na $email. Sprawdź skrzynkę (także folder Spam) – możesz kliknąć link w mailu lub wpisać kod poniżej.',
+                    l10n.onbSentLinkAndCode(email: email),
                 style: Theme.of(ctx).textTheme.bodyMedium,
               ),
               const SizedBox(height: 20),
               Text(
-                'Wpisz kod z maila:',
+                l10n.onbEnterCodeFromEmailLabel,
                 style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -96,10 +113,10 @@ class SaveProgressChecker extends StatefulWidget {
                 keyboardType: TextInputType.number,
                 maxLength: 12,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Kod z maila',
-                  hintText: 'np. 123456',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.onbEmailCodeLabel,
+                  hintText: l10n.onbEmailCodeHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -108,7 +125,7 @@ class SaveProgressChecker extends StatefulWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Zamknij'),
+            child: Text(l10n.commonClose),
           ),
           FilledButton(
             onPressed: () async {
@@ -127,71 +144,80 @@ class SaveProgressChecker extends StatefulWidget {
                 }
                 await showDialog<void>(
                   context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: Text(isSignInFlow ? 'Zalogowano' : 'Konto połączone'),
-                    content: Text(
-                      isSignInFlow
-                          ? 'Zostałeś zalogowany. Twoje dane są zapisane.'
-                          : 'Twój adres e-mail został połączony z kontem. Możesz się teraz logować tym emailem.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('OK'),
+                  builder: (ctx) {
+                    final dialogL10n = ctx.l10n;
+                    return AlertDialog(
+                      title: Text(isSignInFlow ? dialogL10n.onbSignedIn : dialogL10n.onbAccountLinked),
+                      content: Text(
+                        isSignInFlow
+                            ? dialogL10n.onbSignedInDataSaved
+                            : dialogL10n.onbEmailLinkedSuccess,
                       ),
-                    ],
-                  ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: Text(dialogL10n.commonOk),
+                        ),
+                      ],
+                    );
+                  },
                 );
               } else if (verifyResult.errorMessage != null && context.mounted) {
                 await showDialog<void>(
                   context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('Uwaga'),
-                    content: Text(verifyResult.errorMessage!),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        child: const Text('OK'),
-                      ),
-                      FilledButton(
-                        onPressed: () async {
-                          Navigator.of(ctx).pop();
-                          if (!context.mounted) return;
-                          await savePendingVerificationEmail(email);
-                          final res = await AuthLinkService().linkWithEmail(email);
-                          if (!context.mounted) return;
-                          if (res.success) {
-                            await _showLinkAndCodeDialog(
-                              context,
-                              email,
-                              res.infoMessage,
-                              onInvalidate,
-                              dialogTitle: 'Wpisz kod z maila',
-                            );
-                          } else if (res.errorMessage != null) {
-                            await showDialog<void>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Uwaga'),
-                                content: Text(res.errorMessage!),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.of(ctx).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                        child: const Text('Wyślij ponownie'),
-                      ),
-                    ],
-                  ),
+                  builder: (ctx) {
+                    final dialogL10n = ctx.l10n;
+                    return AlertDialog(
+                      title: Text(dialogL10n.commonWarning),
+                      content: Text(verifyResult.errorMessage!),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: Text(dialogL10n.commonOk),
+                        ),
+                        FilledButton(
+                          onPressed: () async {
+                            Navigator.of(ctx).pop();
+                            if (!context.mounted) return;
+                            await savePendingVerificationEmail(email);
+                            final res = await AuthLinkService().linkWithEmail(email);
+                            if (!context.mounted) return;
+                            if (res.success) {
+                              await _showLinkAndCodeDialog(
+                                context,
+                                email,
+                                res.infoMessage,
+                                onInvalidate,
+                                dialogTitle: context.l10n.onbEnterCodeFromEmailTitle,
+                              );
+                            } else if (res.errorMessage != null) {
+                              await showDialog<void>(
+                                context: context,
+                                builder: (ctx) {
+                                  final errL10n = ctx.l10n;
+                                  return AlertDialog(
+                                    title: Text(errL10n.commonWarning),
+                                    content: Text(res.errorMessage!),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(ctx).pop(),
+                                        child: Text(errL10n.commonOk),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          child: Text(dialogL10n.onbResend),
+                        ),
+                      ],
+                    );
+                  },
                 );
               }
             },
-            child: const Text('Potwierdź kod'),
+            child: Text(l10n.onbConfirmCode),
           ),
         ],
       ),
@@ -202,20 +228,22 @@ class SaveProgressChecker extends StatefulWidget {
   static Future<void> _runEnterCodeOnly(BuildContext context, VoidCallback? onInvalidate) async {
     final savedEmail = await getPendingVerificationEmail();
     if (!context.mounted) return;
+    final l10n = context.l10n;
     String? email = savedEmail;
     if (email == null || email.isEmpty) {
       final entered = await showDialog<String>(
         context: context,
         builder: (ctx) {
+          final dialogL10n = ctx.l10n;
           final controller = TextEditingController();
           return AlertDialog(
-            title: const Text('Podaj adres email'),
+            title: Text(dialogL10n.onbEnterEmailTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Na który adres wysłaliśmy link i kod? Podaj go, a następnie wpiszesz kod.',
+                  dialogL10n.onbEnterEmailWhichAddress,
                   style: Theme.of(ctx).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 16),
@@ -223,10 +251,10 @@ class SaveProgressChecker extends StatefulWidget {
                   controller: controller,
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
-                  decoration: const InputDecoration(
-                    labelText: 'Adres email',
-                    hintText: 'np. jan@example.com',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: dialogL10n.onbEmailAddressLabel,
+                    hintText: dialogL10n.onbEmailAddressHint,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
               ],
@@ -234,7 +262,7 @@ class SaveProgressChecker extends StatefulWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Anuluj'),
+                child: Text(dialogL10n.commonCancel),
               ),
               FilledButton(
                 onPressed: () {
@@ -242,7 +270,7 @@ class SaveProgressChecker extends StatefulWidget {
                   if (e.isEmpty) return;
                   Navigator.of(ctx).pop(e);
                 },
-                child: const Text('Dalej'),
+                child: Text(dialogL10n.commonContinue),
               ),
             ],
           );
@@ -256,9 +284,11 @@ class SaveProgressChecker extends StatefulWidget {
     await _showLinkAndCodeDialog(
       context,
       email,
-      savedEmail != null ? 'Kod wysłany na: $email' : 'Wpisz poniżej kod, który otrzymałeś na adres $email.',
+      savedEmail != null
+          ? l10n.onbCodeSentTo(email: email)
+          : l10n.onbEnterCodeReceived(email: email),
       onInvalidate,
-      dialogTitle: 'Wpisz kod z maila',
+      dialogTitle: l10n.onbEnterCodeFromEmailTitle,
     );
   }
 
@@ -267,26 +297,27 @@ class SaveProgressChecker extends StatefulWidget {
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
+        final l10n = ctx.l10n;
         final controller = TextEditingController();
         return AlertDialog(
-          title: const Text('Zapisz z emailem'),
+          title: Text(l10n.onbSaveWithEmailTitle),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
-            decoration: const InputDecoration(
-              labelText: 'Adres email',
-              hintText: 'np. jan@example.com',
+            decoration: InputDecoration(
+              labelText: l10n.onbEmailAddressLabel,
+              hintText: l10n.onbEmailAddressHint,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Anuluj'),
+              child: Text(l10n.commonCancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-              child: const Text('Wyślij link oraz kod'),
+              child: Text(l10n.onbSendLinkAndCode),
             ),
           ],
         );
@@ -302,31 +333,25 @@ class SaveProgressChecker extends StatefulWidget {
     String? emailForVerification,
   }) async {
     if (useLoadingDialog) {
+      final l10n = context.l10n;
       showDialog<void>(
         context: context,
         barrierDismissible: false,
         useRootNavigator: true,
-        builder: (_) => const Center(
+        builder: (_) => Center(
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Łączenie konta...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.onbLinkingAccount),
                 ],
               ),
             ),
           ),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Otwieram przeglądarkę...'),
-          duration: Duration(seconds: 2),
         ),
       );
     }
@@ -340,6 +365,11 @@ class SaveProgressChecker extends StatefulWidget {
     }
 
     if (result.canceled) return;
+    if (result.redirected) {
+      await SaveProgressModal.markDismissed();
+      onInvalidate?.call();
+      return;
+    }
     if (result.success) {
       if (emailForVerification != null) {
         await savePendingVerificationEmail(emailForVerification);
@@ -357,7 +387,7 @@ class SaveProgressChecker extends StatefulWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result.infoMessage ?? 'Konto zapisane pomyślnie!'),
+            content: Text(result.infoMessage ?? context.l10n.onbAccountSavedSuccess),
             backgroundColor: Colors.green,
           ),
         );
@@ -366,6 +396,7 @@ class SaveProgressChecker extends StatefulWidget {
     }
 
     if (context.mounted) {
+      final l10n = context.l10n;
       if (result.suggestSignOutAndLogin && emailForVerification != null) {
         // Zamiast dialogu „E-mail już zarejestrowany” – od razu wyślij kod logowania i pokaż wpisywanie kodu.
         try {
@@ -380,77 +411,86 @@ class SaveProgressChecker extends StatefulWidget {
           await _showLinkAndCodeDialog(
             context,
             email,
-            signInResult.infoMessage ?? 'Wysłaliśmy kod na $email. Wpisz go poniżej.',
+            signInResult.infoMessage ?? l10n.onbCodeSentEnterBelow(email: email),
             onInvalidate,
-            dialogTitle: 'Wpisz kod z maila',
+            dialogTitle: l10n.onbEnterCodeFromEmailTitle,
             isSignInFlow: true,
           );
         } else {
           await showDialog<void>(
             context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('E-mail już zarejestrowany'),
-              content: Text(
-                '${signInResult.errorMessage ?? result.errorMessage}\n\n'
-                'Kliknij poniżej, aby przejść do logowania:',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Anuluj'),
+            builder: (ctx) {
+              final dialogL10n = ctx.l10n;
+              return AlertDialog(
+                title: Text(dialogL10n.onbEmailAlreadyRegistered),
+                content: Text(
+                  '${signInResult.errorMessage ?? result.errorMessage}\n\n'
+                  '${dialogL10n.onbClickBelowToLogin}',
                 ),
-                FilledButton(
-                  onPressed: () async {
-                    Navigator.of(ctx).pop();
-                    if (context.mounted) context.go(AppRoutes.welcome);
-                  },
-                  child: const Text('Wyloguj i zaloguj się'),
-                ),
-              ],
-            ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: Text(dialogL10n.commonCancel),
+                  ),
+                  FilledButton(
+                    onPressed: () async {
+                      Navigator.of(ctx).pop();
+                      if (context.mounted) context.go(AppRoutes.welcome);
+                    },
+                    child: Text(dialogL10n.onbSignOutAndSignIn),
+                  ),
+                ],
+              );
+            },
           );
         }
       } else if (result.suggestSignOutAndLogin) {
         await showDialog<void>(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('E-mail już zarejestrowany'),
-            content: Text(
-              '${result.errorMessage}\n\n'
-              'Kliknij poniżej, aby przejść do logowania:',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Anuluj'),
+          builder: (ctx) {
+            final dialogL10n = ctx.l10n;
+            return AlertDialog(
+              title: Text(dialogL10n.onbEmailAlreadyRegistered),
+              content: Text(
+                '${result.errorMessage}\n\n'
+                '${dialogL10n.onbClickBelowToLogin}',
               ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.of(ctx).pop();
-                  try {
-                    await SupabaseConfig.auth.signOut();
-                    await markSignOut();
-                  } catch (_) {}
-                  if (context.mounted) context.go(AppRoutes.welcome);
-                },
-                child: const Text('Wyloguj i zaloguj się'),
-              ),
-            ],
-          ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(dialogL10n.commonCancel),
+                ),
+                FilledButton(
+                  onPressed: () async {
+                    Navigator.of(ctx).pop();
+                    try {
+                      await SupabaseConfig.auth.signOut();
+                      await markSignOut();
+                    } catch (_) {}
+                    if (context.mounted) context.go(AppRoutes.welcome);
+                  },
+                  child: Text(dialogL10n.onbSignOutAndSignIn),
+                ),
+              ],
+            );
+          },
         );
       } else {
         await showDialog<void>(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Uwaga'),
-            content: Text(result.errorMessage ?? 'Błąd'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+          builder: (ctx) {
+            final dialogL10n = ctx.l10n;
+            return AlertDialog(
+              title: Text(dialogL10n.commonWarning),
+              content: Text(result.errorMessage ?? dialogL10n.commonError),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(dialogL10n.commonOk),
+                ),
+              ],
+            );
+          },
         );
       }
     }
@@ -472,45 +512,147 @@ class SaveProgressChecker extends StatefulWidget {
 }
 
 class _SaveProgressCheckerState extends State<SaveProgressChecker> {
-  bool _checked = false;
+  Duration? _remaining;
+  bool _dismissed = false;
+  bool _loaded = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowModal());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
-  @override
-  void didUpdateWidget(SaveProgressChecker oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.totalMealsCount != widget.totalMealsCount && !_checked) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowModal());
+  Future<void> _load() async {
+    final user = SupabaseConfig.auth.currentUser;
+    if (user == null || !user.isAnonymous) {
+      if (mounted) setState(() => _loaded = true);
+      return;
+    }
+    await GuestTrial.startIfNeeded();
+    final remaining = await GuestTrial.remaining();
+    final dismissed = await GuestTrial.isCardDismissed();
+    if (!mounted) return;
+    setState(() {
+      _remaining = remaining;
+      _dismissed = dismissed;
+      _loaded = true;
+    });
+
+    if (remaining != null &&
+        remaining > Duration.zero &&
+        remaining <= const Duration(hours: 24) &&
+        !await GuestTrial.wasLastDayReminderShown()) {
+      await GuestTrial.markLastDayReminderShown();
+      if (!mounted) return;
+      final l10n = context.l10n;
+      await SaveProgressChecker.showSaveProgressModal(
+        context,
+        mealsCount: widget.totalMealsCount,
+        onInvalidate: widget.onInvalidate,
+        titleText: l10n.guestTrialLastDay,
+        bodyText: l10n.guestTrialCardBody,
+      );
     }
   }
 
-  Future<void> _maybeShowModal() async {
-    if (_checked) return;
-
-    final user = SupabaseConfig.auth.currentUser;
-    if (user == null || !user.isAnonymous) return;
-    if (widget.totalMealsCount < AppConstants.saveProgressMealsThreshold) return;
-
-    // Krótkie opóźnienie, żeby dashboard zdążył się wyrenderować przed modalem.
-    await Future<void>.delayed(const Duration(milliseconds: 400));
-    if (!mounted) return;
-
-    _checked = true;
-
-    if (!mounted) return;
+  Future<void> _openLink({required bool expired}) async {
+    final l10n = context.l10n;
     await SaveProgressChecker.showSaveProgressModal(
       context,
       mealsCount: widget.totalMealsCount,
       onInvalidate: widget.onInvalidate,
+      allowDismiss: !expired,
+      titleText: expired ? l10n.guestTrialEndedTitle : null,
+      bodyText: expired ? l10n.guestTrialEndedBody : null,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    if (!_loaded || _remaining == null) return widget.child;
+    final expired = _remaining == Duration.zero;
+    final lastDay = !expired && _remaining! <= const Duration(hours: 24);
+    if (!expired && !lastDay && _dismissed) return widget.child;
+
+    final l10n = context.l10n;
+    final days = _remaining!.inDays;
+    final title = expired
+        ? l10n.guestTrialEndedTitle
+        : lastDay
+            ? l10n.guestTrialLastDay
+            : days <= 1
+                ? l10n.guestTrialOneDay
+                : l10n.guestTrialDaysLeft(days: days);
+    final body = expired ? l10n.guestTrialEndedBody : l10n.guestTrialCardBody;
+
+    return Column(
+      children: [
+        Material(
+          color: const Color(0xFFFF9800),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 12, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            body,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!expired && !lastDay)
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () async {
+                          await GuestTrial.dismissCard();
+                          if (mounted) setState(() => _dismissed = true);
+                        },
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        tooltip: l10n.onbLater,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFE65100),
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    onPressed: () => _openLink(expired: expired),
+                    child: Text(l10n.onbSaveProgressTitle),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(child: widget.child),
+      ],
+    );
   }
 }
